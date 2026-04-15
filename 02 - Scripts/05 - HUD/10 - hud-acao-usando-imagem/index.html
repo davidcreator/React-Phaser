@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- ========== CONFIGURAÇÕES BÁSICAS DA PÁGINA ========== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Jogo de Arcade com Interface HUD</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ========== ESTRUTURA PRINCIPAL DO JOGO ========== -->
+    <div class="game-container">
+        <!-- Canvas onde o jogo será desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- Interface HUD (Heads-Up Display) - Informações do jogador -->
+        <div class="hud">
+            <!-- Elemento de Vida/Saúde -->
+            <div class="hud-element">
+                <div class="hud-icon health-icon"></div>
+                <span>Vida: </span>
+                <span id="health" class="hud-value">100</span>
+            </div>
+            
+            <!-- Elemento de Pontuação -->
+            <div class="hud-element">
+                <div class="hud-icon score-icon"></div>
+                <span>Score: </span>
+                <span id="score" class="hud-value">0</span>
+            </div>
+            
+            <!-- Elemento de Tempo -->
+            <div class="hud-element">
+                <div class="hud-icon time-icon"></div>
+                <span>Tempo: </span>
+                <span id="time" class="hud-value">0</span>
+                <span>s</span>
+            </div>
+        </div>
+
+        <!-- Controles de demonstração -->
+        <div class="game-controls">
+            <button class="control-button" onclick="loseHealth(10)">Perder Vida (-10)</button>
+            <button class="control-button" onclick="addPoints(50)">Ganhar Pontos (+50)</button>
+            <button class="control-button" onclick="resetGame()">Reiniciar Jogo</button>
+        </div>
+    </div>
+    <!-- Script principal do jogo -->
+    <script src="js/script.js"></script>
+</body>
+</html>

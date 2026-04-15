@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: Detecção de Colisão em Canvas</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ============================================
+             TÍTULO E DESCRIÇÃO DO PROJETO
+        ============================================ -->
+        <h1>🎯 Tutorial: Detecção de Colisão em Canvas</h1>
+        <p class="subtitle">Aprenda como detectar colisões entre objetos em movimento</p>
+        
+        <!-- Painel informativo -->
+        <div class="info-panel">
+            <h3>📚 O que você vai aprender:</h3>
+            <ul>
+                <li>Como desenhar objetos em Canvas</li>
+                <li>Como fazer objetos se moverem</li>
+                <li>Como detectar colisões entre objetos circulares</li>
+                <li>Como reagir às colisões detectadas</li>
+            </ul>
+        </div>
+        
+        <!-- Área do jogo -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- Status da animação -->
+        <div id="status" class="status normal">🟢 Objetos em movimento - Aguardando colisão...</div>
+        
+        <!-- Controles -->
+        <div class="controls">
+            <button onclick="restartAnimation()">🔄 Reiniciar Animação</button>
+            <button onclick="togglePause()">⏸️ Pausar/Continuar</button>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usando teclas direcionais e rotação ↑, ↓, ←, →</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <h1>🎮 Usando teclas direcionais e rotação ↑, ↓, ←, →</h1>
+    
+    <div class="instrucoes">
+        <h3>📋 Como Jogar:</h3>
+        <p>Use as setas do teclado para controlar o quadrado vermelho:</p>
+        <span class="tecla">↑</span> Mover para frente<br>
+        <span class="tecla">↓</span> Mover para trás<br>
+        <span class="tecla">←</span> Girar à esquerda<br>
+        <span class="tecla">→</span> Girar à direita
+    </div>
+
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    
+    <div class="controles">
+        <h3>🎯 Status do Jogo:</h3>
+        <p>Posição: X=<span id="posX">300</span>, Y=<span id="posY">200</span></p>
+        <p>Ângulo: <span id="angulo">0</span>°</p>
+        <p>Velocidade: <span id="velocidade">0</span></p>
+    </div>
+
+    <div class="info">
+        <p><strong>💡 Para Professores:</strong> Este exemplo demonstra conceitos de programação como:</p>
+        <p>• Manipulação do Canvas • Eventos de Teclado • Animação com setInterval • Trigonometria básica</p>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

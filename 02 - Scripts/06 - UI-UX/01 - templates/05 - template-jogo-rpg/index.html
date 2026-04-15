@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface de Usuário de Jogo 2D - Versão Didática</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!--
+    ===============================================
+    TÍTULO: Estrutura HTML da Interface de Jogo
+    DESCRIÇÃO: Organização dos elementos visuais
+    da interface do usuário do jogo 2D
+    ===============================================
+    -->
+
+    <!-- 
+    SEÇÃO: Cabeçalho
+    DESCRIÇÃO: Contém as barras de status do jogador
+    e o mini-mapa para navegação
+    -->
+    <header>
+        <div id="status-bars">
+            <!-- Barra de Vida do Jogador -->
+            <div class="bar" id="health-bar">
+                <div class="bar-text">Vida: <span id="health-count">100%</span></div>
+            </div>
+            
+            <!-- Barra de Energia do Jogador -->
+            <div class="bar" id="energy-bar">
+                <div class="bar-text">Energia: <span id="energy-count">100%</span></div>
+            </div>
+            
+            <!-- Barra de Estamina do Jogador -->
+            <div class="bar" id="stamina-bar">
+                <div class="bar-text">Estamina: <span id="stamina-count">100%</span></div>
+            </div>
+        </div>
+        
+        <!-- Mini-mapa para visualização do mundo -->
+        <div id="mini-map">
+            <span>Mini-mapa</span>
+        </div>
+    </header>
+
+    <!-- 
+    SEÇÃO: Área Principal
+    DESCRIÇÃO: Canvas onde o jogo é renderizado
+    -->
+    <main>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </main>
+
+    <!-- 
+    SEÇÃO: Rodapé
+    DESCRIÇÃO: Barra de experiência e botões de funcionalidades
+    -->
+    <footer>
+        <!-- Barra de Experiência -->
+        <div id="experience-bar">
+            <div id="experience-text">Experiência: <span id="experience-count">0%</span></div>
+        </div>
+        
+        <!-- Ícones de Funcionalidades -->
+        <div id="functions">
+            <div class="function-icon" id="weapon-icon" title="Gerenciar Armas">⚔️ Armas</div>
+            <div class="function-icon" id="bag-icon" title="Abrir Inventário">🎒 Bolsa</div>
+            <div class="function-icon" id="map-icon" title="Ver Mapa Completo">🗺️ Mapa</div>
+            <div class="function-icon" id="settings-icon" title="Configurações do Jogo">⚙️ Config</div>
+        </div>
+    </footer>
+
+    <!-- 
+    SEÇÃO: Controles de Teste (Apenas para demonstração)
+    DESCRIÇÃO: Botões para testar as funcionalidades da interface
+    -->
+    <div id="test-controls">
+        <h4 style="color: #00d4ff; margin-bottom: 10px;">Controles de Teste</h4>
+        <button class="test-btn" onclick="gameUI.adjustHealth(-10)">-10 Vida</button>
+        <button class="test-btn" onclick="gameUI.adjustHealth(10)">+10 Vida</button>
+        <button class="test-btn" onclick="gameUI.adjustEnergy(-15)">-15 Energia</button>
+        <button class="test-btn" onclick="gameUI.adjustEnergy(15)">+15 Energia</button>
+        <button class="test-btn" onclick="gameUI.adjustStamina(-20)">-20 Estamina</button>
+        <button class="test-btn" onclick="gameUI.adjustStamina(20)">+20 Estamina</button>
+        <button class="test-btn" onclick="gameUI.gainExperience(5)">+5% XP</button>
+        <button class="test-btn" onclick="gameUI.resetAll()">Reset Tudo</button>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

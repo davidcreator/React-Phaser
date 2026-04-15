@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Veículos - Física Aplicada</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body onload="iniciarSimulacao()">
+    
+    <!-- CABEÇALHO PRINCIPAL -->
+    <div class="container">
+        <h1 class="titulo-principal">🚗 Simulação de Veículos - Conceitos de Física 🚗</h1>
+        
+        <!-- ÁREA DA SIMULAÇÃO -->
+        <div class="area-simulacao">
+            <p><strong>Observe como diferentes veículos respondem à aceleração e frenagem!</strong></p>
+            <p><em>Os veículos coloridos simulam aceleração, frenagem, atrito e inércia de forma realista.</em></p>
+        </div>
+
+        <!-- PAINEL DE CONTROLES -->
+        <div class="painel-controles">
+            <h2 class="titulo-secao">🎮 Controles dos Veículos</h2>
+            <p>Use as teclas abaixo para controlar cada veículo:</p>
+            
+            <div class="controles-grid">
+                <div class="veiculo-controle">
+                    <div class="veiculo-nome" style="color: red;">🚗 Carro Vermelho</div>
+                    <div>Acelerar: <span class="teclas">→</span></div>
+                    <div>Frenar: <span class="teclas">←</span></div>
+                </div>
+                
+                <div class="veiculo-controle">
+                    <div class="veiculo-nome" style="color: blue;">🏍️ Moto Azul</div>
+                    <div>Acelerar: <span class="teclas">D</span></div>
+                    <div>Frenar: <span class="teclas">A</span></div>
+                </div>
+                
+                <div class="veiculo-controle">
+                    <div class="veiculo-nome" style="color: green;">🚛 Caminhão Verde</div>
+                    <div>Acelerar: <span class="teclas">↑</span></div>
+                    <div>Frenar: <span class="teclas">↓</span></div>
+                </div>
+                
+                <div class="veiculo-controle">
+                    <div class="veiculo-nome" style="color: orange;">🚲 Bicicleta Amarela</div>
+                    <div>Acelerar: <span class="teclas">W</span></div>
+                    <div>Frenar: <span class="teclas">S</span></div>
+                </div>
+                
+                <div class="veiculo-controle">
+                    <div class="veiculo-nome" style="color: purple;">🚌 Ônibus Roxo</div>
+                    <div>Acelerar: <span class="teclas">E</span></div>
+                    <div>Frenar: <span class="teclas">Q</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAINEL EDUCATIVO -->
+        <div class="painel-educativo">
+            <h2 class="titulo-secao">📚 Conceitos Físicos Demonstrados</h2>
+            
+            <div class="conceito-fisico">
+                <div class="conceito-titulo">⚡ Aceleração</div>
+                <p>Cada veículo possui uma aceleração diferente. Observe como alguns aceleram mais rapidamente que outros!</p>
+            </div>
+            
+            <div class="conceito-fisico">
+                <div class="conceito-titulo">🛑 Atrito</div>
+                <p>O atrito faz com que os veículos gradualmente percam velocidade mesmo sem frear. Diferentes veículos têm diferentes coeficientes de atrito.</p>
+            </div>
+            
+            <div class="conceito-fisico">
+                <div class="conceito-titulo">💨 Inércia</div>
+                <p>Veículos mais pesados (como caminhões) demoram mais para acelerar e parar devido à sua maior inércia.</p>
+            </div>
+            
+            <div class="conceito-fisico">
+                <div class="conceito-titulo">🎯 Velocidade Máxima</div>
+                <p>Cada veículo tem características próprias de aceleração e frenagem, simulando suas propriedades reais.</p>
+            </div>
+        </div>
+
+        <!-- RODAPÉ -->
+        <div class="rodape-info">
+            <p>💡 <strong>Dica:</strong> Experimente acelerar e soltar a tecla para ver o efeito do atrito!</p>
+            <p>🎓 Esta simulação demonstra princípios fundamentais da física mecânica de forma interativa.</p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
+

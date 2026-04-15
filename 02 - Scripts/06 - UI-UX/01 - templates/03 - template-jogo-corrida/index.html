@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Corrida 2D - Versão Didática</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ========================================
+         ESTRUTURA HTML - CONTEÚDO DA PÁGINA
+         ======================================== -->
+    
+    <!-- Cabeçalho com elementos da interface do usuário -->
+    <header>
+        <div id="ui">
+            <!-- Contador de voltas completadas -->
+            <div id="laps">🏁 Voltas: <span id="laps-count">0/3</span></div>
+            
+            <!-- Velocidade atual do veículo -->
+            <div id="speed">⚡ Velocidade: <span id="speed-count">0</span> km/h</div>
+            
+            <!-- Tempo decorrido da corrida -->
+            <div id="time">⏱️ Tempo: <span id="time-count">00:00</span></div>
+            
+            <!-- Posição atual na corrida -->
+            <div id="position">🏆 Posição: <span id="position-count">1</span></div>
+            
+            <!-- Nível de combustível restante -->
+            <div id="fuel">⛽ Combustível: <span id="fuel-count">100%</span></div>
+        </div>
+    </header>
+
+    <!-- Área principal do jogo -->
+    <main>
+        <!-- Canvas onde o jogo será renderizado (desenhado) -->
+        <canvas id="gameCanvas" width="800" height="400">
+            Seu navegador não suporta canvas HTML5
+        </canvas>
+    </main>
+
+    <!-- Painel de controles para demonstração -->
+    <div id="controls">
+        <button class="demo-button" onclick="demonstrarVolta()">Completar Volta</button>
+        <button class="demo-button" onclick="demonstrarVelocidade()">Acelerar</button>
+        <button class="demo-button" onclick="demonstrarPosicao()">Mudar Posição</button>
+        <button class="demo-button" onclick="demonstrarCombustivel()">Usar Combustível</button>
+        <button class="demo-button" onclick="reiniciarJogo()">Reiniciar</button>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

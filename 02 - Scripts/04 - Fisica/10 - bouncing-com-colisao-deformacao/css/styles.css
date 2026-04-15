@@ -1,0 +1,74 @@
+/* === ESTILOS CSS === */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f5f5f5;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo para o canvas do jogo */
+canvas {
+    border: 2px solid #333;
+    background-color: #ffffff;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilo para as descrições explicativas */
+.description {
+    max-width: 600px;
+    margin: 0 auto 20px auto;
+    padding: 15px;
+    background-color: #e8f4f8;
+    border-left: 4px solid #2196F3;
+    border-radius: 4px;
+}
+
+.description p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.bounce-values {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    margin: 10px auto;
+    max-width: 600px;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.controls {
+    text-align: center;
+    margin: 20px 0;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.stop-btn {
+    background-color: #f44336;
+}
+
+.stop-btn:hover {
+    background-color: #da190b;
+}

@@ -1,0 +1,121 @@
+/* 
+========================================
+ESTILO GERAL DA PÁGINA
+========================================
+Define a aparência básica da página e centraliza o jogo
+*/
+body {
+    margin: 0; /* Remove margens padrão do navegador */
+    display: flex; /* Usa flexbox para layout */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    height: 100vh; /* Ocupa toda a altura da tela */
+    background-color: #000; /* Fundo preto para ambiente de jogo */
+    font-family: Arial, sans-serif; /* Fonte padrão */
+}
+
+/* 
+========================================
+CONTAINER DO JOGO
+========================================
+Contém o canvas e a HUD em posição relativa
+*/
+.game-container {
+    position: relative; /* Permite posicionamento absoluto dos filhos */
+    text-align: center; /* Centraliza elementos */
+    border: 2px solid #333; /* Borda decorativa */
+    border-radius: 8px; /* Cantos arredondados */
+}
+
+/* 
+========================================
+CANVAS PRINCIPAL
+========================================
+Área onde o jogo será desenhado
+*/
+canvas {
+    background-color: #111; /* Fundo escuro do jogo */
+    display: block; /* Remove espaço extra embaixo */
+    border-radius: 6px; /* Cantos levemente arredondados */
+}
+
+/* 
+========================================
+HUD (HEADS-UP DISPLAY)
+========================================
+Interface que mostra informações do jogador
+*/
+.hud {
+    position: absolute; /* Posiciona sobre o canvas */
+    top: 15px; /* Distância do topo */
+    left: 50%; /* Posição horizontal */
+    transform: translateX(-50%); /* Centraliza perfeitamente */
+    display: flex; /* Layout flexível */
+    gap: 30px; /* Espaço entre elementos */
+    background-color: rgba(0, 0, 0, 0.8); /* Fundo semi-transparente */
+    padding: 10px 20px; /* Espaçamento interno */
+    border-radius: 20px; /* Cantos bem arredondados */
+    color: white; /* Texto branco */
+    font-weight: bold; /* Texto em negrito */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Sombra para destaque */
+}
+
+/* 
+========================================
+ELEMENTOS INDIVIDUAIS DA HUD
+========================================
+Cada item da HUD (vida, moedas, tempo)
+*/
+.hud-element {
+    display: flex; /* Alinha ícone e texto */
+    align-items: center; /* Centraliza verticalmente */
+    font-size: 16px; /* Tamanho da fonte */
+}
+
+/* 
+========================================
+ÍCONES DA HUD
+========================================
+Imagens que representam vida e moedas
+*/
+.hud-icon {
+    width: 24px; /* Largura do ícone */
+    height: 24px; /* Altura do ícone */
+    margin-right: 5px; /* Espaço entre ícone e número */
+}
+
+/* 
+========================================
+BOTÕES DE CONTROLE (PARA DEMONSTRAÇÃO)
+========================================
+Botões para testar as funcionalidades do jogo
+*/
+.controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.control-btn {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.control-btn:hover {
+    background-color: #45a049;
+}
+
+.control-btn.danger {
+    background-color: #f44336;
+}
+
+.control-btn.danger:hover {
+    background-color: #da190b;
+}

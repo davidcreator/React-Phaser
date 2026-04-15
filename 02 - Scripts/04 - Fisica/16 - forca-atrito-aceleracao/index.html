@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação Física - Movimento com Atrito e Colisão</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ===== CABEÇALHO EDUCATIVO ===== -->
+    <div class="header">
+        <h1>🏐 Simulação Física Interativa</h1>
+        <p>Observe o movimento da bola, atrito, colisões e deformação em tempo real!</p>
+    </div>
+
+    <!-- ===== ÁREA DA SIMULAÇÃO ===== -->
+    <div class="simulation-container">
+        <canvas id="canvas"></canvas>
+        
+        <!-- ===== PAINEL DE INFORMAÇÕES ===== -->
+        <div class="info-panel">
+            <div class="info-item">
+                <span class="info-label">Velocidade</span>
+                <span class="info-value" id="velocity">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Posição X</span>
+                <span class="info-value" id="position">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Estado</span>
+                <span class="info-value" id="state">Parado</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Deformação</span>
+                <span class="info-value" id="deformation">1.0</span>
+            </div>
+        </div>
+    </div>
+    <!-- ===== CONCEITOS FÍSICOS EXPLICADOS ===== -->
+    <div class="physics-concepts">
+        <h3>🔬 Conceitos Físicos Demonstrados</h3>
+        
+        <div class="concept">
+            <strong>Atrito:</strong> A bola perde velocidade gradualmente devido ao atrito (coeficiente 0.98).
+        </div>
+        
+        <div class="concept">
+            <strong>Colisão Elástica:</strong> Quando a bola bate na parede, sua velocidade inverte de direção.
+        </div>
+        
+        <div class="concept">
+            <strong>Deformação:</strong> A bola se deforma visualmente conforme seu estado de movimento.
+        </div>
+        
+        <div class="concept">
+            <strong>Inércia:</strong> A bola tende a manter seu movimento até que o atrito a pare completamente.
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

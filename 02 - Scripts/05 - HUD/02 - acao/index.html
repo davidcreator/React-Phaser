@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- Meta Tags: Configurações básicas da página -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Ação com HUD - Tutorial Didático</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- === ESTRUTURA PRINCIPAL DO JOGO === -->
+    <div class="game-container">
+        
+        <!-- Canvas principal onde o jogo será desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- HUD - Interface do usuário sobreposta ao jogo -->
+        <div class="hud">
+            
+            <!-- Elemento 1: Barra de Vida -->
+            <div class="hud-element">
+                <span>💚 Vida:</span>
+                <div id="health-bar-container">
+                    <div id="health-bar"></div>
+                </div>
+                <span id="health-text">100</span>
+            </div>
+            
+            <!-- Elemento 2: Contador de Munição -->
+            <div class="hud-element">
+                <span>🔫 Munição:</span>
+                <span id="ammo-count">10</span>
+            </div>
+            
+            <!-- Elemento 3: Mini-mapa -->
+            <div class="hud-element">
+                <span>🗺️ Mini-Mapa:</span>
+                <canvas id="minimap" width="100" height="100"></canvas>
+            </div>
+            
+        </div>
+        
+        <!-- Controles para demonstração -->
+        <div class="controls">
+            <button class="control-btn" onclick="loseHealth()">Perder Vida (-10)</button>
+            <button class="control-btn" onclick="gainHealth()">Ganhar Vida (+10)</button>
+            <button class="control-btn" onclick="shootBullet()">Atirar</button>
+            <button class="control-btn" onclick="collectAmmo()">Coletar Munição</button>
+            <button class="control-btn" onclick="movePlayer()">Mover Jogador</button>
+        </div>
+        
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
+
+    

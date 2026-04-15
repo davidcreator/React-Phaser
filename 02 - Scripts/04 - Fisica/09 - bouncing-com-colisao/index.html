@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Bolinhas Saltitantes</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body onload="startGame()">
+    <h1>🎾 Jogo de Bolinhas Saltitantes</h1>
+    
+    <div class="description">
+        <h3>📖 Como Funciona o Jogo:</h3>
+        <p><strong>Propriedade de Salto (Bounce):</strong> Indica a força com que uma bolinha irá ricochetear após atingir as bordas ou outras bolinhas.</p>
+        <p><strong>Valores do Salto:</strong> Use um número decimal entre 0 e 1:</p>
+        <ul>
+            <li><strong>0 =</strong> Sem salto (a bolinha para completamente)</li>
+            <li><strong>0.5 =</strong> Salto médio (perde metade da velocidade)</li>
+            <li><strong>1 =</strong> Salto total (mantém toda a velocidade)</li>
+        </ul>
+    </div>
+
+    <div class="controls">
+        <button onclick="resetGame()">🔄 Reiniciar Jogo</button>
+        <button onclick="addRandomBall()">➕ Adicionar Bolinha</button>
+        <button onclick="toggleGravity()">🌍 Alternar Gravidade</button>
+    </div>
+
+    <div id="ball-info">
+        <div class="ball-info" style="background-color: #ffebee;">
+            <strong style="color: red;">🔴 Vermelha:</strong> Bounce 0.6
+        </div>
+        <div class="ball-info" style="background-color: #e3f2fd;">
+            <strong style="color: blue;">🔵 Azul:</strong> Bounce 0.8
+        </div>
+        <div class="ball-info" style="background-color: #e8f5e8;">
+            <strong style="color: green;">🟢 Verde:</strong> Bounce 0.4
+        </div>
+        <div class="ball-info" style="background-color: #fffde7;">
+            <strong style="color: #f57f17;">🟡 Amarela:</strong> Bounce 1.0
+        </div>
+    </div>    
+    <script src="js/script.js"></script>
+</body>
+</html>

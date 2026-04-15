@@ -1,0 +1,26 @@
+/* ===== ESTILOS CSS ===== */
+/* Configurações do corpo da página */
+body {
+    margin: 0; /* Remove margens padrão */
+    display: flex; /* Usa flexbox para centralizar */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    height: 100vh; /* Altura total da tela */
+    background-color: #87CEEB; /* Azul claro representando o céu */
+    font-family: Arial, sans-serif;
+}
+
+/* Estilo do canvas (área de desenho) */
+canvas {
+    border: 2px solid #333; /* Borda escura ao redor do canvas */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Sombra para destacar */
+}
+
+/* Título da página */
+h1 {
+    position: absolute;
+    top: 20px;
+    color: #333;
+    text-align: center;
+    width: 100%;
+}

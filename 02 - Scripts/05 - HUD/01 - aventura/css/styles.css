@@ -1,0 +1,98 @@
+/* ================================================
+    ESTILOS CSS - INTERFACE DO JOGO
+    ================================================ */
+
+/* Estilo geral da página */
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+/* Container principal que organiza o jogo */
+.game-container {
+    position: relative;
+    text-align: center;
+    border: 2px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Estilo do canvas onde o jogo é desenhado */
+canvas {
+    background-color: #111;
+    display: block;
+    cursor: crosshair;
+}
+
+/* HUD - Interface do usuário sobreposta ao jogo */
+.hud {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Elementos individuais do HUD */
+.hud-element {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Container da barra de vida */
+#life-bar-container {
+    width: 150px;
+    height: 20px;
+    background-color: #333;
+    margin-left: 5px;
+    border: 2px solid white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Barra de vida que muda de tamanho */
+#life-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+    transition: width 0.3s ease;
+}
+
+/* Estilo do input de nome */
+input {
+    padding: 5px;
+    margin-left: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Indicadores numéricos do HUD */
+.hud-number {
+    color: #ffff00;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}
+
+/* Instruções para o usuário */
+.instructions {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}

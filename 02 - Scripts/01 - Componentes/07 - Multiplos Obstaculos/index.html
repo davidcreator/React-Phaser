@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplos Obstaculos</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Multiplos Obstaculos</h1>
+        
+        <div class="info-panel">
+            <h3>📚 O que você vai aprender:</h3>
+            <ul>
+                <li>Como criar um canvas HTML5</li>
+                <li>Como desenhar formas geométricas</li>
+                <li>Como criar animações simples</li>
+                <li>Como organizar código JavaScript</li>
+            </ul>
+        </div>
+        
+        <div class="controls">
+            <button onclick="startGame()">🚀 Iniciar Jogo</button>
+            <button onclick="pauseGame()">⏸️ Pausar</button>
+            <button onclick="resetGame()">🔄 Reiniciar</button>
+        </div>
+        
+        <div class="stats">
+            <span>Componentes: <span id="componentCount">0</span></span> | 
+            <span>Obstáculos: <span id="obstacleCount">0</span></span>
+        </div>
+        
+        <!-- O canvas será criado dinamicamente pelo JavaScript -->
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

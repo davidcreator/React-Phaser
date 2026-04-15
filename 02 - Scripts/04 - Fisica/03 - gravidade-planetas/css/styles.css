@@ -1,0 +1,68 @@
+/* ===== ESTILOS CSS - APARÊNCIA DA PÁGINA ===== */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #1a1a2e;
+    color: white;
+    text-align: center;
+}
+
+h1 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.descricao {
+    background-color: #16213e;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 600px;
+    border: 2px solid #4CAF50;
+}
+
+/* Estilo do canvas onde acontece a simulação */
+canvas {
+    border: 3px solid #4CAF50;
+    background: linear-gradient(180deg, #000428 0%, #004e92 100%);
+    border-radius: 10px;
+    margin: 20px 0;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+.controles {
+    margin: 20px 0;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.info-planetas {
+    background-color: #16213e;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 800px;
+    text-align: left;
+}
+
+.planeta-info {
+    display: inline-block;
+    margin: 5px 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}

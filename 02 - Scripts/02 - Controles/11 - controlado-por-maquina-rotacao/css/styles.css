@@ -1,0 +1,63 @@
+/* ====================================
+    📱 ESTILIZAÇÃO DA PÁGINA
+    ==================================== */
+
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 100%);
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+}
+
+/* Título principal do jogo */
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Subtítulo explicativo */
+.subtitle {
+    color: #34495e;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    max-width: 600px;
+}
+
+/* Estilo do canvas do jogo */
+canvas {
+    border: 3px solid #2c3e50;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    background: #ffffff;
+}
+
+/* Painel de informações */
+.info-panel {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    max-width: 800px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.info-panel h3 {
+    color: #e74c3c;
+    margin: 0 0 10px 0;
+}
+
+.info-panel p {
+    color: #2c3e50;
+    margin: 5px 0;
+    font-size: 0.9em;
+}

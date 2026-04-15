@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Arcade 2D - Aprendendo Programação</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ==========================================
+         SEÇÃO HTML: CABEÇALHO COM INTERFACE DO USUÁRIO
+         ========================================== 
+         Mostra informações importantes do jogo em tempo real
+    -->
+    <header>
+        <div id="ui">
+            <!-- Contador de vidas restantes -->
+            <div id="lives">❤️ Vidas: <span id="lives-count">3</span></div>
+            
+            <!-- Barra visual de saúde/energia -->
+            <div id="health-bar" title="Barra de Saúde">
+                <div id="current-health"></div>
+            </div>
+            
+            <!-- Pontuação atual do jogador -->
+            <div id="score">⭐ Pontuação: <span id="score-count">0</span></div>
+            
+            <!-- Lista de power-ups coletados -->
+            <div id="power-ups">🚀 Power-Ups: <span id="power-ups-list">Nenhum</span></div>
+        </div>
+    </header>
+
+    <!-- ==========================================
+         SEÇÃO HTML: ÁREA PRINCIPAL DO JOGO
+         ========================================== 
+         Canvas onde todos os elementos do jogo serão desenhados
+    -->
+    <main>
+        <canvas id="gameCanvas" width="800" height="600">
+            Seu navegador não suporta o elemento canvas. Atualize para uma versão mais recente.
+        </canvas>
+    </main>
+
+    <!-- ==========================================
+         SEÇÃO HTML: CONTROLES DE DEMONSTRAÇÃO
+         ========================================== 
+         Botões para testar as funcionalidades sem um jogo completo
+    -->
+    <div class="demo-controls">
+        <button class="demo-btn" onclick="demonstrarPontuacao()">+ 100 Pontos</button>
+        <button class="demo-btn" onclick="demonstrarDano()">Receber Dano</button>
+        <button class="demo-btn" onclick="demonstrarCura()">Curar (+20)</button>
+        <button class="demo-btn" onclick="demonstrarPowerUp()">Adicionar Power-Up</button>
+        <button class="demo-btn" onclick="demonstrarPerderVida()">Perder Vida</button>
+        <button class="demo-btn" onclick="reiniciarJogo()">Reiniciar</button>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

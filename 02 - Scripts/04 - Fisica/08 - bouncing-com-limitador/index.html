@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Física - Propriedade de Salto</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- TÍTULO PRINCIPAL -->
+        <h1>🏀 Simulador de Física: Propriedade de Salto</h1>
+        
+        <!-- DESCRIÇÃO DIDÁTICA -->
+        <div class="description">
+            <p><span class="highlight">O que é a propriedade de salto?</span></p>
+            <p>A propriedade de salto (bounce) indica <strong>a força com que um componente irá ricochetear</strong> após atingir o solo ou uma parede.</p>
+            
+            <p><span class="highlight">Como funciona:</span></p>
+            <p>• Defina a propriedade saltitante como um <strong>número decimal entre 0 e 1</strong></p>
+            <p>• <strong>0 = sem salto</strong> (a bola para completamente)</p>
+            <p>• <strong>1 = saltará totalmente para trás</strong> (salto perfeito, sem perda de energia)</p>
+            <p>• <strong>Valores intermediários</strong> (0.1 a 0.9) = diferentes intensidades de salto</p>
+        </div>
+        
+        <!-- ÁREA DO JOGO -->
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- LEGENDA DAS BOLAS -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: red;"></div>
+                <span>Vermelha: Bounce 0.6 (salto médio)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: blue;"></div>
+                <span>Azul: Bounce 0.8 (salto alto)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: green;"></div>
+                <span>Verde: Bounce 0.4 (salto baixo)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: gold;"></div>
+                <span>Amarela: Bounce 1.0 (salto perfeito)</span>
+            </div>
+        </div>
+        
+        <!-- CONTROLES -->
+        <div class="controls">
+            <button onclick="restartGame()">🔄 Reiniciar Simulação</button>
+            <button onclick="pauseGame()">⏸️ Pausar</button>
+            <button onclick="resumeGame()">▶️ Continuar</button>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

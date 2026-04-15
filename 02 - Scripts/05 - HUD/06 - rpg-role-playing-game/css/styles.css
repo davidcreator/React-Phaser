@@ -1,0 +1,369 @@
+/* ==========================================
+   TUTORIAL: SISTEMA DE RPG COM HUD - CSS
+   ==========================================
+   
+   Este arquivo CSS define a aparência visual de um jogo RPG
+   com sistema de HUD (interface do usuário) interativo.
+   
+   SEÇÕES:
+   1. Configurações Gerais
+   2. Container Principal
+   3. Canvas do Jogo  
+   4. Sistema HUD
+   5. Barras de Status
+   6. Painel de Controles
+   7. Animações e Efeitos
+*/
+
+/* ==========================================
+   1. CONFIGURAÇÕES GERAIS
+   ========================================== */
+
+/* Reset básico e configuração da página */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilo do corpo da página */
+body {
+    /* Remove margens padrão */
+    margin: 0;
+    
+    /* Centraliza todo o conteúdo na tela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Altura total da tela */
+    height: 100vh;
+    
+    /* Cor de fundo escura para ambiente de jogo */
+    background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+    
+    /* Fonte padrão do sistema */
+    font-family: 'Arial', sans-serif;
+    
+    /* Cor padrão do texto */
+    color: white;
+}
+
+/* ==========================================
+   2. CONTAINER PRINCIPAL DO JOGO
+   ========================================== */
+
+/* Container que engloba todo o jogo */
+.game-container {
+    /* Posicionamento relativo para elementos absolutos internos */
+    position: relative;
+    
+    /* Centraliza o conteúdo */
+    text-align: center;
+    
+    /* Bordas arredondadas */
+    border-radius: 10px;
+    
+    /* Sombra para destacar o container */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    
+    /* Padding interno */
+    padding: 20px;
+    
+    /* Fundo semi-transparente */
+    background: rgba(255, 255, 255, 0.05);
+    
+    /* Efeito glass morphism */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* ==========================================
+   3. CANVAS DO JOGO
+   ========================================== */
+
+/* Área onde o jogo será desenhado */
+canvas {
+    /* Cor de fundo do canvas */
+    background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+    
+    /* Transforma em elemento de bloco */
+    display: block;
+    
+    /* Borda decorativa */
+    border: 2px solid #444;
+    border-radius: 8px;
+    
+    /* Sombra interna */
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================
+   4. SISTEMA HUD (INTERFACE DO USUÁRIO)
+   ========================================== */
+
+/* Container principal do HUD */
+.hud {
+    /* Posicionamento absoluto sobre o canvas */
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    
+    /* Layout flexível para distribuir elementos */
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    
+    /* Cor do texto */
+    color: white;
+    
+    /* Fonte menor para o HUD */
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Cada elemento individual do HUD */
+.hud-element {
+    /* Layout flexível vertical */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    
+    /* Fundo semi-transparente */
+    background: rgba(0, 0, 0, 0.7);
+    
+    /* Padding interno */
+    padding: 8px 12px;
+    
+    /* Bordas arredondadas */
+    border-radius: 8px;
+    
+    /* Borda sutil */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    /* Largura mínima */
+    min-width: 120px;
+}
+
+/* Labels dos elementos do HUD */
+.hud-label {
+    font-size: 12px;
+    margin-bottom: 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================
+   5. BARRAS DE STATUS
+   ========================================== */
+
+/* Container de fundo das barras */
+.bar-background {
+    /* Posicionamento relativo para o texto sobreposto */
+    position: relative;
+    
+    /* Dimensões da barra */
+    width: 100px;
+    height: 16px;
+    
+    /* Cor de fundo (barra vazia) */
+    background-color: rgba(255, 255, 255, 0.1);
+    
+    /* Borda */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    
+    /* Sombra interna */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    
+    /* Efeito de overflow oculto */
+    overflow: hidden;
+}
+
+/* Preenchimento das barras (parte colorida) */
+.bar-fill {
+    /* Altura total da barra */
+    height: 100%;
+    
+    /* Largura inicial (será alterada via JavaScript) */
+    width: 100%;
+    
+    /* Transição suave para mudanças */
+    transition: width 0.3s ease;
+    
+    /* Bordas arredondadas */
+    border-radius: 6px;
+}
+
+/* Cores específicas para cada tipo de barra */
+.bar-fill.health {
+    background: linear-gradient(90deg, #ff4444, #ff6666);
+}
+
+.bar-fill.mana {
+    background: linear-gradient(90deg, #4444ff, #6666ff);
+}
+
+.bar-fill.exp {
+    background: linear-gradient(90deg, #ffaa00, #ffdd44);
+}
+
+/* Texto sobreposto nas barras */
+.bar-text {
+    /* Posicionamento absoluto para sobrepor a barra */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    /* Estilo do texto */
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    
+    /* Impede seleção do texto */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Estilo especial para o display de ouro */
+.gold-amount {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffdd44;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================
+   6. PAINEL DE CONTROLES
+   ========================================== */
+
+/* Container do painel de controles */
+.controls-panel {
+    /* Posicionamento */
+    position: absolute;
+    top: 100px;
+    right: -250px;
+    
+    /* Dimensões */
+    width: 220px;
+    
+    /* Estilo visual */
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #444;
+    border-radius: 10px;
+    padding: 15px;
+    
+    /* Espaçamento interno */
+    text-align: left;
+}
+
+.controls-panel h3 {
+    margin-bottom: 15px;
+    color: #ffdd44;
+    text-align: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+/* Grupos de controles */
+.control-group {
+    margin-bottom: 15px;
+}
+
+.control-group h4 {
+    margin-bottom: 8px;
+    color: #ccc;
+    font-size: 13px;
+}
+
+/* Botões de controle */
+.controls-panel button {
+    /* Dimensões */
+    width: 100%;
+    padding: 6px 10px;
+    margin-bottom: 5px;
+    
+    /* Estilo visual */
+    background: linear-gradient(135deg, #333, #555);
+    color: white;
+    border: 1px solid #666;
+    border-radius: 5px;
+    
+    /* Tipografia */
+    font-size: 11px;
+    font-weight: bold;
+    
+    /* Cursor */
+    cursor: pointer;
+    
+    /* Transição */
+    transition: all 0.2s ease;
+}
+
+/* Efeito hover nos botões */
+.controls-panel button:hover {
+    background: linear-gradient(135deg, #555, #777);
+    border-color: #888;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Efeito de clique nos botões */
+.controls-panel button:active {
+    transform: translateY(0);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   7. ANIMAÇÕES E EFEITOS
+   ========================================== */
+
+/* Animação para quando a vida está baixa */
+@keyframes lowHealthPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Aplicar animação quando vida está baixa */
+.bar-fill.health[style*="width: 1"],
+.bar-fill.health[style*="width: 2"] {
+    animation: lowHealthPulse 0.8s infinite;
+}
+
+/* Efeito de brilho para elementos importantes */
+.hud-element:hover {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.4);
+    transition: all 0.2s ease;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 1200px) {
+    .controls-panel {
+        position: relative;
+        right: auto;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .hud {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        margin-bottom: 10px;
+        justify-content: center;
+    }
+    
+    .hud-element {
+        min-width: auto;
+        flex: 1;
+    }
+}

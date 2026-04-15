@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Arcade com HUD - Versão Didática</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ============================================
+         ESTRUTURA HTML PRINCIPAL
+         ============================================ -->
+    
+    <div class="game-container">
+        <!-- Canvas: área onde o jogo será desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- HUD: Interface do usuário sobreposta ao jogo -->
+        <div class="hud">
+            <!-- Elemento 1: Barra de Vida -->
+            <div class="hud-element" id="health-container">
+                <span>❤️ Vida:</span>
+                <div id="health-bar-container">
+                    <div id="health-bar"></div>
+                </div>
+            </div>
+            
+            <!-- Elemento 2: Sistema de Pontuação -->
+            <div class="hud-element">
+                <span>⭐ Pontos:</span>
+                <span id="score">0</span>
+            </div>
+            
+            <!-- Elemento 3: Cronômetro -->
+            <div class="hud-element">
+                <span>⏱️ Tempo:</span>
+                <span id="time">0</span>s
+            </div>
+        </div>
+        
+        <!-- Controles para testar o sistema -->
+        <div class="controls">
+            <button class="control-btn" onclick="addPoints(10)">+10 Pontos</button>
+            <button class="control-btn damage-btn" onclick="loseHealth(20)">-20 Vida</button>
+            <button class="control-btn" onclick="resetGame()">Resetar Jogo</button>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* Estilo para o canvas */
+canvas {
+    border: 2px solid #333;
+    background-color: #f0f8ff;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Estilo para o corpo da página */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #e6f3ff;
+    text-align: center;
+}
+
+/* Estilo para o título */
+h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* Estilo para as descrições */
+.description {
+    background-color: white;
+    padding: 15px;
+    margin: 10px auto;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.description h3 {
+    color: #3498db;
+    margin-top: 0;
+}
+
+/* Estilo para os controles */
+.controls {
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Estilo para as informações das bolinhas */
+.ball-info {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

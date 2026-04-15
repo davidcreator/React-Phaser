@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏓 Jogo de Pong Didático - Aprenda Programação de Jogos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- 
+    ========================================
+    📋 ESTRUTURA HTML - LAYOUT DO JOGO
+    ========================================
+    Aqui definimos todos os elementos visuais do nosso jogo
+    -->
+    
+    <div class="game-container">
+        <!-- Título do jogo -->
+        <h1>🏓 Jogo de Pong Didático</h1>
+        
+        <!-- Instruções para os jogadores -->
+        <div class="instructions">
+            Player 1: W (cima) / S (baixo) | Player 2: ↑ (cima) / ↓ (baixo)
+        </div>
+        
+        <!-- Canvas: área onde o jogo é desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- HUD: Interface com informações dos jogadores -->
+        <div class="hud">
+            <div class="player-info">
+                <label for="player1-name">🎮 Player 1:</label>
+                <input type="text" id="player1-name" placeholder="Digite seu nome">
+            </div>
+            <div class="player-info">
+                <label for="player2-name">🎮 Player 2:</label>
+                <input type="text" id="player2-name" placeholder="Digite seu nome">
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>    
+</body>
+</html>

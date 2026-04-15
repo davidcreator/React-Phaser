@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- TÍTULO DA PÁGINA -->
+    <title>Tutorial: Sistema de RPG com HUD Interativo</title>
+    
+    <!-- LINK PARA O ARQUIVO CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- CONTAINER PRINCIPAL DO JOGO -->
+    <!-- Esta div contém todos os elementos do jogo (canvas e HUD) -->
+    <div class="game-container">
+        
+        <!-- CANVAS DO JOGO -->
+        <!-- Aqui será desenhado o cenário, personagens e objetos do jogo -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- HUD (HEADS-UP DISPLAY) - INTERFACE DO USUÁRIO -->
+        <!-- Mostra informações importantes do jogador na tela -->
+        <div class="hud">
+            
+            <!-- BARRA DE VIDA -->
+            <!-- Mostra a vida atual do jogador em formato de barra -->
+            <div class="hud-element" id="health-container">
+                <span class="hud-label">❤️ Vida:</span>
+                <div class="bar-background">
+                    <div id="health-bar" class="bar-fill health"></div>
+                    <span class="bar-text" id="health-text">100/100</span>
+                </div>
+            </div>
+            
+            <!-- BARRA DE MANA -->
+            <!-- Mostra a mana atual do jogador para usar habilidades -->
+            <div class="hud-element" id="mana-container">
+                <span class="hud-label">💙 Mana:</span>
+                <div class="bar-background">
+                    <div id="mana-bar" class="bar-fill mana"></div>
+                    <span class="bar-text" id="mana-text">100/100</span>
+                </div>
+            </div>
+            
+            <!-- BARRA DE EXPERIÊNCIA -->
+            <!-- Mostra o progresso de experiência do jogador -->
+            <div class="hud-element" id="exp-container">
+                <span class="hud-label">⭐ EXP:</span>
+                <div class="bar-background">
+                    <div id="exp-bar" class="bar-fill exp"></div>
+                    <span class="bar-text" id="exp-text">0/100</span>
+                </div>
+            </div>
+            
+            <!-- CONTADOR DE OURO -->
+            <!-- Mostra a quantidade de ouro que o jogador possui -->
+            <div class="hud-element" id="gold-container">
+                <span class="hud-label">🪙 Ouro:</span>
+                <span id="gold-display" class="gold-amount">0</span>
+            </div>
+            
+        </div>
+        
+        <!-- PAINEL DE CONTROLES -->
+        <!-- Botões para testar as funcionalidades do jogo -->
+        <div class="controls-panel">
+            <h3>🎮 Controles de Teste</h3>
+            <div class="control-group">
+                <h4>⚔️ Combate:</h4>
+                <button onclick="loseHealth(10)">Receber Dano (-10 Vida)</button>
+                <button onclick="useMana(15)">Usar Magia (-15 Mana)</button>
+            </div>
+            
+            <div class="control-group">
+                <h4>💎 Recompensas:</h4>
+                <button onclick="gainExperience(25)">Ganhar EXP (+25)</button>
+                <button onclick="gainGold(50)">Encontrar Ouro (+50)</button>
+            </div>
+            
+            <div class="control-group">
+                <h4>🔄 Regeneração:</h4>
+                <button onclick="restoreHealth(20)">Usar Poção (+20 Vida)</button>
+                <button onclick="restoreMana(30)">Meditar (+30 Mana)</button>
+            </div>
+            
+            <div class="control-group">
+                <h4>🎯 Sistema:</h4>
+                <button onclick="resetStats()">Resetar Status</button>
+                <button onclick="levelUp()">Subir de Nível</button>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- LINK PARA O ARQUIVO JAVASCRIPT -->
+    <script src="js/script.js"></script>
+</body>
+</html>

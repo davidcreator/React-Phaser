@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Jogo Snake - Versão Educacional</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <!-- =====================================
+         ESTRUTURA HTML PRINCIPAL
+         ===================================== -->
+    
+    <div class="container">
+        <!-- Título do jogo -->
+        <h1>🐍 Jogo da Cobrinha</h1>
+        
+        <!-- Controles do jogo (dificuldade e botão iniciar) -->
+        <div class="game-controls">
+            <div class="difficulty-selector">
+                <label for="difficulty">🎯 Dificuldade:</label>
+                <select id="difficulty">
+                    <option value="easy">🟢 Fácil</option>
+                    <option value="medium">🟡 Médio</option>
+                    <option value="hard">🔴 Difícil</option>
+                </select>
+            </div>
+            <button id="start-button">🚀 Iniciar Jogo</button>
+        </div>
+        
+        <!-- Canvas onde o jogo acontece -->
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        
+        <!-- Informações do jogo (placar e status) -->
+        <div class="game-info">
+            <div class="score-display">
+                🏆 Pontos: <span id="score">0</span>
+            </div>
+            <div id="game-status" style="font-weight: bold; color: #27ae60;">
+                Pronto para jogar!
+            </div>
+        </div>
+        
+        <!-- Instruções para o jogador -->
+        <div class="instructions">
+            <p>🎮 Use as setas do teclado para mover a cobrinha</p>
+            <p>🍎 Colete as maçãs para crescer e marcar pontos</p>
+        </div>
+    </div>
+    <script src="./js/script.js"></script>
+</body>
+</html>

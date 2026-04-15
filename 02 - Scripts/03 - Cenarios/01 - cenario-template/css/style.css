@@ -1,0 +1,37 @@
+/* ====== ESTILOS CSS ====== */
+/* Define os estilos visuais da página */
+
+body {
+    margin: 0; /* Remove margens padrão do navegador */
+    display: flex; /* Usa flexbox para centralizar */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    height: 100vh; /* Altura total da viewport */
+    background-color: #f0f0f0; /* Cor de fundo cinza claro */
+    font-family: Arial, sans-serif; /* Fonte padrão */
+}
+
+.container {
+    text-align: center; /* Centraliza o texto */
+    background-color: white; /* Fundo branco para o container */
+    padding: 20px; /* Espaçamento interno */
+    border-radius: 10px; /* Cantos arredondados */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave */
+}
+
+h1 {
+    color: #333; /* Cor do título */
+    margin-bottom: 20px; /* Espaço abaixo do título */
+}
+
+canvas {
+    border: 2px solid #333; /* Borda preta ao redor do canvas */
+    border-radius: 5px; /* Cantos levemente arredondados */
+    background-color: white; /* Fundo branco do canvas */
+}
+
+.info {
+    margin-top: 15px; /* Espaço acima da informação */
+    font-size: 14px; /* Tamanho da fonte */
+    color: #666; /* Cor cinza para o texto informativo */
+}

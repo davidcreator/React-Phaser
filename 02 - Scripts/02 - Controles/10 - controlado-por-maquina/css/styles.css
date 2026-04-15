@@ -1,0 +1,55 @@
+/* 
+===== ESTILOS CSS =====
+Aqui definimos como nossa página vai aparecer visualmente
+*/
+
+body {
+    /* Remove margens padrão do navegador */
+    margin: 0;
+    
+    /* Usa Flexbox para centralizar o canvas na tela */
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center;     /* Centraliza verticalmente */
+    
+    /* Faz o body ocupar toda a altura da janela */
+    height: 100vh;
+    
+    /* Define cor de fundo azul claro (como um céu) */
+    background-color: #87CEEB;
+    
+    /* Adiciona uma fonte mais bonita */
+    font-family: Arial, sans-serif;
+}
+
+canvas {
+    /* Adiciona uma borda preta ao redor do canvas */
+    border: 3px solid #000;
+    
+    /* Adiciona sombra para dar profundidade */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    
+    /* Arredonda levemente os cantos */
+    border-radius: 10px;
+    
+    /* Define cor de fundo branca para o canvas */
+    background-color: white;
+}
+
+/* Título explicativo */
+.info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    max-width: 300px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.info h3 {
+    margin-top: 0;
+    color: #333;
+}

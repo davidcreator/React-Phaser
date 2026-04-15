@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação Física - Bola Saltitante com Deformação</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- TÍTULO E DESCRIÇÃO -->
+        <h1>🏀 Simulação Física: Bola Saltitante com Deformação</h1>
+        <p class="description">
+            Esta simulação demonstra conceitos fundamentais da física como gravidade, 
+            velocidade, aceleração, atrito e deformação. Observe como a bola muda de forma 
+            conforme seu movimento e estado físico.
+        </p>
+
+        <!-- CANVAS PARA A ANIMAÇÃO -->
+        <canvas id="canvas"></canvas>
+
+        <!-- PAINEL DE INFORMAÇÕES -->
+        <div class="info-panel">
+            <div class="info-item">
+                <div class="info-label">Estado</div>
+                <div class="info-value" id="state">Iniciando...</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Velocidade Y</div>
+                <div class="info-value" id="velocity">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Posição Y</div>
+                <div class="info-value" id="position">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Deformação</div>
+                <div class="info-value" id="deformation">1.0</div>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

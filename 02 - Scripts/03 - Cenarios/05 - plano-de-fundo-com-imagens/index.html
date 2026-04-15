@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- =============================================
+         CONFIGURAÇÕES BÁSICAS DO DOCUMENTO HTML
+         ============================================= -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Jogo educativo de floresta desenvolvido com HTML5 Canvas">
+    <meta name="author" content="Professor - Curso de Desenvolvimento de Jogos">
+    
+    <title>🌲 Jogo de Floresta - Aprendendo HTML5 Canvas</title>
+    
+    <!-- Link para o arquivo CSS externo -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Ícone da página (favicon) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌲</text></svg>">
+</head>
+<body>
+    <!-- =============================================
+         CABEÇALHO COM INFORMAÇÕES DO PROJETO
+         ============================================= -->
+    <header class="game-header">
+        <h1>🌲 Jogo de Floresta</h1>
+        <p class="subtitle">Aprendendo desenvolvimento de jogos com HTML5 Canvas</p>
+        
+        <!-- Informações técnicas do projeto -->
+        <div class="project-info">
+            <div class="info-item">
+                <strong>📚 Disciplina:</strong> Desenvolvimento de Jogos
+            </div>
+            <div class="info-item">
+                <strong>🎯 Objetivo:</strong> Criar cenários 2D com Canvas
+            </div>
+            <div class="info-item">
+                <strong>⚡ Tecnologias:</strong> HTML5, CSS3, JavaScript
+            </div>
+        </div>
+    </header>
+
+    <!-- =============================================
+         ÁREA PRINCIPAL DO JOGO
+         ============================================= -->
+    <main class="game-container">
+        <!-- Canvas onde o jogo será renderizado -->
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            <div class="canvas-info">
+                <span>Canvas: 800x600 pixels</span>
+            </div>
+        </div>
+        
+        <!-- Painel de controles e informações -->
+        <aside class="game-sidebar">
+            <div class="info-panel">
+                <h3>📊 Informações do Jogo</h3>
+                <ul class="game-stats">
+                    <li><strong>Status:</strong> <span id="gameStatus">Carregando...</span></li>
+                    <li><strong>Elementos:</strong> <span id="elementCount">0</span></li>
+                    <li><strong>FPS:</strong> <span id="fps">-</span></li>
+                </ul>
+            </div>
+
+            <div class="controls-panel">
+                <h3>🎮 Controles</h3>
+                <button id="redrawBtn" class="control-btn">🔄 Redesenhar Cenário</button>
+                <button id="toggleInfoBtn" class="control-btn">ℹ️ Mostrar/Ocultar Info</button>
+            </div>
+
+            <div class="instructions-panel">
+                <h3>📝 Instruções</h3>
+                <ol class="instructions-list">
+                    <li>O jogo carrega automaticamente quando a página abre</li>
+                    <li>Observe como os elementos são desenhados em camadas</li>
+                    <li>Use os botões de controle para interagir</li>
+                    <li>Abra o console (F12) para ver os logs detalhados</li>
+                    <li>Experimente modificar o código JavaScript</li>
+                </ol>
+            </div>
+        </aside>
+    </main>
+
+    <!-- =============================================
+         RODAPÉ COM INFORMAÇÕES EDUCATIVAS
+         ============================================= -->
+    <footer class="game-footer">
+        <div class="learning-section">
+            <h3>🎓 O que você está aprendendo:</h3>
+            <div class="learning-grid">
+                <div class="learning-card">
+                    <h4>🖼️ HTML5 Canvas</h4>
+                    <p>Como criar gráficos 2D diretamente no navegador usando a API Canvas</p>
+                </div>
+                <div class="learning-card">
+                    <h4>🎨 Renderização 2D</h4>
+                    <p>Técnicas de desenho, posicionamento e camadas para criar cenários</p>
+                </div>
+                <div class="learning-card">
+                    <h4>📁 Gerenciamento de Recursos</h4>
+                    <p>Como carregar e utilizar imagens em jogos web</p>
+                </div>
+                <div class="learning-card">
+                    <h4>🏗️ Organização de Código</h4>
+                    <p>Estruturação de código JavaScript para jogos de forma modular</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estrutura de arquivos do projeto -->
+        <div class="file-structure">
+            <h3>📁 Estrutura de Arquivos:</h3>
+            <div class="file-tree">
+                <div class="folder">📁 projeto-floresta/</div>
+                <div class="file">├── 📄 index.html</div>
+                <div class="file">├── 📁 css/</div>
+                <div class="file">│   └── 📄 styles.css</div>
+                <div class="file">├── 📁 js/</div>
+                <div class="file">│   └── 📄 script.js</div>
+                <div class="file">└── 📁 images/</div>
+                <div class="file">    ├── 🖼️ background.jpg</div>
+                <div class="file">    ├── 🖼️ platform.png</div>
+                <div class="file">    ├── 🖼️ tree4.png</div>
+                <div class="file">    ├── 🖼️ bush.png</div>
+                <div class="file">    ├── 🖼️ bush2.png</div>
+                <div class="file">    └── 🖼️ bush3.png</div>
+            </div>
+        </div>
+
+        <div class="credits">
+            <p>💡 <strong>Dica:</strong> Abra as Ferramentas do Desenvolvedor (F12) para acompanhar os logs do console!</p>
+            <p>📚 Desenvolvido para fins educacionais • 2025</p>
+        </div>
+    </footer>
+
+    <!-- =============================================
+         SCRIPTS JAVASCRIPT
+         ============================================= -->
+    <!-- Script principal do jogo -->
+    <script src="js/script.js"></script>
+    
+    <!-- Script adicional para funcionalidades da interface -->
+    <script>
+        // Adiciona funcionalidade aos botões de controle
+        document.addEventListener('DOMContentLoaded', function() {
+            const redrawBtn = document.getElementById('redrawBtn');
+            const toggleInfoBtn = document.getElementById('toggleInfoBtn');
+            const gameStatus = document.getElementById('gameStatus');
+            
+            // Atualiza o status do jogo
+            gameStatus.textContent = 'Pronto';
+            document.getElementById('elementCount').textContent = '50+';
+            
+            // Botão para redesenhar o cenário
+            redrawBtn.addEventListener('click', function() {
+                if (typeof desenharCenario === 'function') {
+                    desenharCenario();
+                    gameStatus.textContent = 'Redesenhado!';
+                    setTimeout(() => gameStatus.textContent = 'Pronto', 2000);
+                }
+            });
+            
+            // Botão para alternar informações
+            let infoVisible = true;
+            toggleInfoBtn.addEventListener('click', function() {
+                const sidebar = document.querySelector('.game-sidebar');
+                infoVisible = !infoVisible;
+                sidebar.style.display = infoVisible ? 'block' : 'none';
+                toggleInfoBtn.textContent = infoVisible ? 'ℹ️ Ocultar Info' : 'ℹ️ Mostrar Info';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teclas AWSD</title>
+
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Teclas AWSD</h1>
+        
+        <div class="instrucoes">
+            <h3>📋 Como jogar:</h3>
+            <p>Use as teclas <strong>W, A, S, D</strong> para mover o quadrado vermelho pelo canvas!</p>
+            <p><strong>W</strong> = Cima | <strong>A</strong> = Esquerda | <strong>S</strong> = Baixo | <strong>D</strong> = Direita</p>
+        </div>
+
+        <!-- Indicadores visuais das teclas -->
+        <div class="controles">
+            <div id="teclaW" class="tecla">W</div>
+        </div>
+        <div class="controles">
+            <div id="teclaA" class="tecla">A</div>
+            <div id="teclaS" class="tecla">S</div>
+            <div id="teclaD" class="tecla">D</div>
+        </div>
+
+        <!-- O canvas será criado aqui pelo JavaScript -->
+        <div id="game-container"></div>
+
+        <div class="info">
+            <div class="posicao" id="posicaoInfo">Posição: X=10, Y=120</div>
+            <p><strong>💡 Dica:</strong> Clique na tela do jogo primeiro para garantir que as teclas funcionem!</p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usando teclas direcionais combinadas ↑, ↓, ←, →</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Usando teclas direcionais combinadas ↑, ↓, ←, →</h1>
+        
+        <div class="instrucoes">
+            <h2>📋 Como Jogar:</h2>
+            <ul>
+                <li><strong>Setas do teclado:</strong> Use ↑ ↓ ← → para mover o quadrado</li>
+                <li><strong>Combinações:</strong> Pressione duas setas ao mesmo tempo para movimento diagonal</li>
+                <li><strong>Foco:</strong> Clique na área do jogo para garantir que as teclas funcionem</li>
+                <li><strong>Área de jogo:</strong> O quadrado não pode sair da tela</li>
+            </ul>
+        </div>
+
+        <canvas id="gameCanvas" width="600" height="400" tabindex="0"></canvas>
+
+        <div class="info-painel">
+            <div class="info-item">
+                <h3>Posição X</h3>
+                <div class="info-value" id="posX">0</div>
+            </div>
+            <div class="info-item">
+                <h3>Posição Y</h3>
+                <div class="info-value" id="posY">0</div>
+            </div>
+            <div class="info-item">
+                <h3>Velocidade X</h3>
+                <div class="info-value" id="velX">0</div>
+            </div>
+            <div class="info-item">
+                <h3>Velocidade Y</h3>
+                <div class="info-value" id="velY">0</div>
+            </div>
+        </div>
+
+        <div class="codigo-explicacao">
+            <h3>🔍 Como o código funciona:</h3>
+            <p><strong>1. Canvas:</strong> É como uma tela em branco onde desenhamos</p>
+            <p><strong>2. Componente:</strong> O quadrado vermelho é um "objeto" com propriedades (tamanho, cor, posição)</p>
+            <p><strong>3. Loop do jogo:</strong> A cada 16ms (60 FPS), o jogo limpa a tela e desenha tudo novamente</p>
+            <p><strong>4. Eventos de teclado:</strong> Capturamos quando as teclas são pressionadas/soltas</p>
+            <p><strong>5. Física básica:</strong> Posição + Velocidade = Nova Posição</p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
+

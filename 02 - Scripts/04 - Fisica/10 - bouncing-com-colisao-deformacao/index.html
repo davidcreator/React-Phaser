@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Objetos Saltitantes</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <h1>🎮 Jogo de Objetos Saltitantes</h1>
+    
+    <!-- Descrição do conceito de bounce/salto -->
+    <div class="description">
+        <h3>📚 Como funciona a propriedade "Bounce" (Salto):</h3>
+        <p><strong>A propriedade de salto</strong> indica a força com que um componente irá ricochetear após atingir as bordas da tela ou colidir com outros objetos.</p>
+        <p><strong>Defina a propriedade bounce</strong> como um número decimal entre 0 e 1.</p>
+    </div>
+    
+    <div class="bounce-values">
+        <p><strong>🔢 Valores do Bounce:</strong></p>
+        <p><strong style="color: #dc3545;">🔴 Vermelho (0.6):</strong> Salto médio</p>
+        <p><strong style="color: #0d6efd;">🔵 Azul (0.8):</strong> Salto forte</p>
+        <p><strong style="color: #198754;">🟢 Verde (0.4):</strong> Salto fraco</p>
+        <p><strong style="color: #ffc107;">🟡 Amarelo (1.0):</strong> Salto máximo - saltará totalmente para trás</p>
+        <p><strong>💡 Dica:</strong> 0 = sem salto | 1 = salto completo</p>
+    </div>
+    
+    <!-- Controles do jogo -->
+    <div class="controls">
+        <button onclick="startGame()">🚀 Iniciar Jogo</button>
+        <button onclick="stopGame()" class="stop-btn">⏹️ Parar Jogo</button>
+        <button onclick="restartGame()">🔄 Reiniciar</button>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

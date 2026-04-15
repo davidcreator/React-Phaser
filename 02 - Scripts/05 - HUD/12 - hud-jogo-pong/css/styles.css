@@ -1,0 +1,64 @@
+/*
+========================================
+🎨 ESTILOS CSS - APARÊNCIA DO JOGO
+========================================
+Este arquivo CSS define como nosso jogo vai parecer visualmente
+*/
+
+/* Configurações gerais da página */
+body {
+    margin: 0;                    /* Remove margem padrão do navegador */
+    display: flex;                /* Usa flexbox para centralizar */
+    justify-content: center;      /* Centraliza horizontalmente */
+    align-items: center;         /* Centraliza verticalmente */
+    height: 100vh;               /* Ocupa toda a altura da tela */
+    background-color: #000;      /* Fundo preto como jogos clássicos */
+    font-family: Arial, sans-serif; /* Fonte padrão */
+}
+
+/* Container principal que engloba tudo */
+.game-container {
+    position: relative;          /* Permite posicionamento absoluto dos filhos */
+    text-align: center;         /* Centraliza o texto */
+}
+
+/* Estilo do canvas onde o jogo acontece */
+canvas {
+    background-color: #111;      /* Fundo cinza escuro */
+    display: block;             /* Remove espaços em branco */
+    border: 2px solid #333;     /* Borda para delimitar a área de jogo */
+}
+
+/* Área do HUD (interface do usuário) */
+.hud {
+    margin-top: 10px;           /* Espaço acima do HUD */
+    display: flex;              /* Organiza elementos lado a lado */
+    justify-content: space-around; /* Distribui espaço igualmente */
+}
+
+/* Informações de cada jogador */
+.player-info {
+    color: #fff;                /* Texto branco */
+}
+
+/* Campos de entrada de texto */
+input {
+    padding: 5px;               /* Espaçamento interno */
+    margin-left: 5px;          /* Margem à esquerda */
+    border-radius: 3px;        /* Bordas arredondadas */
+    border: 1px solid #ccc;    /* Borda cinza clara */
+}
+
+/* Título principal */
+h1 {
+    color: #fff;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+/* Instruções do jogo */
+.instructions {
+    color: #ccc;
+    margin-bottom: 15px;
+    font-size: 14px;
+}

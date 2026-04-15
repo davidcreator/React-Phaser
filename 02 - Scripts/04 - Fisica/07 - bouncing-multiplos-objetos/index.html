@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Física - Propriedade Bounce (Salto)</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- === TÍTULO E INSTRUÇÕES === -->
+        <h1>🎮 Simulador de Física - Propriedade Bounce (Salto)</h1>
+        
+        <div class="instructions">
+            <h2>📚 Como funciona:</h2>
+            <p><strong>A propriedade bounce (salto)</strong> determina quanta energia um objeto mantém após colidir com o solo.</p>
+            <ul>
+                <li><strong>Bounce = 0:</strong> Sem salto (objeto para completamente)</li>
+                <li><strong>Bounce = 0.5:</strong> Salto médio (perde metade da energia)</li>
+                <li><strong>Bounce = 1:</strong> Salto perfeito (mantém toda a energia)</li>
+            </ul>
+            <p><em>Observe como cada retângulo colorido se comporta de forma diferente!</em></p>
+        </div>
+
+        <!-- === LEGENDA DOS OBJETOS === -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: red;"></div>
+                <span>Vermelho (Bounce: 0.6)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: blue;"></div>
+                <span>Azul (Bounce: 0.8)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: green;"></div>
+                <span>Verde (Bounce: 0.4)</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: yellow; border: 1px solid #ccc;"></div>
+                <span>Amarelo (Bounce: 1.0)</span>
+            </div>
+        </div>
+
+        <!-- === CONTROLES DO JOGO === -->
+        <div class="controls">
+            <button id="startBtn" onclick="startGame()">▶️ Iniciar Simulação</button>
+            <button id="stopBtn" onclick="stopGame()" disabled>⏹️ Parar Simulação</button>
+            <button class="reset-btn" onclick="resetGame()">🔄 Reiniciar</button>
+        </div>
+
+        <!-- === ÁREA DO JOGO === -->
+        <!-- O canvas será inserido aqui pelo JavaScript -->
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

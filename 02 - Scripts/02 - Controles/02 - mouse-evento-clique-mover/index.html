@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse evento clicar para mover</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Mouse evento clicar para mover</h1>
+        
+        <!-- Área onde o jogo será desenhado -->
+        <canvas id="gameCanvas" width="480" height="270"></canvas>
+        
+        <!-- Placar -->
+        <div class="score">
+            Posição: X = <span id="posX">10</span>, Y = <span id="posY">120</span>
+        </div>
+        
+        <!-- Controles do jogo -->
+        <div class="controls">
+            <div class="button-row">
+                <button class="control-button" 
+                        onmousedown="moverParaCima()" 
+                        onmouseup="pararMovimento()" 
+                        ontouchstart="moverParaCima()" 
+                        ontouchend="pararMovimento()">
+                    ⬆️ CIMA
+                </button>
+            </div>
+            
+            <div class="button-row">
+                <button class="control-button" 
+                        onmousedown="moverParaEsquerda()" 
+                        onmouseup="pararMovimento()" 
+                        ontouchstart="moverParaEsquerda()" 
+                        ontouchend="pararMovimento()">
+                    ⬅️ ESQUERDA
+                </button>
+                
+                <button class="control-button" 
+                        onmousedown="moverParaDireita()" 
+                        onmouseup="pararMovimento()" 
+                        ontouchstart="moverParaDireita()" 
+                        ontouchend="pararMovimento()">
+                    ➡️ DIREITA
+                </button>
+            </div>
+            
+            <div class="button-row">
+                <button class="control-button" 
+                        onmousedown="moverParaBaixo()" 
+                        onmouseup="pararMovimento()" 
+                        ontouchstart="moverParaBaixo()" 
+                        ontouchend="pararMovimento()">
+                    ⬇️ BAIXO
+                </button>
+            </div>
+        </div>
+
+        <!-- Informações educativas -->
+        <div class="info-box">
+            <h3>📚 Como funciona:</h3>
+            <ul>
+                <li><strong>Canvas:</strong> É como uma "tela" onde desenhamos nosso jogo</li>
+                <li><strong>Quadrado vermelho:</strong> É nosso "personagem" do jogo</li>
+                <li><strong>Velocidade:</strong> Controla o quão rápido o quadrado se move</li>
+                <li><strong>Coordenadas X,Y:</strong> Mostram a posição exata do quadrado na tela</li>
+                <li><strong>Loop do jogo:</strong> Redesenha tudo 50 vezes por segundo para criar movimento</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h3>🔧 Conceitos de programação utilizados:</h3>
+            <ul>
+                <li><strong>Objetos:</strong> O quadrado é um objeto com propriedades (cor, tamanho, posição)</li>
+                <li><strong>Métodos:</strong> Funções que fazem o quadrado se mover e se desenhar</li>
+                <li><strong>Eventos:</strong> Detectam quando você clica nos botões</li>
+                <li><strong>Animação:</strong> Usa setInterval() para criar movimento contínuo</li>
+            </ul>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

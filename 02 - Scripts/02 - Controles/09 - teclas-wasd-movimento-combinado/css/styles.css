@@ -1,0 +1,59 @@
+/* CSS - Estilização do Canvas */
+canvas {
+    border: 1px solid #d3d3d3; /* Define uma borda cinza clara ao redor do canvas */
+    background-color: #f1f1f1; /* Define a cor de fundo do canvas */
+    display: block; /* Garante que o canvas seja exibido como bloco */
+    margin: 20px auto; /* Centraliza o canvas na página */
+}
+
+body {
+    font-family: Arial, sans-serif; /* Define a fonte da página */
+    text-align: center; /* Centraliza o texto */
+    background-color: #ffffff; /* Cor de fundo da página */
+    margin: 0; /* Remove margens padrão */
+    padding: 20px; /* Adiciona espaçamento interno */
+}
+
+.container {
+    max-width: 800px; /* Largura máxima do container */
+    margin: 0 auto; /* Centraliza o container na página */
+}
+
+.game-container {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.instructions {
+    background-color: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-left: 5px solid #2007ff;
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 5px;
+    max-width: 500px;
+}
+
+.info {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-left: 5px solid #ffc107;
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 5px;
+    max-width: 500px;
+}
+
+
+h1 {
+    color: #333; /* Cor do título */
+    margin-bottom: 20px; /* Espaçamento abaixo do título */
+}
+
+p {
+    color: #666; /* Cor do texto das instruções */
+    margin: 10px 0; /* Espaçamento vertical dos parágrafos */
+    max-width: 600px; /* Largura máxima do texto */
+    margin-left: auto; /* Centraliza o texto */
+    margin-right: auto; /* Centraliza o texto */
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <div class="menu">
+        <h1>Pong Game</h1>
+        <button onclick="startGame('easy', 'single')">Fácil (Player vs Máquina)</button>
+        <button onclick="startGame('medium', 'single')">Médio (Player vs Máquina)</button>
+        <button onclick="startGame('hard', 'single')">Difícil (Player vs Máquina)</button>
+        <button onclick="startGame('medium', 'multi')">Player vs Player</button>
+    </div>
+    <canvas id="pongCanvas" width="800" height="400"></canvas>
+    <div class="game-controls">
+        <button onclick="resetGame()">Reiniciar</button>
+        <button onclick="pauseGame()">Pausar</button>
+    </div>
+    <script src="./js/script.js"></script>
+</body>
+</html>

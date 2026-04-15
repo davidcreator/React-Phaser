@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Ação 2D - Aprenda Desenvolvimento Web</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ====== CABEÇALHO COM INTERFACE DO USUÁRIO (HUD) ====== -->
+    <!-- Esta seção mostra informações importantes do jogo em tempo real -->
+    <header>
+        <div id="ui">
+            <!-- Contador de vidas do jogador -->
+            <div id="lives">
+                🧡 Vidas: <span id="lives-count">3</span>
+            </div>
+            
+            <!-- Pontuação atual do jogador -->
+            <div id="score">
+                ⭐ Pontuação: <span id="score-count">0</span>
+            </div>
+            
+            <!-- Lista de power-ups coletados -->
+            <div id="power-ups">
+                ⚡ Power-Ups: <span id="power-ups-list">Nenhum</span>
+            </div>
+            
+            <!-- Sistema de armas com 9 slots numerados -->
+            <div id="weapons">
+                <span>🔫 Armas:</span>
+                <!-- Cada slot representa uma arma diferente (teclas 1-9) -->
+                <span id="weapon1" class="weapon-slot" title="Pressione 1 para selecionar">1</span>
+                <span id="weapon2" class="weapon-slot" title="Pressione 2 para selecionar">2</span>
+                <span id="weapon3" class="weapon-slot" title="Pressione 3 para selecionar">3</span>
+                <span id="weapon4" class="weapon-slot" title="Pressione 4 para selecionar">4</span>
+                <span id="weapon5" class="weapon-slot" title="Pressione 5 para selecionar">5</span>
+                <span id="weapon6" class="weapon-slot" title="Pressione 6 para selecionar">6</span>
+                <span id="weapon7" class="weapon-slot" title="Pressione 7 para selecionar">7</span>
+                <span id="weapon8" class="weapon-slot" title="Pressione 8 para selecionar">8</span>
+                <span id="weapon9" class="weapon-slot" title="Pressione 9 para selecionar">9</span>
+            </div>
+        </div>
+    </header>
+    
+    <!-- ====== ÁREA PRINCIPAL DO JOGO ====== -->
+    <main>
+        <!-- Canvas: elemento HTML5 onde desenharemos o jogo -->
+        <!-- É aqui que personagens, inimigos, projéteis, etc. aparecerão -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </main>
+    <script src="js/script.js"></script>
+</body>
+</html>

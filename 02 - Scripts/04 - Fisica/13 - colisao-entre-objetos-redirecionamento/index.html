@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demonstração Didática - Colisão entre Objetos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ========================================
+             TÍTULO E DESCRIÇÃO DO PROJETO
+        ======================================== -->
+        <h1>🎯 Demonstração Didática: Colisão entre Objetos</h1>
+        
+        <div class="description">
+            <strong>Objetivo:</strong> Este projeto demonstra como detectar e responder a colisões entre objetos em movimento usando HTML5 Canvas e JavaScript. Os alunos aprenderão conceitos fundamentais de física computacional, matemática aplicada e programação de jogos.
+        </div>
+        
+        <!-- ========================================
+             CONTROLES INTERATIVOS
+        ======================================== -->
+        <div class="controls">
+            <button onclick="pauseAnimation()">⏸️ Pausar</button>
+            <button onclick="resumeAnimation()">▶️ Continuar</button>
+            <button onclick="resetAnimation()">🔄 Reiniciar</button>
+            <button onclick="randomizeObjects()">🎲 Posições Aleatórias</button>
+        </div>
+        
+        <!-- ========================================
+             ÁREA DE DESENHO (CANVAS)
+        ======================================== -->
+        <canvas id="myCanvas" width="800" height="400"></canvas>
+        
+        <!-- ========================================
+             INDICADOR DE STATUS
+        ======================================== -->
+        <div id="status" class="status no-collision">
+            🟢 Sem colisão detectada
+        </div>
+        
+        <!-- ========================================
+             PAINEL DE INFORMAÇÕES TÉCNICAS
+        ======================================== -->
+        <div class="info-panel">
+            <div class="info-box">
+                <h3>🔴 Objeto 1 (Vermelho)</h3>
+                <p><strong>Posição:</strong> <span id="obj1-pos">-</span></p>
+                <p><strong>Velocidade:</strong> <span id="obj1-vel">-</span></p>
+                <p><strong>Raio:</strong> <span id="obj1-radius">-</span>px</p>
+            </div>
+            <div class="info-box">
+                <h3>🔵 Objeto 2 (Azul)</h3>
+                <p><strong>Posição:</strong> <span id="obj2-pos">-</span></p>
+                <p><strong>Velocidade:</strong> <span id="obj2-vel">-</span></p>
+                <p><strong>Raio:</strong> <span id="obj2-radius">-</span>px</p>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+/* ==========================================
+    SEÇÃO 1: ESTILOS GERAIS DA PÁGINA
+    ========================================== 
+    Define a aparência básica da página e layout principal
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #000; /* Fundo preto para criar atmosfera de jogo */
+}
+
+/* ==========================================
+    SEÇÃO 2: ESTILOS DO CABEÇALHO (HEADER)
+    ========================================== 
+    Interface do usuário (UI) que mostra informações do jogo
+*/
+
+header {
+    background-color: #222; /* Cor escura para contrastar com o texto */
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 2px solid #444; /* Linha decorativa */
+}
+
+/* Container principal da interface do usuário */
+#ui {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    align-items: center;
+}
+
+/* ==========================================
+    SEÇÃO 3: ELEMENTOS INFORMATIVOS DO JOGO
+    ========================================== 
+    Estilos para vidas, pontuação e power-ups
+*/
+
+#lives, #score, #power-ups {
+    margin: 0 15px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Destaque visual para números importantes */
+#lives-count, #score-count {
+    color: #00ff00; /* Verde para destacar os valores */
+}
+
+/* ==========================================
+    SEÇÃO 4: BARRA DE VIDA (HEALTH BAR)
+    ========================================== 
+    Sistema visual para mostrar a saúde do jogador
+*/
+
+#health-bar {
+    background-color: #555; /* Fundo cinza escuro */
+    width: 200px;
+    height: 20px;
+    border: 2px solid #fff; /* Borda branca para destaque */
+    margin: 0 15px;
+    border-radius: 10px; /* Bordas arredondadas */
+    overflow: hidden; /* Esconde o excesso da barra interna */
+}
+
+#current-health {
+    background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00); /* Gradiente vermelho-amarelo-verde */
+    width: 100%; /* Largura inicial (100% de saúde) */
+    height: 100%;
+    transition: width 0.3s ease; /* Animação suave quando a saúde muda */
+    border-radius: 8px;
+}
+
+/* ==========================================
+    SEÇÃO 5: ÁREA DO JOGO (CANVAS)
+    ========================================== 
+    Onde o jogo será desenhado e executado
+*/
+
+#gameCanvas {
+    flex-grow: 1; /* Ocupa todo o espaço restante */
+    background-color: #111; /* Fundo preto para o canvas */
+    border: 2px solid #333; /* Borda sutil */
+    display: block; /* Remove espaços extras */
+}
+
+/* ==========================================
+    SEÇÃO 6: BOTÕES DE DEMONSTRAÇÃO
+    ========================================== 
+    Botões para testar as funcionalidades do jogo
+*/
+
+.demo-controls {
+    background-color: #333;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.demo-btn {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.demo-btn:hover {
+    background-color: #0052a3;
+}
+
+.demo-btn:active {
+    transform: scale(0.95);
+}

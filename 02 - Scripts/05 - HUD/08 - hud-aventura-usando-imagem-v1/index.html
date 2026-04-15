@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Aventura com HUD - Tutorial Didático</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- 
+    ========================================
+    ESTRUTURA PRINCIPAL DO JOGO
+    ========================================
+    -->
+    <div class="game-container">
+        <!-- Canvas onde o jogo será desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- HUD - Interface com informações do jogador -->
+        <div class="hud">
+            <!-- Elemento de Vida -->
+            <div class="hud-element">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDIxLjM1TDEwLjU1IDE5Ljc0QzUuNDAwMTUgMTQuOCAyIDE2IDMuMzQzMSA5LjUwNEMxLjAwMDA4IDYuNzEgMi42NCAwIDYgMEM4LjAwMDA0IDAgOS45OTAwNyAwIDEwLjk5IDEuMTU3QzEyIDEuMDUgMTQgMCAxOCAwQzIxLjM2IDAgMjMgMi4wOCAyMC42NiA0Ljg4QzE3IDkgMTIgMjEuMzUgMTIgMjEuMzVaIiBmaWxsPSIjZmY0NDQ0Ii8+Cjwvc3ZnPgo=" alt="Vida" class="hud-icon">
+                <span id="health">3</span>
+            </div>
+            
+            <!-- Elemento de Moedas -->
+            <div class="hud-element">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIGZpbGw9IiNmZmQ3MDAiLz4KPHA+JDwvcCBzdHlsZT0iZm9udC1zaXplOjE0cHg7IGZvbnQtd2VpZ2h0OmJvbGQ7IHRleHQtYW5jaG9yOm1pZGRsZTsgZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbDsgZmlsbDojMzMzOyIgeD0iMTIiIHk9IjEyIj4kPC9wPgo8L3N2Zz4K" alt="Moedas" class="hud-icon">
+                <span id="coins">0</span>
+            </div>
+            
+            <!-- Elemento de Tempo -->
+            <div class="hud-element">
+                <span>🕐 Tempo: </span>
+                <span id="time">0</span>s
+            </div>
+        </div>
+
+        <!-- Botões de controle para demonstração -->
+        <div class="controls">
+            <button class="control-btn danger" onclick="loseHealth()">Perder Vida ❤️</button>
+            <button class="control-btn" onclick="gainCoins(10)">Ganhar 10 Moedas 🪙</button>
+            <button class="control-btn" onclick="resetGame()">Reiniciar Jogo 🔄</button>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Colisão com Canvas - Projeto Educacional</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- === CABEÇALHO === -->
+        <div class="header">
+            <h1>🎯 Simulação de Colisão com Canvas</h1>
+            <p>Aprenda os conceitos fundamentais de animação e física computacional</p>
+        </div>
+
+        <!-- === ÁREA DA SIMULAÇÃO === -->
+        <div class="canvas-section">
+            <h2 class="canvas-title">⚡ Área de Simulação</h2>
+            <p class="canvas-description">
+                Observe como a bola se move e colide com as bordas do canvas. 
+                A bola para quando toca nas bordas, demonstrando detecção de colisão básica.
+            </p>
+            
+            <canvas id="simulationCanvas" width="800" height="400"></canvas>
+            
+            <div class="controls">
+                <button class="control-button start-btn" onclick="startSimulation()">▶️ Iniciar</button>
+                <button class="control-button pause-btn" onclick="pauseSimulation()">⏸️ Pausar</button>
+                <button class="control-button reset-btn" onclick="resetSimulation()">🔄 Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- === SEÇÃO EDUCACIONAL === -->
+        <div class="educational-section">
+            <h2 class="concept-title">📚 Conceitos Aprendidos</h2>
+            <div class="concept-description">
+                Este projeto demonstra conceitos fundamentais de programação gráfica e física computacional:
+            </div>
+
+            <div class="code-explanation">
+                <strong>🎨 Canvas HTML5:</strong> Elemento para desenhar gráficos 2D<br>
+                <strong>⚡ RequestAnimationFrame:</strong> Função para animações suaves<br>
+                <strong>🔄 Loop de Animação:</strong> Ciclo contínuo de atualização e desenho<br>
+                <strong>💥 Detecção de Colisão:</strong> Verificação de limites e intersecções<br>
+                <strong>📐 Sistema de Coordenadas:</strong> Posicionamento em pixels (x, y)
+            </div>
+
+            <h3 class="concept-title">🧮 Como Funciona a Física</h3>
+            <div class="concept-description">
+                A simulação utiliza conceitos básicos de física para movimento:
+                <br><br>
+                • <span class="highlight">Posição (x, y)</span>: Localização atual da bola no canvas<br>
+                • <span class="highlight">Velocidade (dx, dy)</span>: Rapidez e direção do movimento<br>
+                • <span class="highlight">Colisão</span>: Quando a bola atinge os limites, o movimento para<br>
+                • <span class="highlight">Atualização</span>: A cada frame, calculamos nova posição
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

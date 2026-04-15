@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Física: Movimento e Atrito - Canvas HTML5</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- TÍTULO E DESCRIÇÃO DO EXPERIMENTO -->
+        <h1>🏀 Simulação de Física: Movimento com Atrito</h1>
+        <div class="description">
+            <p><strong>Conceitos demonstrados:</strong> Movimento retilíneo, força de atrito, conservação de energia, colisões elásticas e deformação de objetos.</p>
+            <p><strong>Objetivo:</strong> Observar como o atrito reduz gradualmente a velocidade de um objeto em movimento e como ocorrem as colisões com as bordas.</p>
+        </div>
+
+        <!-- ÁREA DE DESENHO (CANVAS) -->
+        <canvas id="canvas"></canvas>
+
+        <!-- CONTROLES INTERATIVOS -->
+        <div class="controls">
+            <button onclick="reiniciarSimulacao()">🔄 Reiniciar</button>
+            <button onclick="alternarPausa()">⏯️ Pausar/Continuar</button>
+            <button onclick="aumentarVelocidade()">⚡ Mais Velocidade</button>
+        </div>
+
+        <!-- PAINEL DE INFORMAÇÕES EM TEMPO REAL -->
+        <div class="info-panel">
+            <h3>📊 Dados da Simulação em Tempo Real</h3>
+            <div class="info-item">Posição X: <span id="posicao-x">0</span> pixels</div>
+            <div class="info-item">Velocidade: <span id="velocidade">0</span> pixels/frame</div>
+            <div class="info-item">Energia Cinética: <span id="energia">0</span> (relativa)</div>
+            <div class="info-item">Status: <span id="status">Em movimento</span></div>
+            <div class="info-item">Colisões: <span id="colisoes">0</span></div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

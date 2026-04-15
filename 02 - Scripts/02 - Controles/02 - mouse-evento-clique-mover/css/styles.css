@@ -1,0 +1,88 @@
+/* ===== ESTILOS CSS ===== */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e8f4f8;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #2c5282;
+    margin-bottom: 20px;
+}
+
+/* Estilo do canvas (área do jogo) */
+#gameCanvas {
+    border: 3px solid #2c5282;
+    background-color: #f7fafc;
+    margin: 20px 0;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 5px;
+}
+
+/* Estilo dos botões de controle */
+.controls {
+    margin: 20px 0;
+}
+
+.control-button {
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    margin: 5px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: 80px;
+}
+
+.control-button:hover {
+    background-color: #3182ce;
+}
+
+.control-button:active {
+    background-color: #2c5282;
+    transform: scale(0.95);
+}
+
+/* Layout dos botões */
+.button-row {
+    margin: 10px 0;
+}
+
+/* Informações educativas */
+.info-box {
+    background-color: #e6fffa;
+    border: 2px solid #38b2ac;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.info-box h3 {
+    color: #2c7a7b;
+    margin-top: 0;
+}
+
+.score {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c5282;
+    margin: 10px 0;
+}

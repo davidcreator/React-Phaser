@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakout Clássico - Jogo Educacional</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Breakout Clássico</h1>
+        <div class="info-panel">
+            <div class="score">Pontos: <span id="score">0</span></div>
+            <div class="lives">Vidas: <span id="lives">3</span></div>
+            <div class="level">Nível: <span id="level">1</span></div>
+        </div>
+        
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <div class="controls">
+            <button id="startBtn">Iniciar Jogo</button>
+            <button id="pauseBtn">Pausar</button>
+            <button id="resetBtn">Reiniciar</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>Como Jogar:</h3>
+            <p>• Use as setas ← → ou A/D para mover a raquete</p>
+            <p>• Quebre todos os blocos para avançar de nível</p>
+            <p>• Não deixe a bola cair!</p>
+        </div>
+        
+        <div class="educational-notes">
+            <h3>Conceitos de Programação Aplicados:</h3>
+            <ul>
+                <li><strong>Canvas API:</strong> Renderização 2D em tempo real</li>
+                <li><strong>Game Loop:</strong> Ciclo de atualização e renderização</li>
+                <li><strong>Detecção de Colisão:</strong> Física básica de jogos</li>
+                <li><strong>Estados do Jogo:</strong> Gerenciamento de diferentes telas</li>
+                <li><strong>Eventos de Teclado:</strong> Input do jogador</li>
+                <li><strong>Orientação a Objetos:</strong> Classes para entidades do jogo</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

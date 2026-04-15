@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Controlado por Máquina - Movimento e Rotação - Multi</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <!-- ==========================================
+         SEÇÃO 1: CABEÇALHO DA APLICAÇÃO
+         ========================================== -->
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Controlado por Máquina - Movimento e Rotação - Multi</h1>
+            <p>Aprenda programação através de animação e física básica!</p>
+        </div>
+
+        <!-- ==========================================
+             SEÇÃO 2: ÁREA PRINCIPAL DO JOGO
+             ========================================== -->
+        <div class="game-area">
+            <div class="canvas-container">
+                <h3>🎯 Área de Simulação</h3>
+                <canvas id="gameCanvas" width="600" height="400"></canvas>
+                <p><em>Observe como os objetos se movem e colidem com as bordas!</em></p>
+            </div>
+
+            <div class="controls">
+                <h3>🎛️ Controles Interativos</h3>
+                
+                <div class="control-group">
+                    <label for="objectCount">📊 Número de Objetos:</label>
+                    <input type="range" id="objectCount" min="1" max="10" value="5">
+                    <span id="objectCountValue">5</span>
+                </div>
+
+                <div class="control-group">
+                    <label for="speed">⚡ Velocidade Global:</label>
+                    <input type="range" id="speed" min="0.5" max="5" step="0.1" value="2">
+                    <span id="speedValue">2</span>
+                </div>
+
+                <div class="control-group">
+                    <label for="size">📏 Tamanho dos Objetos:</label>
+                    <input type="range" id="size" min="20" max="80" value="40">
+                    <span id="sizeValue">40</span>
+                </div>
+
+                <button class="btn-primary" onclick="resetSimulation()">🔄 Reiniciar Simulação</button>
+                <button class="btn-secondary" onclick="togglePause()"id="pauseBtn">⏸️ Pausar</button>
+                <button class="btn-danger" onclick="clearCanvas()">🗑️ Limpar Tela</button>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             SEÇÃO 3: CONTEÚDO EDUCATIVO
+             ========================================== -->
+        <div class="educational-content">
+            <div class="info-card">
+                <h3>📚 Conceitos de Programação</h3>
+                <ul>
+                    <li><strong>Classes e Objetos:</strong> Cada forma é um objeto da classe Component</li>
+                    <li><strong>Métodos:</strong> draw() desenha o objeto, update() atualiza posição</li>
+                    <li><strong>Propriedades:</strong> x, y (posição), speed (velocidade), angle (ângulo)</li>
+                    <li><strong>Loop de Animação:</strong> requestAnimationFrame para suavidade</li>
+                </ul>
+                
+                <div class="code-example">
+                    // Exemplo de classe Component
+                    class Component {
+                        constructor(x, y, size, speed) {
+                            this.x = x;      // posição horizontal
+                            this.y = y;      // posição vertical  
+                            this.size = size; // tamanho do objeto
+                            this.speed = speed; // velocidade
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>🧮 Conceitos de Matemática</h3>
+                <ul>
+                    <li><strong>Trigonometria:</strong> cos() e sin() para calcular direção</li>
+                    <li><strong>Ângulos:</strong> Radianos para rotação (π = 180°)</li>
+                    <li><strong>Colisões:</strong> Detecção de bordas usando coordenadas</li>
+                    <li><strong>Reflexão:</strong> Inversão de ângulos nas colisões</li>
+                </ul>
+                
+                <div class="code-example">
+                    // Movimento baseado em trigonometria
+                    this.x += this.speed * Math.cos(this.angle);
+                    this.y += this.speed * Math.sin(this.angle);
+
+                    // Colisão com bordas
+                    if (this.x > canvas.width) {
+                        this.angle = Math.PI - this.angle;
+                        this.x = canvas.width;
+                    }
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>🎨 Conceitos de Gráficos</h3>
+                <ul>
+                    <li><strong>Canvas API:</strong> Elemento HTML5 para desenho 2D</li>
+                    <li><strong>Contexto 2D:</strong> Interface para desenhar formas e cores</li>
+                    <li><strong>Transformações:</strong> translate() e rotate() para posicionamento</li>
+                    <li><strong>Estados:</strong> save() e restore() para preservar configurações</li>
+                </ul>
+                
+                <div class="code-example">
+                    // Desenho com transformações
+                    context.save();                    // salva estado
+                    context.translate(this.x, this.y); // move origem
+                    context.rotate(this.angle);        // rotaciona
+                    context.fillRect(-25, -25, 50, 50); // desenha
+                    context.restore();                 // restaura estado
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>⚙️ Como Funciona</h3>
+                <ul>
+                    <li><strong>1. Inicialização:</strong> Criamos objetos com posições aleatórias</li>
+                    <li><strong>2. Loop Principal:</strong> gameLoop() roda 60 vezes por segundo</li>
+                    <li><strong>3. Atualização:</strong> Cada objeto calcula nova posição</li>
+                    <li><strong>4. Detecção:</strong> Verifica colisões com bordas do canvas</li>
+                    <li><strong>5. Desenho:</strong> Limpa tela e desenha todos os objetos</li>
+                    <li><strong>6. Repetição:</strong> Processo se repete infinitamente</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
+

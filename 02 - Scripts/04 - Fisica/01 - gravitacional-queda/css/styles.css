@@ -1,0 +1,67 @@
+/* ===== ESTILOS CSS ===== */
+
+/* 1. ESTILO GERAL DA PÁGINA */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #e8f4fd;
+    text-align: center;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.descricao {
+    background-color: #fff;
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 600px;
+    color: #34495e;
+}
+
+/* 2. ESTILO DO CANVAS (ÁREA DO JOGO) */
+canvas {
+    border: 3px solid #2c3e50;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    margin: 20px auto;
+    display: block;
+}
+
+/* 3. ESTILO DOS CONTROLES */
+.controles {
+    margin: 20px auto;
+    max-width: 480px;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.info {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 10px;
+    margin: 10px auto;
+    border-radius: 5px;
+    max-width: 480px;
+    font-size: 14px;
+    color: #856404;
+}

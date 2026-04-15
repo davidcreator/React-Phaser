@@ -1,0 +1,97 @@
+/* === ESTILOS GERAIS === */
+/* Remove margens padrão e centraliza o conteúdo na tela */
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000;
+    font-family: Arial, sans-serif;
+}
+
+/* === CONTAINER DO JOGO === */
+/* Elemento pai que contém o canvas e a HUD */
+.game-container {
+    position: relative; /* Permite posicionamento absoluto dos filhos */
+    text-align: center;
+}
+
+/* === CANVAS PRINCIPAL === */
+/* Onde o jogo é desenhado */
+canvas {
+    background-color: #111;
+    display: block;
+    border: 2px solid #333;
+}
+
+/* === HUD (Interface do Usuário) === */
+/* Barra superior com informações do jogador */
+.hud {
+    position: absolute; /* Posiciona sobre o canvas */
+    top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    color: white;
+    font-weight: bold;
+}
+
+/* Cada elemento da HUD */
+.hud-element {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* === BARRA DE VIDA === */
+/* Container da barra de vida */
+#health-bar-container {
+    width: 150px;
+    height: 20px;
+    background-color: #8B0000; /* Vermelho escuro para fundo */
+    margin-left: 5px;
+    border: 2px solid white;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+/* A barra de vida em si */
+#health-bar {
+    width: 100%; /* Será controlada pelo JavaScript */
+    height: 100%;
+    background-color: #00AA00; /* Verde para vida */
+    transition: width 0.3s ease; /* Animação suave */
+}
+
+/* === MINI-MAPA === */
+#minimap {
+    border: 1px solid white;
+    background-color: #222;
+}
+
+/* === CONTROLES (Adicionados para interatividade) === */
+.controls {
+    position: absolute;
+    bottom: -50px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.control-btn {
+    background-color: #333;
+    color: white;
+    border: 1px solid #666;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.control-btn:hover {
+    background-color: #555;
+}

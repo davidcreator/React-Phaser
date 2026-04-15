@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlando Componente com Mouse, Teclado e Controle Gamepad</title>
+
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Controlando Componente com Mouse, Teclado e Controle Gamepad</h1>
+        <p class="subtitle">Aprenda a controlar elementos gráficos com diferentes dispositivos</p>
+        
+        <div class="game-area">
+            <div class="canvas-container">
+                <canvas id="canvas" width="600" height="400"></canvas>
+            </div>
+            
+            <div class="controls-panel">
+                <div class="control-section">
+                    <h3>📊 Status do Objeto</h3>
+                    <div class="status-display">
+                        <div>Posição X: <span id="posX" class="coordinate-display">300</span></div>
+                        <div>Posição Y: <span id="posY" class="coordinate-display">200</span></div>
+                        <div>Velocidade: <span id="currentSpeed" class="coordinate-display">5</span></div>
+                        <div>Controle ativo: <span id="activeControl" class="coordinate-display">Nenhum</span></div>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>⚙️ Configurações</h3>
+                    <div class="speed-control">
+                        <label for="speedSlider">Velocidade de movimento:</label>
+                        <input type="range" id="speedSlider" min="1" max="15" value="5">
+                        <span id="speedValue">5</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h3>🎮 Status do Gamepad</h3>
+                    <div id="gamepadStatus" class="gamepad-status">Nenhum gamepad detectado</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>📝 Como usar:</h2>
+            <div class="instruction-item">
+                <strong>⌨️ Teclado:</strong> Use as setas <span class="kbd">↑</span> <span class="kbd">↓</span> <span class="kbd">←</span> <span class="kbd">→</span> para mover o quadrado
+            </div>
+            <div class="instruction-item">
+                <strong>🖱️ Mouse:</strong> Mova o mouse sobre o canvas para que o quadrado siga o cursor
+            </div>
+            <div class="instruction-item">
+                <strong>🎮 Gamepad:</strong> Conecte um controle e use o analógico esquerdo para movimento suave
+            </div>
+            <div class="instruction-item">
+                <strong>⚡ Velocidade:</strong> Ajuste a velocidade usando o controle deslizante
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+/* ============================================
+    SEÇÃO 1: ESTILOS BÁSICOS DO CORPO DA PÁGINA
+    ============================================ */
+
+/* Remove margens padrão e centraliza o conteúdo na tela */
+body {
+    margin: 0;                    /* Remove margens padrão do navegador */
+    display: flex;                /* Usa flexbox para centralização */
+    justify-content: center;      /* Centraliza horizontalmente */
+    align-items: center;          /* Centraliza verticalmente */
+    height: 100vh;               /* Altura total da tela (100% viewport height) */
+    background-color: #000;       /* Fundo preto para ambiente de jogo */
+    font-family: Arial, sans-serif; /* Fonte padrão limpa e legível */
+}
+
+/* ============================================
+    SEÇÃO 2: CONTAINER PRINCIPAL DO JOGO
+    ============================================ */
+
+/* Container que agrupa o canvas e a HUD */
+.game-container {
+    position: relative;           /* Permite posicionar elementos filhos absolutamente */
+    text-align: center;          /* Centraliza texto dentro do container */
+}
+
+/* ============================================
+    SEÇÃO 3: ESTILOS DO CANVAS (ÁREA DE JOGO)
+    ============================================ */
+
+/* Área principal onde o jogo será desenhado */
+canvas {
+    background-color: #111;       /* Fundo cinza escuro para contraste */
+    display: block;              /* Remove espaços em branco abaixo do canvas */
+    border: 2px solid #333;      /* Borda sutil para delimitar a área de jogo */
+}
+
+/* ============================================
+    SEÇÃO 4: SISTEMA DE HUD (INTERFACE DO USUÁRIO)
+    ============================================ */
+
+/* Container principal da HUD - fica sobreposta ao jogo */
+.hud {
+    position: absolute;           /* Posicionamento absoluto sobre o canvas */
+    top: 10px;                   /* Distância do topo */
+    width: 100%;                 /* Ocupa toda a largura do container pai */
+    display: flex;               /* Layout flexível para distribuir elementos */
+    justify-content: space-around; /* Distribui elementos uniformemente */
+    color: white;                /* Texto branco para contraste */
+    font-weight: bold;           /* Texto em negrito para melhor visibilidade */
+}
+
+/* Cada elemento individual da HUD (vida, pontos, tempo) */
+.hud-element {
+    display: flex;               /* Layout flexível para alinhar ícone/texto */
+    align-items: center;         /* Alinha verticalmente ao centro */
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente */
+    padding: 5px 10px;          /* Espaçamento interno */
+    border-radius: 5px;         /* Bordas arredondadas */
+}
+
+/* ============================================
+    SEÇÃO 5: BARRA DE VIDA (HEALTH BAR)
+    ============================================ */
+
+/* Container da barra de vida */
+#health-bar-container {
+    width: 150px;               /* Largura fixa da barra */
+    height: 20px;               /* Altura da barra */
+    background-color: #8B0000; /* Fundo vermelho escuro (vida perdida) */
+    margin-left: 5px;           /* Espaço entre o texto "Vida:" e a barra */
+    border: 2px solid white;    /* Borda branca para destaque */
+    border-radius: 3px;         /* Bordas levemente arredondadas */
+    overflow: hidden;           /* Esconde qualquer conteúdo que exceda os limites */
+}
+
+/* Barra de vida atual (parte verde que diminui conforme perde vida) */
+#health-bar {
+    width: 100%;                /* Inicialmente ocupa 100% (vida cheia) */
+    height: 100%;               /* Altura total do container */
+    background-color: #00ff00;  /* Verde brilhante para vida */
+    transition: width 0.3s ease; /* Animação suave quando a vida muda */
+}
+
+/* ============================================
+    SEÇÃO 6: CONTROLES DO JOGO
+    ============================================ */
+
+/* Container para botões de teste/controle */
+.controls {
+    position: absolute;
+    bottom: -50px;              /* Posiciona abaixo do canvas */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;                  /* Espaço entre botões */
+}
+
+/* Estilo dos botões */
+.control-btn {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.control-btn:hover {
+    background-color: #45a049;  /* Cor mais escura no hover */
+}
+
+/* Botão de dano com cor diferente */
+.damage-btn {
+    background-color: #f44336;
+}
+
+.damage-btn:hover {
+    background-color: #da190b;
+}

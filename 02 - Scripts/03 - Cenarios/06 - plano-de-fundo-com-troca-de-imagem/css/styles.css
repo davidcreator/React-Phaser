@@ -1,0 +1,73 @@
+/* SEÇÃO 1: ESTILOS CSS */
+/* Aqui definimos como nosso jogo vai aparecer visualmente */
+/* Estilo do canvas (área do jogo) */
+canvas {
+    border: 2px solid #333; /* Borda preta ao redor do jogo */
+    background-color: #f0f0f0; /* Cor de fundo cinza claro */
+    display: block; /* Exibe como bloco */
+    margin: 0 auto; /* Centraliza o canvas */
+    box-shadow: 0 0 10px rgba(0,0,0,0.3); /* Sombra para dar profundidade */
+}
+
+/* Container principal dos controles */
+.controls-container {
+    text-align: center; /* Centraliza o conteúdo */
+    width: 480px; /* Mesma largura do canvas */
+    margin: 20px auto; /* Centraliza e adiciona espaçamento */
+    font-family: Arial, sans-serif; /* Fonte padrão */
+}
+
+/* Estilo dos botões de movimento */
+.movement-button {
+    background-color: #4CAF50; /* Verde */
+    border: none; /* Remove borda padrão */
+    color: white; /* Texto branco */
+    padding: 15px 32px; /* Espaçamento interno */
+    text-align: center; /* Centraliza texto */
+    font-size: 16px; /* Tamanho da fonte */
+    margin: 4px 2px; /* Espaçamento entre botões */
+    cursor: pointer; /* Cursor de ponteiro */
+    border-radius: 8px; /* Bordas arredondadas */
+    min-width: 80px; /* Largura mínima */
+}
+
+/* Efeito hover nos botões */
+.movement-button:hover {
+    background-color: #45a049; /* Verde mais escuro ao passar o mouse */
+}
+
+/* Efeito quando botão é pressionado */
+.movement-button:active {
+    background-color: #3d8b40; /* Verde ainda mais escuro */
+    transform: translateY(2px); /* Simula pressão */
+}
+
+/* Estilo do seletor de fundo */
+.background-selector {
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    background-color: white;
+    margin-top: 15px;
+}
+
+/* Estilo das instruções */
+.instructions {
+    background-color: #e7f3ff;
+    border-left: 6px solid #2196F3;
+    margin: 20px auto;
+    padding: 15px;
+    max-width: 480px;
+    border-radius: 5px;
+}
+
+.instructions h3 {
+    margin-top: 0;
+    color: #1976D2;
+}
+
+.instructions p {
+    margin: 8px 0;
+    line-height: 1.5;
+}

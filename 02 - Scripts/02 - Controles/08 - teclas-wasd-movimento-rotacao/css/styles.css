@@ -1,0 +1,37 @@
+/* ===== ESTILOS CSS ===== */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f0f0f0;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+.game-container {
+    text-align: center;
+    margin: 20px auto;
+}
+
+canvas {
+    border: 2px solid #333; /* Define uma borda preta ao redor do canvas */
+    background-color: #ffffff; /* Define a cor de fundo branca do canvas */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Adiciona uma sombra suave */
+}
+
+.instructions {
+    background-color: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 5px;
+    max-width: 500px;
+}
+
+.controls {
+    margin: 10px 0;
+    font-weight: bold;
+}

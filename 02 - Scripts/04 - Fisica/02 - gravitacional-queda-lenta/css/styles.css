@@ -1,0 +1,65 @@
+/* =============================================== --*/
+/*--           ESTILOS CSS DO PROJETO              --*/
+/* =============================================== --*/
+
+/* 1. ESTILO GERAL DA PÁGINA */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f0f8ff;
+}
+
+/* 2. TÍTULO PRINCIPAL */
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* 3. DESCRIÇÃO DO PROJETO */
+.description {
+    background-color: #e8f4fd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+}
+
+/* 4. ESTILO DO CANVAS (ÁREA DO JOGO) */
+canvas {
+    border: 3px solid #34495e;
+    background-color: #ecf0f1;
+    display: block;
+    margin: 20px auto;
+    border-radius: 5px;
+}
+
+/* 5. PAINEL DE INFORMAÇÕES */
+.info-panel {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 6. ESTILO DOS CONTROLES */
+.controls {
+    text-align: center;
+    margin: 20px 0;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}

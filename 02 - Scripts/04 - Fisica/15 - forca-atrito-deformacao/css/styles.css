@@ -1,0 +1,89 @@
+/* === ESTILOS CSS === */
+/* Configurações do corpo da página */
+body {
+    margin: 0; /* Remove margens padrão do navegador */
+    display: flex; /* Usa flexbox para centralizar o canvas */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    height: 100vh; /* Altura total da janela do navegador */
+    background-color: #f0f0f0; /* Cor de fundo cinza claro */
+    font-family: Arial, sans-serif; /* Fonte padrão */
+}
+
+/* Container principal que agrupa canvas e controles */
+.container {
+    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Título principal */
+h1 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+/* Descrição do experimento */
+.description {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 14px;
+    max-width: 600px;
+}
+
+/* Estilização do canvas (área de desenho) */
+canvas {
+    border: 2px solid #333; /* Borda preta ao redor do canvas */
+    background-color: #ffffff; /* Fundo branco para o canvas */
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
+/* Painel de informações em tempo real */
+.info-panel {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 15px;
+    text-align: left;
+    max-width: 600px;
+}
+
+.info-panel h3 {
+    margin-top: 0;
+    color: #495057;
+}
+
+.info-item {
+    margin: 5px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+/* Botões de controle */
+.controls {
+    margin-top: 15px;
+}
+
+button {
+    background: #0095DD;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background: #007BB5;
+}
+
+button:active {
+    transform: translateY(1px);
+}

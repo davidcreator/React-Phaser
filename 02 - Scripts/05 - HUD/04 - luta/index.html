@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- META TAGS E CONFIGURAÇÕES BÁSICAS -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Luta com HUD - Projeto Educacional</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- CONTAINER PRINCIPAL DO JOGO -->
+    <div class="game-container">
+        
+        <!-- CANVAS: Área onde o jogo é desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- HUD: Interface do usuário que fica sobre o canvas -->
+        <div class="hud">
+            <!-- Barra de vida do Player 1 -->
+            <div class="hud-element">
+                <span>Player 1 Vida:</span>
+                <div id="player1-health-bar-container">
+                    <div id="player1-health-bar"></div>
+                </div>
+            </div>
+            
+            <!-- Display do tempo de jogo -->
+            <div class="hud-element">
+                <span>Tempo:</span>
+                <span id="time">99</span>s
+            </div>
+            
+            <!-- Barra de vida do Player 2 -->
+            <div class="hud-element">
+                <span>Player 2 Vida:</span>
+                <div id="player2-health-bar-container">
+                    <div id="player2-health-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONTROLES PARA TESTE -->
+        <div class="controls">
+            <h3>Controles de Teste</h3>
+            <button onclick="loseHealth(1, 10)">Player 1 perde 10 de vida</button>
+            <button onclick="loseHealth(2, 10)">Player 2 perde 10 de vida</button>
+            <button onclick="resetGame()">Reiniciar Jogo</button>
+        </div>
+        
+        <!-- INSTRUÇÕES PARA OS ALUNOS -->
+        <div class="instructions">
+            <h4>Como funciona este código:</h4>
+            <p>• O canvas é onde desenhamos o jogo</p>
+            <p>• A HUD mostra informações importantes (vida, tempo)</p>
+            <p>• JavaScript controla a lógica do jogo</p>
+            <p>• Use os botões para testar a perda de vida</p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evento de Clique</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 Evento de Clique</h1>
+        <p class="subtitle">Aprenda JavaScript de forma divertida!</p>
+        
+        <!-- Canvas onde o jogo acontece -->
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        
+        <!-- Estatísticas do jogo -->
+        <div class="stats">
+            <div class="stat-item">
+                <div>Posição X</div>
+                <div class="stat-value" id="posX">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Posição Y</div>
+                <div class="stat-value" id="posY">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Velocidade X</div>
+                <div class="stat-value" id="speedX">0</div>
+            </div>
+            <div class="stat-item">
+                <div>Velocidade Y</div>
+                <div class="stat-value" id="speedY">0</div>
+            </div>
+        </div>
+
+        <!-- Controles de movimento -->        
+        <div class="controls">
+            <button class="button-up" onclick="moverPara('cima')" title="Move o quadrado para cima">
+                ⬆️ CIMA
+            </button>
+            <div class="button-middle">
+                <button onclick="moverPara('esquerda')" title="Move o quadrado para a esquerda">
+                    ⬅️ ESQUERDA
+                </button>
+                <button onclick="moverPara('direita')" title="Move o quadrado para a direita">
+                    DIREITA ➡️
+                </button>
+            </div>
+            <button class="button-down" onclick="moverPara('baixo')" title="Move o quadrado para baixo">
+                ⬇️ BAIXO
+            </button>
+        </div>        
+
+        <!-- Controles do jogo -->
+        <div class="game-controls">
+            <button onclick="pausarJogo()" id="pauseBtn">⏸️ Pausar</button>
+            <button onclick="reiniciarJogo()" class="reset-btn">🔄 Reiniciar</button>
+            <button onclick="alterarCor()">🎨 Mudar Cor</button>
+        </div>
+
+        <!-- Informações educativas -->
+        <div class="educational-section">
+            <h3>📚 Como funciona?</h3>
+            <p><strong>Conceitos aprendidos:</strong></p>
+            <ul>
+                <li><code>Canvas</code>: Elemento HTML5 para desenhar gráficos</li>
+                <li><code>setInterval()</code>: Executa uma função repetidamente</li>
+                <li><code>clearRect()</code>: Limpa uma área do canvas</li>
+                <li><code>fillRect()</code>: Desenha um retângulo preenchido</li>
+                <li><strong>Física básica</strong>: Posição, velocidade e movimento</li>
+            </ul>
+        </div>
+
+        <div class="info-panel">
+            <h3>🎯 Instruções:</h3>
+            <p>1. Clique nos botões de direção para mover o quadrado</p>
+            <p>2. Cada clique aumenta a velocidade nessa direção</p>
+            <p>3. Observe como as coordenadas e velocidades mudam</p>
+            <p>4. Use "Pausar" para parar o movimento e estudar os valores</p>
+            <p>5. Use "Reiniciar" para voltar ao estado inicial</p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

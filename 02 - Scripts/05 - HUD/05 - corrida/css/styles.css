@@ -1,0 +1,78 @@
+/* ========================================
+    ESTILOS CSS - APARÊNCIA DO JOGO
+======================================== */
+
+/* Reset básico e configuração do corpo da página */
+body {
+    margin: 0;                    /* Remove margem padrão */
+    display: flex;                /* Layout flexível */
+    justify-content: center;      /* Centraliza horizontalmente */
+    align-items: center;          /* Centraliza verticalmente */
+    height: 100vh;                /* Ocupa toda a altura da tela */
+    background-color: #000;       /* Fundo preto */
+    font-family: Arial, sans-serif; /* Fonte padrão */
+}
+
+/* Container principal do jogo */
+.game-container {
+    position: relative;           /* Permite posicionamento absoluto dos filhos */
+    text-align: center;           /* Centraliza o conteúdo */
+}
+
+/* Estilo do canvas (área de desenho do jogo) */
+canvas {
+    background-color: #111;       /* Fundo cinza escuro */
+    display: block;               /* Remove espaço extra abaixo */
+    border: 2px solid #333;       /* Borda para delimitar a área */
+}
+
+/* HUD (Heads-Up Display) - Interface do usuário */
+.hud {
+    position: absolute;           /* Posição fixa sobre o canvas */
+    top: 10px;                    /* 10px do topo */
+    width: 100%;                  /* Largura total do container */
+    display: flex;                /* Layout flexível horizontal */
+    justify-content: space-around; /* Espaça elementos uniformemente */
+    color: white;                 /* Texto branco */
+    font-weight: bold;            /* Texto em negrito */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* Sombra no texto */
+}
+
+/* Cada elemento individual do HUD */
+.hud-element {
+    display: flex;                /* Layout flexível */
+    align-items: center;          /* Alinha verticalmente */
+    background: rgba(0,0,0,0.6);  /* Fundo semi-transparente */
+    padding: 8px 12px;            /* Espaçamento interno */
+    border-radius: 5px;           /* Cantos arredondados */
+    border: 1px solid #555;       /* Borda sutil */
+}
+
+/* Botões de controle para demonstração */
+.controls {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.control-btn {
+    padding: 10px 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.control-btn:hover {
+    background: #0056b3;
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}

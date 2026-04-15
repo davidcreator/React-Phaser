@@ -1,0 +1,48 @@
+/* ==============================================
+    ESTILOS CSS - Aparência Visual do Jogo
+============================================== */
+
+body {
+font-family: Arial, sans-serif;
+background-color: #f0f0f0;
+color: black;
+margin: 0;
+padding: 20px;
+text-align: center;
+}
+
+h1 {
+color: #333;
+margin-bottom: 10px;
+}
+
+p {
+    color: #333;
+}
+
+.game-info {
+background-color: #e7f3ff;
+padding: 15px;
+border-left: 4px solid #2196F3;
+margin: 20px 0;
+border-radius: 10px;
+margin: 20px auto;
+max-width: 600px;
+box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Estilo do canvas (área do jogo) */
+#gameCanvas {
+border: 3px solid #3498db;
+background: linear-gradient(135deg, #f1f1f1 0%, #e8e8e8 100%);
+border-radius: 10px;
+box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+margin: 20px auto;
+display: block;
+}
+
+.controls {
+margin: 20px 0;
+font-size: 14px;
+color: #bdc3c7;
+}

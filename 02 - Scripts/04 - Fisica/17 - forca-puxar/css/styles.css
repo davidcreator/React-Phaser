@@ -1,0 +1,72 @@
+/* ==============================================
+    ESTILOS CSS - APRESENTAÇÃO VISUAL
+    ============================================== */
+
+body {
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.description {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 14px;
+    max-width: 600px;
+    line-height: 1.4;
+}
+
+canvas {
+    border: 3px solid #333;
+    border-radius: 10px;
+    background: #f8f9fa;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+.controls {
+    margin-top: 15px;
+}
+
+.info-panel {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding: 15px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.info-item {
+    text-align: center;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.info-value {
+    color: #0095DD;
+    font-family: monospace;
+}

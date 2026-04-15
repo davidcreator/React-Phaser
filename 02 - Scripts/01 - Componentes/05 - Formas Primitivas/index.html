@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formas Primitivas Canvas</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Formas Primitivas Canvas</h1>
+        
+        <div class="description">
+            <p><strong>O que este código faz:</strong></p>
+            <p>Este exemplo demonstra como desenhar diferentes formas primitivas usando Canvas HTML5: 
+            retângulos, círculos, elipses, triângulos, linhas, polígonos e formas customizadas!</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="adicionarFormaAleatoria()">➕ Adicionar Forma Aleatória</button>
+            <button class="btn" onclick="adicionarCirculo()">⭕ Adicionar Círculo</button>
+            <button class="btn" onclick="adicionarTriangulo()">🔺 Adicionar Triângulo</button>
+            <button class="btn" onclick="adicionarEstrela()">⭐ Adicionar Estrela</button>
+            <button class="btn clear" onclick="limparTudo()">🗑️ Limpar Tudo</button>
+        </div>
+
+        <!-- O canvas será inserido aqui pelo JavaScript -->
+        
+        <div class="info">
+            <p><strong>💡 Formas disponíveis:</strong></p>
+            <div class="shapes-grid">
+                <div class="shape-info">🟩 <strong>Retângulo</strong><br>Forma básica com 4 lados</div>
+                <div class="shape-info">🟨 <strong>Quadrado</strong><br>Retângulo com lados iguais</div>
+                <div class="shape-info">🔴 <strong>Círculo</strong><br>Forma redonda perfeita</div>
+                <div class="shape-info">🟣 <strong>Elipse</strong><br>Círculo achatado</div>
+                <div class="shape-info">🔺 <strong>Triângulo</strong><br>Forma com 3 lados</div>
+                <div class="shape-info">⭐ <strong>Estrela</strong><br>Polígono com pontas</div>
+                <div class="shape-info">📐 <strong>Linha</strong><br>Traço reto</div>
+                <div class="shape-info">🔸 <strong>Losango</strong><br>Quadrado rotacionado</div>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

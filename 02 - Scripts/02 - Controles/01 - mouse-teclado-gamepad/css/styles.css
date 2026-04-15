@@ -1,0 +1,133 @@
+/* ===== ESTILOS CSS ===== */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+h1 {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    text-align: center;
+    color: #718096;
+    margin-bottom: 30px;
+    font-size: 1.2em;
+}
+
+.game-area {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.canvas-container {
+    flex: 2;
+    text-align: center;
+}
+
+#canvas {
+    border: 3px solid #4299e1;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background: linear-gradient(45deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+.controls-panel {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+}
+
+.control-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.control-section h3 {
+    margin: 0 0 10px 0;
+    color: #2d3748;
+    font-size: 1.1em;
+    border-bottom: 2px solid #4299e1;
+    padding-bottom: 5px;
+}
+
+.status-display {
+    background: #2d3748;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.instructions {
+    background: #e6fffa;
+    border: 2px solid #38b2ac;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.instructions h2 {
+    color: #2c7a7b;
+    margin-top: 0;
+}
+
+.instruction-item {
+    margin: 10px 0;
+    padding: 8px;
+    background: white;
+    border-radius: 5px;
+    border-left: 4px solid #38b2ac;
+}
+
+.kbd {
+    background: #4a5568;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.coordinate-display {
+    font-weight: bold;
+    color: #2b6cb0;
+}
+
+.gamepad-status {
+    color: #38a169;
+    font-weight: bold;
+}
+
+.speed-control {
+    margin: 10px 0;
+}
+
+.speed-control input {
+    width: 100%;
+    margin: 5px 0;
+}

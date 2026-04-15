@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Gravidade Lunar - Jogo Educativo</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <!-- =============================================== -->
+    <!--              CONTEÚDO DA PÁGINA                -->
+    <!-- =============================================== -->
+    
+    <!-- TÍTULO DO PROJETO -->
+    <h1>🌙 Simulação de Gravidade Lunar</h1>
+    
+    <!-- DESCRIÇÃO EDUCATIVA -->
+    <div class="description">
+        <h3>📚 O que você vai aprender:</h3>
+        <p><strong>Este projeto demonstra:</strong></p>
+        <ul>
+            <li>Como a gravidade afeta objetos em queda</li>
+            <li>Diferença entre gravidade da Terra e da Lua</li>
+            <li>Conceitos de física aplicados em jogos</li>
+            <li>Programação com Canvas HTML5</li>
+        </ul>
+    </div>
+
+    <!-- CONTROLES DO JOGO -->
+    <div class="controls">
+        <button onclick="startGame()">🚀 Iniciar Simulação</button>
+        <button onclick="resetGame()">🔄 Reiniciar</button>
+        <button onclick="toggleGravity()">🌍↔️🌙 Trocar Gravidade</button>
+    </div>
+
+    <!-- PAINEL DE INFORMAÇÕES -->
+    <div class="info-panel">
+        <h3>📊 Informações da Simulação:</h3>
+        <p id="gravityInfo">Gravidade atual: Lua (1/6 da gravidade terrestre)</p>
+        <p id="positionInfo">Posição do objeto: x=80, y=75</p>
+        <p id="speedInfo">Velocidade de queda: 0</p>
+    </div>
+    <!-- CANVAS DO JOGO -->    
+    <script src="js/script.js"></script>
+</body>
+</html>

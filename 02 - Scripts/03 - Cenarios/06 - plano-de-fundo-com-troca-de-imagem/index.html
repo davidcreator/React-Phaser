@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos de Fundo</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body onload="startGame()">
+    <!-- SEÇÃO 2: INTERFACE DO USUÁRIO -->
+    <!-- Aqui criamos os controles que o usuário vai usar para jogar -->
+    
+    <div class="controls-container">
+        <h1>🎮 Jogo do Personagem Animado</h1>
+        
+        <!-- Botões de movimento do personagem -->
+        <div class="movement-controls">
+            <button class="movement-button" 
+                    onmousedown="move('up')" 
+                    onmouseup="clearmove()" 
+                    ontouchstart="move('up')" 
+                    ontouchend="clearmove()">
+                ⬆️ CIMA
+            </button>
+            <br><br>
+            
+            <button class="movement-button" 
+                    onmousedown="move('left')" 
+                    onmouseup="clearmove()" 
+                    ontouchstart="move('left')" 
+                    ontouchend="clearmove()">
+                ⬅️ ESQUERDA
+            </button>
+            
+            <button class="movement-button" 
+                    onmousedown="move('right')" 
+                    onmouseup="clearmove()" 
+                    ontouchstart="move('right')" 
+                    ontouchend="clearmove()">
+                ➡️ DIREITA
+            </button>
+            <br><br>
+            
+            <button class="movement-button" 
+                    onmousedown="move('down')" 
+                    onmouseup="clearmove()" 
+                    ontouchstart="move('down')" 
+                    ontouchend="clearmove()">
+                ⬇️ BAIXO
+            </button>
+        </div>
+        
+        <!-- Seletor para mudar o fundo do jogo -->
+        <div class="background-controls">
+            <label for="backgroundSelect"><strong>🖼️ Escolha o cenário:</strong></label>
+            <br>
+            <select id="backgroundSelect" class="background-selector" onchange="changeBackground()">
+                <option value="citymarket.jpg">🏪 Mercado da Cidade</option>
+                <option value="forest.jpg">🌲 Floresta</option>
+                <option value="desert.jpg">🏜️ Deserto</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Instruções para os alunos -->
+    <div class="instructions">
+        <h3>📋 Como funciona este jogo:</h3>
+        <p><strong>• Movimento:</strong> Use os botões para mover o personagem pela tela</p>
+        <p><strong>• Cenário:</strong> O fundo se move automaticamente criando sensação de movimento</p>
+        <p><strong>• Mudança de visual:</strong> O personagem muda de expressão quando se move</p>
+        <p><strong>• Cenários:</strong> Você pode trocar o fundo usando o menu suspenso</p>
+        <p><strong>• Loop infinito:</strong> O fundo se repete continuamente para criar movimento perpétuo</p>
+        <p><strong>• Fallback visual:</strong> Se as imagens não carregarem, o jogo usa formas coloridas</p>
+        
+        <h3>📁 Estrutura de Arquivos Necessária:</h3>
+        <p><strong>• Pasta "images/"</strong> deve conter:</p>
+        <p>&nbsp;&nbsp;- smiley.gif (personagem normal)</p>
+        <p>&nbsp;&nbsp;- angry.gif (personagem em movimento - opcional)</p>
+        <p>&nbsp;&nbsp;- citymarket.jpg (cenário mercado)</p>
+        <p>&nbsp;&nbsp;- forest.jpg (cenário floresta)</p>
+        <p>&nbsp;&nbsp;- desert.jpg (cenário deserto)</p>
+    </div>
+<script src="js/script.js"></script>
+</body>
+</html>

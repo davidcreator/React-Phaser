@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Física - Efeito Bounce</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body onload="startGame()">
+    
+    <!-- TÍTULO PRINCIPAL -->
+    <div class="container">
+        <h1>🎾 Simulador de Física - Propriedade Bounce (Quique)</h1>
+        
+        <!-- DESCRIÇÃO DO CONCEITO -->
+        <div class="description">
+            <h2>📚 O que é a Propriedade Bounce?</h2>
+            <p>A <span class="highlight">propriedade bounce</span> simula o comportamento físico de um objeto quando ele colide com uma superfície, como uma bola quicando no chão.</p>
+            
+            <p><strong>Como funciona:</strong></p>
+            <p>• <span class="highlight">Valor 0</span> = Sem quique (objeto para completamente)</p>
+            <p>• <span class="highlight">Valor 1</span> = Quique perfeito (volta com 100% da energia)</p>
+            <p>• <span class="highlight">Valores entre 0 e 1</span> = Quique com perda de energia (mais realista)</p>
+            
+            <p><strong>Exemplo atual:</strong> O quadrado vermelho tem bounce = <span class="highlight">0.6</span>, ou seja, a cada quique ele perde 40% da energia!</p>
+        </div>
+
+        <!-- ÁREA DO JOGO (canvas será inserido aqui) -->
+        <div class="game-info">
+            🎮 Observe como o quadrado vermelho quica e vai perdendo altura a cada bounce!
+        </div>
+
+        <!-- CONTROLES E INFORMAÇÕES ADICIONAIS -->
+        <div class="controls">
+            <h3>💡 Conceitos de Física Aplicados:</h3>
+            <p><strong>Gravidade:</strong> Acelera o objeto para baixo (9.8 m/s² na Terra)</p>
+            <p><strong>Energia Cinética:</strong> Energia do movimento do objeto</p>
+            <p><strong>Coeficiente de Restituição:</strong> O valor do bounce representa quanto da energia é preservada</p>
+            <p><strong>Atrito:</strong> Causa a perda gradual de energia a cada quique</p>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

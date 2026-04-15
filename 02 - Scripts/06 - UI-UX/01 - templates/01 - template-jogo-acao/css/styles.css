@@ -1,0 +1,83 @@
+/* ====== ESTILOS GERAIS DO CORPO DA PÁGINA ====== */
+/* Remove margens padrão e configura o layout principal */
+body {
+    font-family: Arial, sans-serif; /* Define a fonte do texto */
+    margin: 0;                      /* Remove margens padrão */
+    padding: 0;                     /* Remove espaçamento interno padrão */
+    display: flex;                  /* Usa flexbox para organizar elementos */
+    flex-direction: column;         /* Organiza elementos verticalmente */
+    height: 100vh;                  /* Ocupa toda a altura da tela */
+    background-color: #000;         /* Fundo preto para criar atmosfera de jogo */
+}
+
+/* ====== ESTILO DO CABEÇALHO (INTERFACE DO USUÁRIO) ====== */
+/* Área onde ficam as informações do jogador (vidas, pontos, etc.) */
+header {
+    background-color: #222;         /* Fundo cinza escuro */
+    color: #fff;                    /* Texto branco para contraste */
+    padding: 10px;                  /* Espaçamento interno */
+    display: flex;                  /* Layout flexível */
+    justify-content: space-around;  /* Distribui elementos uniformemente */
+    align-items: center;            /* Centraliza verticalmente */
+    border-bottom: 2px solid #444;  /* Borda inferior para separar do jogo */
+}
+
+/* ====== CONTÊINER PRINCIPAL DA INTERFACE ====== */
+/* Organiza todos os elementos da HUD (heads-up display) */
+#ui {
+    display: flex;                  /* Layout flexível horizontal */
+    justify-content: space-around;  /* Espaça elementos igualmente */
+    width: 100%;                    /* Ocupa toda a largura disponível */
+    align-items: center;            /* Alinha elementos ao centro */
+}
+
+/* ====== ESTILOS PARA SEÇÕES INDIVIDUAIS DA HUD ====== */
+/* Aplica margem para separar visualmente cada informação */
+#lives, #score, #power-ups, #weapons {
+    margin: 0 15px;                /* Espaçamento horizontal entre seções */
+    font-weight: bold;             /* Texto em negrito para destaque */
+}
+
+/* ====== ESTILOS PARA OS SLOTS DE ARMAS ====== */
+/* Cria botões visuais para cada slot de arma (1-9) */
+.weapon-slot {
+    display: inline-block;         /* Permite definir largura e altura */
+    padding: 8px 12px;            /* Espaçamento interno do botão */
+    background-color: #333;        /* Fundo cinza médio */
+    margin: 0 3px;                /* Espaçamento entre slots */
+    cursor: pointer;              /* Mostra que é clicável */
+    border-radius: 4px;           /* Cantos arredondados */
+    transition: all 0.3s ease;   /* Transição suave para efeitos hover */
+    border: 1px solid #555;       /* Borda sutil */
+    color: #ccc;                  /* Cor do texto */
+}
+
+/* ====== EFEITO HOVER NOS SLOTS DE ARMAS ====== */
+/* Muda aparência quando o mouse passa sobre o slot */
+.weapon-slot:hover {
+    background-color: #555;        /* Fundo mais claro ao passar o mouse */
+    transform: scale(1.05);       /* Pequeno aumento de tamanho */
+    border-color: #777;           /* Borda mais clara */
+}
+
+/* ====== ESTILO PARA O CANVAS DO JOGO ====== */
+/* Área onde o jogo será desenhado e renderizado */
+#gameCanvas {
+    flex-grow: 1;                 /* Ocupa todo o espaço restante */
+    background-color: #111;        /* Fundo quase preto para o jogo */
+    border: none;                 /* Remove bordas padrão */
+    cursor: crosshair;            /* Cursor de mira para jogos */
+}
+
+/* ====== ESTILOS PARA VALORES NUMÉRICOS ====== */
+/* Destaca números importantes como vidas e pontuação */
+#lives-count, #score-count {
+    color: #00ff00;               /* Verde brilhante para chamar atenção */
+    font-size: 1.2em;            /* Texto ligeiramente maior */
+}
+
+/* ====== ESTILO PARA LISTA DE POWER-UPS ====== */
+#power-ups-list {
+    color: #ffaa00;               /* Cor laranja para power-ups */
+    font-style: italic;           /* Texto em itálico */
+}

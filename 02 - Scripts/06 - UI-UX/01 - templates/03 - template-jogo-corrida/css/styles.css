@@ -1,0 +1,73 @@
+/* ========================================
+    ESTILOS CSS - APARÊNCIA DA PÁGINA
+    ======================================== */
+
+/* Estilos gerais do corpo da página */
+body {
+    font-family: Arial, sans-serif; /* Define a fonte */
+    margin: 0;                      /* Remove margens padrão */
+    padding: 0;                     /* Remove padding padrão */
+    display: flex;                  /* Layout flexível */
+    flex-direction: column;         /* Organiza elementos verticalmente */
+    height: 100vh;                  /* Altura total da tela */
+    background-color: #000;         /* Fundo preto para o jogo */
+}
+
+/* Estilos para o cabeçalho com informações do jogo */
+header {
+    background-color: #222;         /* Cor de fundo escura */
+    color: #fff;                    /* Texto branco */
+    padding: 10px;                  /* Espaçamento interno */
+    display: flex;                  /* Layout flexível */
+    justify-content: space-around;  /* Distribui elementos uniformemente */
+    align-items: center;            /* Centraliza verticalmente */
+}
+
+/* Contêiner principal das informações da interface */
+#ui {
+    display: flex;                  /* Layout flexível */
+    justify-content: space-around;  /* Distribui elementos uniformemente */
+    width: 100%;                    /* Ocupa toda a largura */
+}
+
+/* Estilos individuais para cada elemento de informação */
+#laps, #speed, #time, #position, #fuel {
+    margin: 0 10px;                 /* Margem lateral */
+    font-weight: bold;              /* Texto em negrito */
+}
+
+/* Estilo para o canvas onde o jogo será desenhado */
+#gameCanvas {
+    flex-grow: 1;                   /* Cresce para ocupar espaço restante */
+    background-color: #111;         /* Fundo escuro para o canvas */
+    border: 2px solid #333;         /* Borda decorativa */
+}
+
+/* Painel de controles para demonstração */
+#controls {
+    background-color: #333;
+    padding: 15px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Estilos para botões de demonstração */
+.demo-button {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.demo-button:hover {
+    background-color: #45a049;
+}
+
+.demo-button:active {
+    transform: scale(0.95);
+}

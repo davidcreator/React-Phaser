@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧩 Jogo de Puzzle 2D - Versão Educativa</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- ====================================
+         SEÇÃO HTML: CABEÇALHO DO JOGO
+         ================================= -->
+    
+    <header>
+        <!-- Título principal do jogo -->
+        <h1 class="game-title">🧩 Jogo de Puzzle Deslizante</h1>
+        
+        <!-- Interface com indicadores do jogo -->
+        <div id="ui">
+            <!-- Contador de movimentos realizados -->
+            <div class="ui-item">
+                <div class="ui-label">Movimentos</div>
+                <div class="ui-value" id="moves-count">0</div>
+            </div>
+            
+            <!-- Sistema de pontuação -->
+            <div class="ui-item">
+                <div class="ui-label">Pontuação</div>
+                <div class="ui-value" id="score-count">0</div>
+            </div>
+            
+            <!-- Cronômetro do jogo -->
+            <div class="ui-item">
+                <div class="ui-label">Tempo</div>
+                <div class="ui-value" id="time-count">00:00</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ====================================
+         SEÇÃO HTML: ÁREA PRINCIPAL DO JOGO
+         ================================= -->
+    
+    <main>
+        <!-- Tabuleiro onde as peças do puzzle são organizadas -->
+        <div>
+            <div id="puzzle-board">
+                <!-- As peças do puzzle serão criadas dinamicamente pelo JavaScript -->
+            </div>
+            
+            <!-- Controles do jogo -->
+            <div class="controls">
+                <button class="btn" onclick="gameManager.shufflePuzzle()">🔄 Embaralhar</button>
+                <button class="btn" onclick="gameManager.resetGame()">🔄 Reiniciar</button>
+                <button class="btn" onclick="gameManager.showSolution()">💡 Mostrar Solução</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ====================================
+         SEÇÃO HTML: ELEMENTOS DE FEEDBACK
+         ================================= -->
+    
+    <!-- Overlay para mensagens modais -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Mensagem de vitória -->
+    <div class="victory-message" id="victory-message">
+        <div class="victory-title">🎉 Parabéns!</div>
+        <p>Você completou o puzzle!</p>
+        <p>Movimentos: <span id="final-moves">0</span></p>
+        <p>Tempo: <span id="final-time">00:00</span></p>
+        <p>Pontuação: <span id="final-score">0</span></p>
+        <button class="btn" onclick="gameManager.closeVictoryMessage()">Continuar</button>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

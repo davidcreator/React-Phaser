@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de RPG com HUD - Tutorial Didático</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- CONTAINER PRINCIPAL QUE ENGLOBA TODO O JOGO -->
+    <div class="game-container">
+        
+        <!-- CANVAS: Área onde o jogo será desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <!-- HUD: Interface do usuário com informações importantes -->
+        <div class="hud">
+            <!-- Barra de Vida do Jogador -->
+            <div class="hud-element">
+                <span>❤️ Vida:</span>
+                <div id="health-bar-container">
+                    <div id="health-bar"></div>
+                </div>
+            </div>
+            
+            <!-- Barra de Munição do Jogador -->
+            <div class="hud-element">
+                <span>🔫 Munição:</span>
+                <div id="ammo-bar-container">
+                    <div id="ammo-bar"></div>
+                </div>
+            </div>
+            
+            <!-- Arma Atual do Jogador -->
+            <div class="hud-element">
+                <span>⚔️ Arma:</span>
+                <span id="weapon">Pistola</span>
+            </div>
+            
+            <!-- Quantidade de Ouro do Jogador -->
+            <div class="hud-element">
+                <span>💰 Ouro:</span>
+                <span id="gold">0</span>
+            </div>
+        </div>
+        
+        <!-- CONTROLES DE TESTE PARA DEMONSTRAÇÃO -->
+        <div class="controls">
+            <button class="control-btn" onclick="loseHealth(10)">Perder Vida (-10)</button>
+            <button class="control-btn" onclick="useAmmo(5)">Usar Munição (-5)</button>
+            <button class="control-btn" onclick="changeWeapon('Rifle')">Trocar Arma</button>
+            <button class="control-btn" onclick="gainGold(25)">Ganhar Ouro (+25)</button>
+            <button class="control-btn" onclick="resetGame()">Reset</button>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

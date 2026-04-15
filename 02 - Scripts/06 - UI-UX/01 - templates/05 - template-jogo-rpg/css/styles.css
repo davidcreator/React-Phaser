@@ -1,0 +1,300 @@
+/*
+===============================================
+TÍTULO: Estilos CSS para Interface de Jogo 2D
+DESCRIÇÃO: Este arquivo contém todos os estilos
+necessários para criar uma interface de usuário
+moderna e funcional para jogos 2D
+===============================================
+*/
+
+/*
+SEÇÃO: Reset e Configurações Gerais
+DESCRIÇÃO: Remove margens padrão e configura
+o layout básico da página
+*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    color: #ffffff;
+    overflow: hidden;
+}
+
+/*
+SEÇÃO: Cabeçalho - Barras de Status e Mini-mapa
+DESCRIÇÃO: Contém as informações vitais do jogador
+como vida, energia, estamina e o mini-mapa
+*/
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 15px 20px;
+    background: rgba(34, 34, 34, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid #00d4ff;
+    box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+}
+
+/*
+SEÇÃO: Barras de Status (Vida, Energia, Estamina)
+DESCRIÇÃO: Mostra os atributos principais do personagem
+com barras visuais preenchidas
+*/
+#status-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 200px;
+}
+
+.bar {
+    position: relative;
+    background-color: #333;
+    border: 2px solid #555;
+    border-radius: 20px;
+    height: 30px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 18px;
+    transition: width 0.3s ease;
+}
+
+#health-bar::before {
+    background: linear-gradient(90deg, #ff4444, #ff6666);
+    width: 100%; /* Vida inicial: 100% */
+}
+
+#energy-bar::before {
+    background: linear-gradient(90deg, #4444ff, #6666ff);
+    width: 100%; /* Energia inicial: 100% */
+}
+
+#stamina-bar::before {
+    background: linear-gradient(90deg, #44ff44, #66ff66);
+    width: 100%; /* Estamina inicial: 100% */
+}
+
+.bar-text {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    line-height: 26px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-size: 14px;
+}
+
+/*
+SEÇÃO: Mini-mapa
+DESCRIÇÃO: Área que mostra uma visão reduzida
+do mundo do jogo
+*/
+#mini-map {
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, #2a2a2a, #1a1a1a);
+    border: 2px solid #00d4ff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    position: relative;
+}
+
+#mini-map::after {
+    content: '📍';
+    position: absolute;
+    font-size: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/*
+SEÇÃO: Área Principal do Jogo
+DESCRIÇÃO: Contém o canvas onde o jogo é renderizado
+*/
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#gameCanvas {
+    width: 90%;
+    height: 90%;
+    background: linear-gradient(45deg, #0a0a0a, #1a1a1a);
+    border: 3px solid #00d4ff;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    cursor: crosshair;
+}
+
+/*
+SEÇÃO: Rodapé - Experiência e Funções
+DESCRIÇÃO: Contém a barra de experiência e
+ícones de funcionalidades do jogo
+*/
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(34, 34, 34, 0.9);
+    backdrop-filter: blur(10px);
+    border-top: 2px solid #00d4ff;
+    box-shadow: 0 -2px 10px rgba(0, 212, 255, 0.3);
+}
+
+/*
+SEÇÃO: Barra de Experiência
+DESCRIÇÃO: Mostra o progresso de experiência
+do jogador para o próximo nível
+*/
+#experience-bar {
+    position: relative;
+    width: 60%;
+    height: 25px;
+    background-color: #333;
+    border: 2px solid #ffaa00;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#experience-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #ffaa00, #ffcc44);
+    border-radius: 13px;
+    width: 0%; /* Experiência inicial: 0% */
+    transition: width 0.5s ease;
+}
+
+#experience-text {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    line-height: 21px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-size: 14px;
+}
+
+/*
+SEÇÃO: Ícones de Funcionalidades
+DESCRIÇÃO: Botões para acessar diferentes
+partes do jogo (inventário, mapa, etc.)
+*/
+#functions {
+    display: flex;
+    gap: 10px;
+}
+
+.function-icon {
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #444, #666);
+    border: 2px solid #888;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    user-select: none;
+}
+
+.function-icon:hover {
+    background: linear-gradient(135deg, #555, #777);
+    border-color: #00d4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 212, 255, 0.4);
+}
+
+.function-icon:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/*
+SEÇÃO: Botões de Teste (Apenas para demonstração)
+DESCRIÇÃO: Botões para testar as funcionalidades
+da interface durante o desenvolvimento
+*/
+#test-controls {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #00d4ff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.test-btn {
+    padding: 8px 12px;
+    background: #333;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.test-btn:hover {
+    background: #555;
+}
+
+/*
+SEÇÃO: Responsividade
+DESCRIÇÃO: Ajustes para telas menores
+*/
+@media (max-width: 768px) {
+    header, footer {
+        padding: 10px;
+    }
+    
+    #status-bars {
+        min-width: 150px;
+    }
+    
+    #mini-map {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .function-icon {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}

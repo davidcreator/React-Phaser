@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Gravidade dos Planetas</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+    <!-- ===== CONTEÚDO HTML - ESTRUTURA DA PÁGINA ===== -->
+    
+    <h1>🌍 Simulador de Gravidade dos Planetas</h1>
+    
+    <div class="descricao">
+        <p><strong>Como funciona:</strong> Os quadrados coloridos representam objetos caindo em diferentes planetas do sistema solar. Observe como a velocidade de queda varia de acordo com a gravidade de cada planeta!</p>
+        <p><strong>Dica:</strong> Júpiter tem a maior gravidade, então os objetos caem mais rápido lá. Mercúrio e Marte têm gravidade menor, então os objetos caem mais devagar.</p>
+    </div>
+
+    <div class="controles">
+        <button onclick="reiniciarSimulacao()">🔄 Reiniciar Simulação</button>
+        <button onclick="pausarSimulacao()">⏸️ Pausar/Continuar</button>
+    </div>
+
+    <!-- Canvas onde a simulação acontece -->
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="info-planetas">
+        <h3>📊 Informações dos Planetas (Gravidade relativa à Terra):</h3>
+        <div class="planeta-info" style="background-color: #666;">Mercúrio: 0.38x</div>
+        <div class="planeta-info" style="background-color: #FFC649;">Vênus: 0.91x</div>
+        <div class="planeta-info" style="background-color: #6B93D6;">Terra: 1.00x</div>
+        <div class="planeta-info" style="background-color: #C1440E;">Marte: 0.38x</div>
+        <div class="planeta-info" style="background-color: #D8CA9D;">Júpiter: 2.34x</div>
+        <div class="planeta-info" style="background-color: #FAD5A5;">Saturno: 1.06x</div>
+        <div class="planeta-info" style="background-color: #4FD0E7;">Urano: 0.92x</div>
+        <div class="planeta-info" style="background-color: #4B70DD;">Netuno: 1.19x</div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

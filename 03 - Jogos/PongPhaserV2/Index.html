@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PongEdu — Aprendizado Interativo</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet" />
+
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Phaser 3 -->
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+  <style>
+    :root {
+      --bg:        #050a12;
+      --surface:   #0d1829;
+      --card:      #0f2040;
+      --accent:    #00e5ff;
+      --accent2:   #ff4081;
+      --accent3:   #69ff47;
+      --text:      #e8f4f8;
+      --muted:     #5a7a8a;
+      --border:    rgba(0,229,255,.18);
+      --glow:      0 0 20px rgba(0,229,255,.5);
+      --glow2:     0 0 20px rgba(255,64,129,.5);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body, #root {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg);
+      font-family: 'Exo 2', sans-serif;
+      color: var(--text);
+    }
+
+    /* ── SCANLINE OVERLAY ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,.06) 2px, rgba(0,0,0,.06) 4px
+      );
+      pointer-events: none; z-index: 9999;
+    }
+
+    /* ── STARS BACKGROUND ── */
+    .stars {
+      position: fixed; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .star {
+      position: absolute; background: white; border-radius: 50%;
+      animation: twinkle var(--d,3s) ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity:.1; transform: scale(1); }
+      50%      { opacity:.9; transform: scale(1.4); }
+    }
+
+    /* ── SCREEN WRAPPER ── */
+    .screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      animation: fadeIn .45s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform: translateY(16px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ── LOGO ── */
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.8rem, 8vw, 6rem);
+      font-weight: 900;
+      letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--accent) 0%, #fff 50%, var(--accent2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 30px rgba(0,229,255,.7));
+      text-align: center;
+    }
+    .logo-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(.75rem, 2vw, 1rem);
+      color: var(--accent);
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin-top: .4rem;
+      opacity: .8;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      position: relative;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(.75rem, 1.8vw, 1rem);
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: .75em 2.2em;
+      border: 2px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      cursor: pointer;
+      clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+      transition: all .2s;
+      min-width: 200px;
+    }
+    .btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--accent);
+      clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+      opacity: 0;
+      transition: opacity .2s;
+      z-index: -1;
+    }
+    .btn:hover { color: var(--bg); box-shadow: var(--glow); }
+    .btn:hover::before { opacity: 1; }
+    .btn.red    { border-color: var(--accent2); color: var(--accent2); }
+    .btn.red:hover { box-shadow: var(--glow2); }
+    .btn.red::before { background: var(--accent2); }
+    .btn.green  { border-color: var(--accent3); color: var(--accent3); }
+    .btn.green:hover { box-shadow: 0 0 20px rgba(105,255,71,.5); }
+    .btn.green::before { background: var(--accent3); }
+
+    /* ── CARD PANEL ── */
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: clamp(1.2rem, 3vw, 2.5rem) clamp(1.5rem, 4vw, 3.5rem);
+      max-width: 680px;
+      width: 90%;
+      backdrop-filter: blur(10px);
+    }
+    .panel h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--accent);
+      letter-spacing: .14em;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    /* ── OPTION ROW ── */
+    .opt-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .7rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+    .opt-row:last-child { border-bottom: none; }
+    .opt-label {
+      font-size: .9rem;
+      color: var(--muted);
+      font-family: 'Share Tech Mono', monospace;
+      letter-spacing: .08em;
+    }
+    .opt-chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .chip {
+      font-family: 'Orbitron', sans-serif;
+      font-size: .65rem;
+      letter-spacing: .1em;
+      padding: .35em .9em;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .chip.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0,229,255,.1);
+      box-shadow: 0 0 10px rgba(0,229,255,.3);
+    }
+
+    /* ── TOGGLE ── */
+    .toggle {
+      position: relative; width: 46px; height: 24px; cursor: pointer;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: .25s;
+    }
+    .slider::before {
+      content: '';
+      position: absolute; left: 3px; top: 3px;
+      width: 16px; height: 16px;
+      background: var(--muted);
+      transition: .25s;
+    }
+    input:checked + .slider { border-color: var(--accent); background: rgba(0,229,255,.15); }
+    input:checked + .slider::before { transform: translateX(22px); background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+    /* ── CREDITS ── */
+    .credit-block { margin-bottom: 1.2rem; }
+    .credit-block h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: .75rem;
+      color: var(--accent2);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: .4rem;
+    }
+    .credit-block p {
+      font-size: .85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .credit-block p span { color: var(--text); }
+
+    /* ── PEDAGOGY CARD ── */
+    .ped-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: .8rem 0; border-bottom: 1px solid var(--border);
+    }
+    .ped-item:last-child { border-bottom: none; }
+    .ped-icon {
+      font-size: 1.6rem; flex-shrink: 0;
+      width: 42px; text-align: center;
+    }
+    .ped-item h4 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: .75rem;
+      color: var(--accent3);
+      letter-spacing: .1em;
+      margin-bottom: .25rem;
+    }
+    .ped-item p {
+      font-size: .8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── GAME HUD OVERLAY ── */
+    #game-container { position: absolute; inset: 0; }
+    .hud {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .6rem 1.5rem;
+      background: rgba(5,10,18,.7);
+      backdrop-filter: blur(4px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      pointer-events: none;
+    }
+    .hud-score {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 900;
+    }
+    .hud-score span { color: var(--accent); }
+    .hud-score .sep { color: var(--muted); margin: 0 .6rem; }
+    .hud-score .p2c { color: var(--accent2); }
+    .hud-info {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .75rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .hud-level {
+      font-family: 'Orbitron', sans-serif;
+      font-size: .7rem;
+      color: var(--accent3);
+      letter-spacing: .15em;
+    }
+
+    /* ── TIP TOAST ── */
+    .tip-toast {
+      position: absolute;
+      bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(13,24,41,.92);
+      border: 1px solid var(--accent);
+      padding: .6rem 1.4rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem;
+      color: var(--accent);
+      text-align: center;
+      max-width: 90%;
+      animation: toastIn .4s ease, toastOut .4s ease 3.5s forwards;
+      z-index: 200;
+      pointer-events: none;
+    }
+    @keyframes toastIn  { from { opacity:0; transform: translateX(-50%) translateY(16px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+    /* ── PAUSE OVERLAY ── */
+    .pause-overlay {
+      position: absolute; inset: 0;
+      background: rgba(5,10,18,.88);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.2rem; z-index: 300;
+      animation: fadeIn .2s ease;
+    }
+    .pause-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 900;
+      color: var(--accent);
+      text-shadow: var(--glow);
+      letter-spacing: .1em;
+    }
+
+    /* ── GAME OVER OVERLAY ── */
+    .gameover-overlay {
+      position: absolute; inset: 0;
+      background: rgba(5,10,18,.9);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; z-index: 300;
+      animation: fadeIn .3s ease;
+      padding: 1rem;
+    }
+    .gameover-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-weight: 900;
+      letter-spacing: .1em;
+    }
+    .winner-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(.85rem, 2vw, 1.1rem);
+      text-align: center;
+      color: var(--muted);
+      max-width: 420px;
+    }
+    .stats-row {
+      display: flex; gap: 2rem; margin: .4rem 0;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .12em;
+    }
+    .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+    /* scrollable panels */
+    .scroll-body { overflow-y: auto; max-height: 65vh; padding-right: .4rem; }
+    .scroll-body::-webkit-scrollbar { width: 4px; }
+    .scroll-body::-webkit-scrollbar-track { background: transparent; }
+    .scroll-body::-webkit-scrollbar-thumb { background: var(--border); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ─────────────── CONSTANTS ─────────────── */
+const TIPS = [
+  "💡 Tente prever onde a bola vai chegar antes de mover o paddle!",
+  "🎯 Manter o paddle no centro te dá mais opções de reação.",
+  "🧠 Raciocínio antecipatório: visualize a trajetória da bola.",
+  "⚡ Velocidade de reação melhora com a prática — não desanime!",
+  "🔄 Cada erro é uma oportunidade de aprendizado. Observe o padrão.",
+  "📐 Acertar a bola nas extremidades do paddle muda o ângulo!",
+  "🎮 Concentração é uma habilidade — treine-a como um músculo.",
+  "🌀 Dificuldade maior = mais aprendizado. Desafie-se!",
+  "🏆 Consistência supera velocidade. Seja preciso, depois rápido.",
+  "👁️ Foque nos movimentos, não no placar. O desempenho virá!",
+];
+
+const DIFFICULTIES = {
+  iniciante:     { aiSpeed: 2.5,  ballSpeed: 3.5,  label: "Iniciante",    color: "#69ff47" },
+  intermediario: { aiSpeed: 4.0,  ballSpeed: 5.5,  label: "Intermediário", color: "#00e5ff" },
+  avancado:      { aiSpeed: 6.5,  ballSpeed: 8.0,  label: "Avançado",     color: "#ff4081" },
+};
+
+const WIN_SCORE = 7;
+
+/* ─────────────── STAR BACKGROUND ─────────────── */
+function Stars() {
+  const stars = Array.from({ length: 80 }, (_, i) => ({
+    id: i,
+    x:  Math.random() * 100,
+    y:  Math.random() * 100,
+    s:  Math.random() * 2.5 + 0.5,
+    d:  (Math.random() * 4 + 2).toFixed(1) + 's',
+    delay: (Math.random() * 4).toFixed(1) + 's',
+  }));
+  return (
+    <div className="stars">
+      {stars.map(s => (
+        <div key={s.id} className="star" style={{
+          left: s.x + '%', top: s.y + '%',
+          width: s.s + 'px', height: s.s + 'px',
+          '--d': s.d, animationDelay: s.delay
+        }} />
+      ))}
+    </div>
+  );
+}
+
+/* ─────────────── HOME SCREEN ─────────────── */
+function HomeScreen({ onNav }) {
+  return (
+    <div className="screen" style={{ gap: '2rem' }}>
+      <Stars />
+      <div style={{ textAlign: 'center' }}>
+        <div className="logo">PONG<span style={{color:'var(--accent2)'}}>EDU</span></div>
+        <div className="logo-sub">Aprendizado Interativo com Jogos</div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem', alignItems: 'center' }}>
+        <button className="btn green"  onClick={() => onNav('game')}>▶  Jogar</button>
+        <button className="btn"        onClick={() => onNav('options')}>⚙  Opções</button>
+        <button className="btn"        onClick={() => onNav('pedagogy')}>📚  Metodologia</button>
+        <button className="btn red"    onClick={() => onNav('credits')}>★  Créditos</button>
+      </div>
+
+      <p style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:'.7rem', color:'var(--muted)', letterSpacing:'.1em', textAlign:'center' }}>
+        W/S · P1 &nbsp;|&nbsp; ↑↓ · P2 &nbsp;|&nbsp; ESC · Pausar
+      </p>
+    </div>
+  );
+}
+
+/* ─────────────── OPTIONS SCREEN ─────────────── */
+function OptionsScreen({ options, setOptions, onBack }) {
+  const set = (key, val) => setOptions(o => ({ ...o, [key]: val }));
+
+  return (
+    <div className="screen">
+      <Stars />
+      <div className="panel">
+        <h2>⚙ Opções de Jogo</h2>
+        <div className="scroll-body">
+          {/* Dificuldade */}
+          <div className="opt-row">
+            <span className="opt-label">Dificuldade</span>
+            <div className="opt-chips">
+              {Object.keys(DIFFICULTIES).map(k => (
+                <button key={k} className={`chip ${options.difficulty === k ? 'active' : ''}`}
+                  onClick={() => set('difficulty', k)}>
+                  {DIFFICULTIES[k].label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Modo */}
+          <div className="opt-row">
+            <span className="opt-label">Modo de Jogo</span>
+            <div className="opt-chips">
+              {[['1player','1 Jogador'],['2player','2 Jogadores']].map(([v,l]) => (
+                <button key={v} className={`chip ${options.mode === v ? 'active' : ''}`}
+                  onClick={() => set('mode', v)}>{l}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Pontuação */}
+          <div className="opt-row">
+            <span className="opt-label">Pontos para Vencer</span>
+            <div className="opt-chips">
+              {[3,5,7,11].map(n => (
+                <button key={n} className={`chip ${options.winScore === n ? 'active' : ''}`}
+                  onClick={() => set('winScore', n)}>{n} pts</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Dicas */}
+          <div className="opt-row">
+            <span className="opt-label">Dicas Pedagógicas</span>
+            <label className="toggle">
+              <input type="checkbox" checked={options.tips}
+                onChange={e => set('tips', e.target.checked)} />
+              <span className="slider" />
+            </label>
+          </div>
+
+          {/* Som */}
+          <div className="opt-row">
+            <span className="opt-label">Som</span>
+            <label className="toggle">
+              <input type="checkbox" checked={options.sound}
+                onChange={e => set('sound', e.target.checked)} />
+              <span className="slider" />
+            </label>
+          </div>
+
+          {/* Esteira de Bola */}
+          <div className="opt-row">
+            <span className="opt-label">Rastro da Bola</span>
+            <label className="toggle">
+              <input type="checkbox" checked={options.trail}
+                onChange={e => set('trail', e.target.checked)} />
+              <span className="slider" />
+            </label>
+          </div>
+        </div>
+
+        <div style={{ marginTop:'1.5rem', textAlign:'center' }}>
+          <button className="btn" onClick={onBack}>← Voltar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────── PEDAGOGY SCREEN ─────────────── */
+function PedagogyScreen({ onBack }) {
+  const items = [
+    { icon: '🧱', title: 'Construtivismo (Piaget)',
+      desc: 'O aluno aprende construindo conhecimento pela experiência direta. Cada partida oferece tentativa, erro e descoberta ativa.' },
+    { icon: '🤝', title: 'ZDP de Vygotsky',
+      desc: 'A dificuldade adaptável mantém o jogo na Zona de Desenvolvimento Proximal — desafiador o suficiente sem ser frustrante.' },
+    { icon: '🎮', title: 'Gamificação (Kapp)',
+      desc: 'Pontuação, progressão de nível e feedback imediato aumentam motivação intrínseca e engajamento prolongado.' },
+    { icon: '💬', title: 'Feedback Imediato',
+      desc: 'Dicas contextuais após cada ponto reforçam conceitos de coordenação motora, antecipação e raciocínio estratégico.' },
+    { icon: '🔁', title: 'Aprendizagem Baseada em Jogo (GBL)',
+      desc: 'O jogo é o ambiente de aprendizado. Habilidades como concentração, tempo de reação e pensamento tático são desenvolvidas naturalmente.' },
+    { icon: '📊', title: 'Objetivos de Aprendizagem',
+      desc: 'Coordenação olho-mão · Raciocínio espacial · Pensamento antecipatório · Regulação emocional · Persistência.' },
+    { icon: '🌀', title: 'Metacognição',
+      desc: 'As dicas incentivam o jogador a refletir sobre suas próprias estratégias, desenvolvendo consciência do próprio aprendizado.' },
+  ];
+
+  return (
+    <div className="screen">
+      <Stars />
+      <div className="panel" style={{ maxWidth: 720 }}>
+        <h2>📚 Metodologia Pedagógica</h2>
+        <div className="scroll-body">
+          {items.map((it, i) => (
+            <div className="ped-item" key={i}>
+              <div className="ped-icon">{it.icon}</div>
+              <div>
+                <h4>{it.title}</h4>
+                <p>{it.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop:'1.5rem', textAlign:'center' }}>
+          <button className="btn" onClick={onBack}>← Voltar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────── CREDITS SCREEN ─────────────── */
+function CreditsScreen({ onBack }) {
+  return (
+    <div className="screen">
+      <Stars />
+      <div className="panel">
+        <h2>★ Créditos</h2>
+        <div className="scroll-body">
+          <div className="credit-block">
+            <h3>Sobre o Projeto</h3>
+            <p>
+              <span>PongEdu</span> é uma recriação pedagógica do clássico Pong (Atari, 1972),
+              desenvolvida com foco em aprendizado interativo. Combina mecânicas simples
+              com metodologias educacionais modernas para estimular habilidades cognitivas e motoras.
+            </p>
+          </div>
+          <div className="credit-block">
+            <h3>Desenvolvimento</h3>
+            <p>Motor de Jogo: <span>Phaser 3.60</span></p>
+            <p>Interface: <span>React 18</span></p>
+            <p>Design: <span>Retro-Futurista / Arcade Pedagógico</span></p>
+            <p>Tipografia: <span>Orbitron · Share Tech Mono · Exo 2</span></p>
+          </div>
+          <div className="credit-block">
+            <h3>Metodologia Educacional</h3>
+            <p>Baseada em: <span>Piaget · Vygotsky · Kapp (GBL)</span></p>
+            <p>Abordagem: <span>Aprendizagem Baseada em Jogos (ABJ)</span></p>
+          </div>
+          <div className="credit-block">
+            <h3>Inspiração Original</h3>
+            <p><span>Pong</span> — Atari Inc., 1972</p>
+            <p>Criado por <span>Allan Alcorn</span>, supervisionado por <span>Nolan Bushnell</span></p>
+          </div>
+          <div className="credit-block">
+            <h3>Licença</h3>
+            <p><span>MIT License</span> — Uso educacional livre</p>
+          </div>
+        </div>
+        <div style={{ marginTop:'1.5rem', textAlign:'center' }}>
+          <button className="btn" onClick={onBack}>← Voltar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────── PHASER GAME SCENE ─────────────── */
+function createPhaserGame(containerId, options, callbacks) {
+  const { difficulty, mode, winScore, sound, trail } = options;
+  const diff = DIFFICULTIES[difficulty];
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+
+  class GameScene extends Phaser.Scene {
+    constructor() { super({ key: 'GameScene' }); }
+
+    create() {
+      this.W = this.scale.width;
+      this.H = this.scale.height;
+      this.PADDLE_W = 14;
+      this.PADDLE_H = Math.min(100, this.H * 0.13);
+      this.score1 = 0;
+      this.score2 = 0;
+      this.paused = false;
+      this.rallyCount = 0;
+      this.trailParticles = [];
+
+      // Background gradient
+      const bg = this.add.graphics();
+      bg.fillGradientStyle(0x050a12, 0x050a12, 0x0d1829, 0x0d1829, 1);
+      bg.fillRect(0, 0, this.W, this.H);
+
+      // Center dashed line
+      for (let y = 0; y < this.H; y += 28) {
+        const dash = this.add.rectangle(this.W/2, y+8, 3, 14, 0x1a3050);
+        dash.setAlpha(0.7);
+      }
+
+      // Paddles
+      this.paddle1 = this.add.rectangle(28, this.H/2, this.PADDLE_W, this.PADDLE_H, 0x00e5ff);
+      this.paddle2 = this.add.rectangle(this.W-28, this.H/2, this.PADDLE_W, this.PADDLE_H, 0xff4081);
+
+      // Paddle glow (graphics)
+      this.p1glow = this.add.graphics();
+      this.p2glow = this.add.graphics();
+
+      // Ball
+      this.ball = this.add.circle(this.W/2, this.H/2, 8, 0xffffff);
+
+      // Trail group
+      this.trailGroup = this.add.group();
+
+      // Cursor keys
+      this.cursors = this.input.keyboard.createCursorKeys();
+      this.wasd = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S });
+      this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+
+      this.launchBall();
+      this.setupSound();
+
+      // Bounce tweens for paddles
+      this.p1tween = null;
+      this.p2tween = null;
+    }
+
+    setupSound() {
+      if (!sound) return;
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    playBeep(freq = 440, dur = 0.05, type = 'square') {
+      if (!sound || !this.audioCtx) return;
+      try {
+        const osc  = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.connect(gain); gain.connect(this.audioCtx.destination);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + dur);
+        osc.start(); osc.stop(this.audioCtx.currentTime + dur);
+      } catch(e) {}
+    }
+
+    launchBall(dirX = null) {
+      const angle = (Math.random() * 60 - 30) * (Math.PI / 180);
+      const dir = dirX ?? (Math.random() > 0.5 ? 1 : -1);
+      this.ballVX = Math.cos(angle) * diff.ballSpeed * dir;
+      this.ballVY = Math.sin(angle) * diff.ballSpeed;
+      this.ball.setPosition(this.W/2, this.H/2);
+      this.rallyCount = 0;
+    }
+
+    spawnTrailParticle() {
+      if (!trail) return;
+      const p = this.add.circle(this.ball.x, this.ball.y, 5, 0xffffff);
+      p.setAlpha(0.5);
+      this.add.tween({
+        targets: p, alpha: 0, scaleX: 0, scaleY: 0,
+        duration: 250, ease: 'Power2',
+        onComplete: () => p.destroy()
+      });
+    }
+
+    drawGlow(gfx, rect, color, alpha = 0.3) {
+      gfx.clear();
+      gfx.fillStyle(color, alpha);
+      gfx.fillRect(rect.x - rect.width/2 - 4, rect.y - rect.height/2 - 4,
+                   rect.width + 8, rect.height + 8);
+    }
+
+    update(time, delta) {
+      if (this.paused) return;
+
+      // ESC
+      if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
+        callbacks.onPause();
+        return;
+      }
+
+      const dt = delta / 1000;
+      const spd = 380;
+
+      // Player 1 (W/S)
+      if (this.wasd.up.isDown)   this.paddle1.y -= spd * dt;
+      if (this.wasd.down.isDown) this.paddle1.y += spd * dt;
+
+      // Player 2 or AI
+      if (mode === '2player') {
+        if (this.cursors.up.isDown)   this.paddle2.y -= spd * dt;
+        if (this.cursors.down.isDown) this.paddle2.y += spd * dt;
+      } else {
+        // AI with configurable speed
+        const aiTarget = this.ball.y;
+        const aiDiff   = aiTarget - this.paddle2.y;
+        const aiMove   = Math.sign(aiDiff) * Math.min(Math.abs(aiDiff), diff.aiSpeed * 60 * dt);
+        this.paddle2.y += aiMove;
+      }
+
+      // Clamp paddles
+      const half1 = this.PADDLE_H / 2;
+      this.paddle1.y = Phaser.Math.Clamp(this.paddle1.y, half1 + 8, this.H - half1 - 8);
+      this.paddle2.y = Phaser.Math.Clamp(this.paddle2.y, half1 + 8, this.H - half1 - 8);
+
+      // Ball movement
+      this.ball.x += this.ballVX * 60 * dt;
+      this.ball.y += this.ballVY * 60 * dt;
+
+      // Trail
+      if (trail && time % 3 < 2) this.spawnTrailParticle();
+
+      // Wall bounce (top/bottom)
+      if (this.ball.y <= 8 || this.ball.y >= this.H - 8) {
+        this.ballVY *= -1;
+        this.ball.y = Phaser.Math.Clamp(this.ball.y, 8, this.H - 8);
+        this.playBeep(330, 0.04);
+      }
+
+      // Paddle collision
+      const bx = this.ball.x, by = this.ball.y, br = 8;
+      const p1b = { left: this.paddle1.x - this.PADDLE_W/2 - br,
+                    right: this.paddle1.x + this.PADDLE_W/2 + br,
+                    top: this.paddle1.y - this.PADDLE_H/2 - br,
+                    bottom: this.paddle1.y + this.PADDLE_H/2 + br };
+      const p2b = { left: this.paddle2.x - this.PADDLE_W/2 - br,
+                    right: this.paddle2.x + this.PADDLE_W/2 + br,
+                    top: this.paddle2.y - this.PADDLE_H/2 - br,
+                    bottom: this.paddle2.y + this.PADDLE_H/2 + br };
+
+      if (this.ballVX < 0 && bx >= p1b.left && bx <= p1b.right && by >= p1b.top && by <= p1b.bottom) {
+        this.ballVX = Math.abs(this.ballVX) * 1.04;
+        const relImpact = (by - this.paddle1.y) / (this.PADDLE_H / 2);
+        this.ballVY = relImpact * diff.ballSpeed * 1.2;
+        this.rallyCount++;
+        this.playBeep(520, 0.07);
+        this.flashPaddle(1);
+      }
+      if (this.ballVX > 0 && bx >= p2b.left && bx <= p2b.right && by >= p2b.top && by <= p2b.bottom) {
+        this.ballVX = -Math.abs(this.ballVX) * 1.04;
+        const relImpact = (by - this.paddle2.y) / (this.PADDLE_H / 2);
+        this.ballVY = relImpact * diff.ballSpeed * 1.2;
+        this.rallyCount++;
+        this.playBeep(520, 0.07);
+        this.flashPaddle(2);
+      }
+
+      // Max ball speed
+      const maxSpd = diff.ballSpeed * 2.5;
+      const mag = Math.sqrt(this.ballVX**2 + this.ballVY**2);
+      if (mag > maxSpd) {
+        this.ballVX = (this.ballVX / mag) * maxSpd;
+        this.ballVY = (this.ballVY / mag) * maxSpd;
+      }
+
+      // Scoring
+      if (this.ball.x < 0) {
+        this.score2++;
+        this.playBeep(200, 0.3, 'sawtooth');
+        callbacks.onScore(this.score1, this.score2);
+        if (this.score2 >= winScore) { callbacks.onGameOver(2, this.score1, this.score2, this.rallyCount); return; }
+        this.launchBall(1);
+      }
+      if (this.ball.x > this.W) {
+        this.score1++;
+        this.playBeep(200, 0.3, 'sawtooth');
+        callbacks.onScore(this.score1, this.score2);
+        if (this.score1 >= winScore) { callbacks.onGameOver(1, this.score1, this.score2, this.rallyCount); return; }
+        this.launchBall(-1);
+      }
+
+      // Glow update
+      this.drawGlow(this.p1glow, this.paddle1, 0x00e5ff, 0.18);
+      this.drawGlow(this.p2glow, this.paddle2, 0xff4081, 0.18);
+    }
+
+    flashPaddle(which) {
+      const p = which === 1 ? this.paddle1 : this.paddle2;
+      this.tweens.add({ targets: p, scaleX: 1.4, yoyo: true, duration: 60, ease: 'Power2' });
+    }
+
+    setPaused(val) { this.paused = val; }
+  }
+
+  const config = {
+    type: Phaser.AUTO,
+    width: W,
+    height: H,
+    parent: containerId,
+    backgroundColor: '#050a12',
+    scene: GameScene,
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
+    banner: false,
+  };
+
+  return new Phaser.Game(config);
+}
+
+/* ─────────────── GAME SCREEN (React wrapper) ─────────────── */
+function GameScreen({ options, onBack }) {
+  const [score, setScore]     = useState({ p1: 0, p2: 0 });
+  const [paused, setPaused]   = useState(false);
+  const [gameOver, setGameOver] = useState(null);
+  const [tip, setTip]         = useState(null);
+  const [tipKey, setTipKey]   = useState(0);
+  const gameRef = useRef(null);
+  const sceneRef = useRef(null);
+  const tipTimer = useRef(null);
+
+  const showTip = useCallback(() => {
+    if (!options.tips) return;
+    const t = TIPS[Math.floor(Math.random() * TIPS.length)];
+    setTip(t); setTipKey(k => k+1);
+    clearTimeout(tipTimer.current);
+    tipTimer.current = setTimeout(() => setTip(null), 4000);
+  }, [options.tips]);
+
+  useEffect(() => {
+    // small delay so DOM paints
+    const id = setTimeout(() => {
+      const g = createPhaserGame('phaser-container', options, {
+        onScore: (p1, p2) => {
+          setScore({ p1, p2 });
+          showTip();
+        },
+        onPause: () => {
+          setPaused(true);
+          const scene = g.scene.getScene('GameScene');
+          if (scene) scene.setPaused(true);
+        },
+        onGameOver: (winner, p1, p2, rally) => {
+          setGameOver({ winner, p1, p2, rally });
+        },
+      });
+      gameRef.current  = g;
+      sceneRef.current = g;
+    }, 80);
+
+    return () => {
+      clearTimeout(id);
+      clearTimeout(tipTimer.current);
+      if (gameRef.current) { gameRef.current.destroy(true); gameRef.current = null; }
+    };
+  }, []);
+
+  const resumeGame = () => {
+    setPaused(false);
+    const g = gameRef.current;
+    if (!g) return;
+    const scene = g.scene.getScene('GameScene');
+    if (scene) scene.setPaused(false);
+  };
+
+  const diff = DIFFICULTIES[options.difficulty];
+  const p2label = options.mode === '2player' ? 'P2' : 'IA';
+
+  return (
+    <div style={{ position:'absolute', inset:0 }}>
+      <div id="phaser-container" style={{ position:'absolute', inset:0 }} />
+
+      {/* HUD */}
+      <div className="hud">
+        <div className="hud-score">
+          <span>{score.p1}</span>
+          <span className="sep">:</span>
+          <span className="p2c">{score.p2}</span>
+        </div>
+        <div className="hud-info">
+          P1 · W/S &nbsp;&nbsp; {p2label} · {options.mode==='2player'?'↑↓':'AUTO'}
+          <div className="hud-level" style={{ color: diff.color }}>
+            {diff.label.toUpperCase()}
+          </div>
+        </div>
+        <div style={{ display:'flex', gap:'.6rem' }}>
+          <button className="btn" style={{ minWidth:'auto', padding:'.4em .9em', fontSize:'.65rem' }}
+            onClick={() => { setPaused(true); const s = gameRef.current?.scene.getScene('GameScene'); if(s) s.setPaused(true); }}>
+            II
+          </button>
+        </div>
+      </div>
+
+      {/* Tip */}
+      {tip && <div key={tipKey} className="tip-toast">{tip}</div>}
+
+      {/* Pause overlay */}
+      {paused && !gameOver && (
+        <div className="pause-overlay">
+          <div className="pause-title">PAUSADO</div>
+          <p style={{ fontFamily:"'Share Tech Mono',monospace", color:'var(--muted)', fontSize:'.85rem', textAlign:'center', maxWidth:320 }}>
+            {TIPS[Math.floor(Math.random() * TIPS.length)]}
+          </p>
+          <div className="btn-row" style={{ marginTop:'.5rem' }}>
+            <button className="btn green" onClick={resumeGame}>▶ Continuar</button>
+            <button className="btn red"   onClick={onBack}>⏹ Menu</button>
+          </div>
+        </div>
+      )}
+
+      {/* Game Over overlay */}
+      {gameOver && (
+        <div className="gameover-overlay">
+          <div className="gameover-title" style={{ color: gameOver.winner===1?'var(--accent)':'var(--accent2)' }}>
+            {gameOver.winner === 1 ? '🏆 JOGADOR 1 VENCEU!' :
+             options.mode === '2player' ? '🏆 JOGADOR 2 VENCEU!' : '🤖 IA VENCEU!'}
+          </div>
+
+          <div className="stats-row">
+            <div className="stat">
+              <div className="stat-val" style={{color:'var(--accent)'}}>{gameOver.p1}</div>
+              <div className="stat-lbl">P1 PONTOS</div>
+            </div>
+            <div className="stat">
+              <div className="stat-val" style={{color:'var(--accent2)'}}>{gameOver.p2}</div>
+              <div className="stat-lbl">{p2label} PONTOS</div>
+            </div>
+            <div className="stat">
+              <div className="stat-val" style={{color:'var(--accent3)'}}>{gameOver.rally}</div>
+              <div className="stat-lbl">RALLY MÁX.</div>
+            </div>
+          </div>
+
+          <p className="winner-text">
+            {gameOver.winner === 1
+              ? "Excelente! Você demonstrou boa coordenação e antecipação. Continue praticando!"
+              : options.mode === '1player'
+              ? "Não desanime! Cada partida treina reflexos e raciocínio. Tente novamente!"
+              : "Boa partida! Cada jogador mostrou suas habilidades. Joguem de novo!"}
+          </p>
+
+          <div className="btn-row">
+            <button className="btn green" onClick={() => { setGameOver(null); setScore({p1:0,p2:0}); if(gameRef.current){gameRef.current.destroy(true);gameRef.current=null;} setTimeout(()=>{ const g=createPhaserGame('phaser-container',options,{onScore:(p1,p2)=>{setScore({p1,p2});showTip();},onPause:()=>{setPaused(true);const s=g.scene.getScene('GameScene');if(s)s.setPaused(true);},onGameOver:(winner,p1,p2,rally)=>setGameOver({winner,p1,p2,rally})});gameRef.current=g;},80); }}>
+              ↺ Jogar Novamente
+            </button>
+            <button className="btn" onClick={onBack}>← Menu</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────── APP ROOT ─────────────── */
+function App() {
+  const [screen, setScreen] = useState('home');
+  const [options, setOptions] = useState({
+    difficulty: 'iniciante',
+    mode: '1player',
+    winScore: 7,
+    tips: true,
+    sound: true,
+    trail: true,
+  });
+
+  const nav = (s) => setScreen(s);
+
+  if (screen === 'home')     return <HomeScreen onNav={nav} />;
+  if (screen === 'options')  return <OptionsScreen options={options} setOptions={setOptions} onBack={() => nav('home')} />;
+  if (screen === 'pedagogy') return <PedagogyScreen onBack={() => nav('home')} />;
+  if (screen === 'credits')  return <CreditsScreen onBack={() => nav('home')} />;
+  if (screen === 'game')     return <GameScreen options={options} onBack={() => nav('home')} />;
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

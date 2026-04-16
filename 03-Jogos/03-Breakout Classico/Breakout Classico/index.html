@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Breakout Melhorado - Versão Educacional</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <h1>🎮 Breakout Melhorado</h1>
+    
+    <!-- Menu Principal -->
+    <div id="menu">
+        <button onclick="startGame('classic')">🎯 Modo Clássico</button>
+        <button onclick="startGame('multiplayer')">🤝 Modo Multiplayer</button>
+        <button onclick="startGame('survival')">⚡ Modo Sobrevivência</button>
+        <button onclick="showControls()">🎮 Controles</button>
+    </div>
+
+    <!-- Canvas do jogo (inicialmente oculto) -->
+    <div style="position: relative;">
+        <canvas id="gameCanvas" width="800" height="500" style="display: none;"></canvas>
+        <!-- Interface do usuário (HUD) -->
+        <div class="game-ui" style="display: none;" id="gameUI">
+            <div>Pontuação: <span id="scoreDisplay">0</span></div>
+            <div>Vidas: <span id="livesDisplay">3</span></div>
+            <div>Nível: <span id="levelDisplay">1</span></div>
+        </div>
+        <div class="power-up-info" style="display: none;" id="powerUpInfo">
+            <div id="activePowerUps"></div>
+        </div>
+    </div>
+
+    <!-- Tela de configuração de controles -->
+    <div id="controls" style="display: none;">
+        <h2>🎮 Configuração de Controles</h2>
+        <h3>Controles do Teclado:</h3>
+        <p><strong>Jogador 1:</strong> Setas ← → ou A/D</p>
+        <p><strong>Jogador 2:</strong> Q/E</p>
+        <p><strong>Especiais:</strong> ESPAÇO (pausar), R (reiniciar)</p>
+        
+        <h3>Controles do Gamepad:</h3>
+        <p>Conecte um controle USB/Bluetooth e use o D-Pad ou analógico esquerdo</p>
+        
+        <button onclick="backToMenu()">← Voltar ao Menu</button>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

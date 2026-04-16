@@ -1,0 +1,43 @@
+/* Define o estilo do corpo da página */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(to bottom, #70c5ce, #ffffff);
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+}
+
+/* Estilo do canvas onde o jogo será desenhado */
+#gameCanvas {
+    border: 2px solid #000;
+    background: linear-gradient(to bottom, #87CEEB, #f0f8ff);
+}
+
+/* Estilo do placar */
+#score, #lives {
+    font-size: 24px;
+    color: #333;
+    margin: 10px;
+}
+
+/* Estilo do pássaro */
+.bird {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: yellow;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo dos canos */
+.pipe {
+    display: inline-block;
+    width: 30px;
+    background-color: green;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}

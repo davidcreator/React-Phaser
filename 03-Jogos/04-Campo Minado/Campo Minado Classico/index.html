@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campo Minado Clássico - Versão Completa</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Tela de Menu Principal -->
+        <div id="menuScreen" class="screen active">
+            <header class="menu-header">
+                <h1 class="game-title">⛏️ CAMPO MINADO</h1>
+                <p class="subtitle">Versão Clássica Completa</p>
+                <div class="title-decoration"></div>
+            </header>
+            
+            <nav class="main-menu">
+                <button class="menu-btn primary" id="playBtn">
+                    🎮 JOGAR
+                </button>
+                <button class="menu-btn" id="settingsBtn">
+                    ⚙️ CONFIGURAÇÕES
+                </button>
+                <button class="menu-btn" id="statsBtn">
+                    📊 ESTATÍSTICAS
+                </button>
+                <button class="menu-btn" id="helpBtn">
+                    ❓ COMO JOGAR
+                </button>
+                <button class="menu-btn" id="creditsBtn">
+                    🏆 CRÉDITOS
+                </button>
+            </nav>
+            
+            <div class="menu-footer">
+                <p>Versão 2.0 - Jogo Didático Completo</p>
+            </div>
+        </div>
+
+        <!-- Tela de Seleção de Dificuldade -->
+        <div id="difficultyScreen" class="screen">
+            <header>
+                <h2>📐 Escolha a Dificuldade</h2>
+                <button class="back-btn" id="backFromDifficulty">← Voltar</button>
+            </header>
+            
+            <div class="difficulty-cards">
+                <div class="difficulty-card" data-difficulty="beginner">
+                    <h3>🌱 INICIANTE</h3>
+                    <div class="card-stats">
+                        <p>Grade: 9x9</p>
+                        <p>Minas: 10</p>
+                        <p>Tempo Médio: 2 min</p>
+                    </div>
+                    <div class="best-time" id="bestTimeBeginner">Melhor: --:--</div>
+                </div>
+                
+                <div class="difficulty-card" data-difficulty="intermediate">
+                    <h3>⚡ INTERMEDIÁRIO</h3>
+                    <div class="card-stats">
+                        <p>Grade: 16x16</p>
+                        <p>Minas: 40</p>
+                        <p>Tempo Médio: 5 min</p>
+                    </div>
+                    <div class="best-time" id="bestTimeIntermediate">Melhor: --:--</div>
+                </div>
+                
+                <div class="difficulty-card" data-difficulty="expert">
+                    <h3>🔥 ESPECIALISTA</h3>
+                    <div class="card-stats">
+                        <p>Grade: 30x16</p>
+                        <p>Minas: 99</p>
+                        <p>Tempo Médio: 10 min</p>
+                    </div>
+                    <div class="best-time" id="bestTimeExpert">Melhor: --:--</div>
+                </div>
+                
+                <div class="difficulty-card" data-difficulty="custom">
+                    <h3>🎯 PERSONALIZADO</h3>
+                    <div class="card-stats custom-inputs">
+                        <input type="number" id="customRows" placeholder="Linhas" min="5" max="30" value="12">
+                        <input type="number" id="customCols" placeholder="Colunas" min="5" max="30" value="12">
+                        <input type="number" id="customMines" placeholder="Minas" min="1" max="200" value="20">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela do Jogo -->
+        <div id="gameScreen" class="screen">
+            <div class="game-header">
+                <button class="back-btn" id="backToMenu">🏠 Menu</button>
+                
+                <div class="game-stats">
+                    <div class="stat-display">
+                        <span class="stat-icon">💣</span>
+                        <span id="mineCount">10</span>
+                    </div>
+                    <div class="stat-display timer-display">
+                        <span class="stat-icon">⏱️</span>
+                        <span id="timer">00:00</span>
+                    </div>
+                    <div class="stat-display">
+                        <span class="stat-icon">🎯</span>
+                        <span id="score">0</span>
+                    </div>
+                    <div class="stat-display">
+                        <span class="stat-icon">🏅</span>
+                        <span id="streak">0</span>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button id="pauseBtn" class="control-btn">⏸️</button>
+                    <button id="newGameBtn" class="control-btn">🔄</button>
+                    <button id="hintBtn" class="control-btn">💡</button>
+                </div>
+            </div>
+            
+            <div class="game-container">
+                <canvas id="gameCanvas"></canvas>
+                <div id="gameOverlay" class="game-overlay hidden">
+                    <div class="overlay-content">
+                        <h2 id="overlayTitle">Jogo Pausado</h2>
+                        <p id="overlayMessage">Clique para continuar</p>
+                        <button id="resumeBtn" class="overlay-btn">▶️ Continuar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-status">
+                <div id="statusMessage">Clique para começar! Use dicas se precisar de ajuda.</div>
+                <div class="progress-bar">
+                    <div id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela de Configurações -->
+        <div id="settingsScreen" class="screen">
+            <header>
+                <h2>⚙️ Configurações</h2>
+                <button class="back-btn" id="backFromSettings">← Voltar</button>
+            </header>
+            
+            <div class="settings-content">
+                <div class="setting-group">
+                    <h3>🎨 Tema Visual</h3>
+                    <div class="theme-selector">
+                        <button class="theme-btn active" data-theme="default">Padrão</button>
+                        <button class="theme-btn" data-theme="dark">Escuro</button>
+                        <button class="theme-btn" data-theme="neon">Neon</button>
+                        <button class="theme-btn" data-theme="retro">Retrô</button>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3>🔊 Audio</h3>
+                    <label class="toggle-setting">
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span class="toggle-slider"></span>
+                        Efeitos Sonoros
+                    </label>
+                    <label class="toggle-setting">
+                        <input type="checkbox" id="musicToggle" checked>
+                        <span class="toggle-slider"></span>
+                        Música de Fundo
+                    </label>
+                </div>
+                
+                <div class="setting-group">
+                    <h3>🎮 Jogabilidade</h3>
+                    <label class="toggle-setting">
+                        <input type="checkbox" id="animationsToggle" checked>
+                        <span class="toggle-slider"></span>
+                        Animações
+                    </label>
+                    <label class="toggle-setting">
+                        <input type="checkbox" id="hintsToggle" checked>
+                        <span class="toggle-slider"></span>
+                        Sistema de Dicas
+                    </label>
+                    <label class="toggle-setting">
+                        <input type="checkbox" id="autoFlagToggle">
+                        <span class="toggle-slider"></span>
+                        Auto-Bandeira em Números Completos
+                    </label>
+                </div>
+                
+                <div class="setting-group">
+                    <h3>📱 Interface</h3>
+                    <div class="size-selector">
+                        <label>Tamanho das Células:</label>
+                        <input type="range" id="cellSizeSlider" min="15" max="60" value="35" title="Ajuste o tamanho das células" placeholder="Tamanho das células" aria-label="Controle deslizante para ajustar o tamanho das células">
+                        <span id="cellSizeValue">35px</span>
+                    </div>
+                </div>
+                
+                <button id="resetStatsBtn" class="danger-btn">🗑️ Resetar Estatísticas</button>
+            </div>
+        </div>
+
+        <!-- Tela de Estatísticas -->
+        <div id="statsScreen" class="screen">
+            <header>
+                <h2>📊 Estatísticas</h2>
+                <button class="back-btn" id="backFromStats">← Voltar</button>
+            </header>
+            
+            <div class="stats-content">
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <h3>🏆 Total de Vitórias</h3>
+                        <span class="stat-value" id="totalWins">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>💥 Total de Derrotas</h3>
+                        <span class="stat-value" id="totalLosses">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>📈 Taxa de Vitória</h3>
+                        <span class="stat-value" id="winRate">0%</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>⏱️ Tempo Total</h3>
+                        <span class="stat-value" id="totalTime">0:00:00</span>
+                    </div>
+                </div>
+                
+                <div class="best-times-section">
+                    <h3>🥇 Melhores Tempos</h3>
+                    <div class="best-times-list">
+                        <div class="time-entry">
+                            <span class="difficulty-name">Iniciante:</span>
+                            <span class="time-value" id="bestTimeDisplayBeginner">--:--</span>
+                        </div>
+                        <div class="time-entry">
+                            <span class="difficulty-name">Intermediário:</span>
+                            <span class="time-value" id="bestTimeDisplayIntermediate">--:--</span>
+                        </div>
+                        <div class="time-entry">
+                            <span class="difficulty-name">Especialista:</span>
+                            <span class="time-value" id="bestTimeDisplayExpert">--:--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <canvas id="statsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Tela de Ajuda -->
+        <div id="helpScreen" class="screen">
+            <header>
+                <h2>❓ Como Jogar</h2>
+                <button class="back-btn" id="backFromHelp">← Voltar</button>
+            </header>
+            
+            <div class="help-content">
+                <div class="help-section">
+                    <h3>🎯 Objetivo</h3>
+                    <p>Revelar todas as células do campo sem explodir nenhuma mina. Use os números como pistas para localizar as minas.</p>
+                </div>
+                
+                <div class="help-section">
+                    <h3>🖱️ Controles</h3>
+                    <ul class="help-list">
+                        <li><strong>Clique Esquerdo:</strong> Revela uma célula</li>
+                        <li><strong>Clique Direito:</strong> Marca/desmarca bandeira</li>
+                        <li><strong>Duplo Clique:</strong> Revela células adjacentes (se bandeiras corretas)</li>
+                        <li><strong>Tecla Espaço:</strong> Pausa o jogo</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3>🔢 Números</h3>
+                    <p>Cada número indica quantas minas existem nas 8 células adjacentes. Use essa informação para deduzir onde estão as minas.</p>
+                    <div class="number-guide">
+                        <span class="number-example" style="color: #0984e3;">1</span>
+                        <span class="number-example" style="color: #00b894;">2</span>
+                        <span class="number-example" style="color: #e17055;">3</span>
+                        <span class="number-example" style="color: #6c5ce7;">4</span>
+                        <span class="number-example" style="color: #a29bfe;">5</span>
+                        <span class="number-example" style="color: #fd79a8;">6</span>
+                        <span class="number-example" style="color: #fdcb6e;">7</span>
+                        <span class="number-example" style="color: #e84393;">8</span>
+                    </div>
+                </div>
+                
+                <div class="help-section">
+                    <h3>💡 Dicas</h3>
+                    <ul class="help-list">
+                        <li>Comece pelos cantos e bordas</li>
+                        <li>Procure por padrões de números</li>
+                        <li>Use bandeiras para marcar minas suspeitas</li>
+                        <li>Números satisfeitos permitem revelar células adjacentes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela de Créditos -->
+        <div id="creditsScreen" class="screen">
+            <header>
+                <h2>🏆 Créditos</h2>
+                <button class="back-btn" id="backFromCredits">← Voltar</button>
+            </header>
+            
+            <div class="credits-content">
+                <div class="credits-section">
+                    <h3>💻 Desenvolvimento</h3>
+                    <p>Campo Minado Clássico - Versão Didática Completa</p>
+                    <p>Implementado em JavaScript vanilla com HTML5 Canvas</p>
+                </div>
+                
+                <div class="credits-section">
+                    <h3>🎓 Propósito Educativo</h3>
+                    <p>Este jogo foi criado como exemplo didático para ensino de:</p>
+                    <ul>
+                        <li>Desenvolvimento de jogos em JavaScript</li>
+                        <li>Manipulação de Canvas HTML5</li>
+                        <li>Programação orientada a objetos</li>
+                        <li>Algoritmos de busca e recursão</li>
+                        <li>Gerenciamento de estado e eventos</li>
+                        <li>Design responsivo e UX</li>
+                    </ul>
+                </div>
+                
+                <div class="credits-section">
+                    <h3>🎨 Recursos Implementados</h3>
+                    <ul>
+                        <li>Sistema de menu completo</li>
+                        <li>Múltiplos temas visuais</li>
+                        <li>Estatísticas detalhadas</li>
+                        <li>Configurações personalizáveis</li>
+                        <li>Sistema de dicas</li>
+                        <li>Responsividade total</li>
+                    </ul>
+                </div>
+                
+                <div class="version-info">
+                    <p>Versão 2.0 - Março 2024</p>
+                    <p>Licença: Educacional</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/script.js"></script>
+</body>
+</html>

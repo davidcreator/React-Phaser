@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Dominó - Educacional</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Menu Principal -->
+    <div id="menuPrincipal" class="menu-container">
+        <div class="menu-content">
+            <h1 class="titulo-principal">🎲 Jogo de Dominó</h1>
+            <p class="subtitulo">Aprenda e divirta-se com diferentes modalidades!</p>
+            
+            <div class="opcoes-jogo">
+                <div class="modo-jogo" data-modo="classico">
+                    <h3>🎯 Dominó Clássico</h3>
+                    <p>Modalidade tradicional com 28 peças</p>
+                    <span class="dificuldade facil">Fácil</span>
+                </div>
+                
+                <div class="modo-jogo" data-modo="bloqueio">
+                    <h3>🔒 Dominó de Bloqueio</h3>
+                    <p>Estratégia para bloquear o adversário</p>
+                    <span class="dificuldade medio">Médio</span>
+                </div>
+                
+                <div class="modo-jogo" data-modo="pontos">
+                    <h3>📊 Dominó por Pontos</h3>
+                    <p>Primeiro a atingir 100 pontos vence</p>
+                    <span class="dificuldade dificil">Difícil</span>
+                </div>
+                
+                <div class="modo-jogo" data-modo="duplo-seis">
+                    <h3>⚡ Duplo-Seis Especial</h3>
+                    <p>Regras especiais para duplas</p>
+                    <span class="dificuldade medio">Médio</span>
+                </div>
+            </div>
+            
+            <div class="menu-rodape">
+                <button id="btnInstrucoes" class="btn-secundario">📖 Como Jogar</button>
+                <button id="btnEstatisticas" class="btn-secundario">📈 Estatísticas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela do Jogo -->
+    <div id="telaJogo" class="game-container" style="display: none;">
+        <div class="game-header">
+            <div class="info-jogo">
+                <h2 id="modoAtual">Dominó Clássico</h2>
+                <button id="btnMenu" class="btn-voltar">← Menu</button>
+            </div>
+            
+            <div class="pontuacao">
+                <div class="placar-jogador">
+                    <span>Você: </span>
+                    <span id="pontosJogador">0</span>
+                </div>
+                <div class="placar-oponente">
+                    <span>IA: </span>
+                    <span id="pontosIA">0</span>
+                </div>
+            </div>
+            
+            <div class="controles-jogo">
+                <button id="btnComprar" class="btn-acao">🎲 Comprar</button>
+                <button id="btnPassar" class="btn-acao">⏭️ Passar</button>
+                <button id="btnNovoJogo" class="btn-acao">🔄 Novo Jogo</button>
+            </div>
+        </div>
+
+        <!-- Canvas do Jogo -->
+        <canvas id="canvasJogo" width="1200" height="700"></canvas>
+        
+        <!-- Painel de Informações -->
+        <div class="painel-info">
+            <div class="info-item">
+                <span class="label">Status:</span>
+                <span id="statusJogo">Sua vez</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Peças na mão:</span>
+                <span id="pecasJogador">7</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Peças da IA:</span>
+                <span id="pecasIA">7</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Estoque:</span>
+                <span id="pecasEstoque">14</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Movimentos:</span>
+                <span id="numeroMovimentos">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Instruções -->
+    <div id="modalInstrucoes" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📖 Como Jogar Dominó</h2>
+                <span class="fechar">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h3>🎯 Objetivo</h3>
+                <p>Seja o primeiro a jogar todas as suas peças ou tenha o menor valor na mão quando o jogo travar.</p>
+                
+                <h3>🎮 Controles</h3>
+                <ul>
+                    <li><strong>Arrastar:</strong> Clique e arraste uma peça para jogá-la</li>
+                    <li><strong>Comprar:</strong> Clique no botão "Comprar" ou pressione 'C'</li>
+                    <li><strong>Passar:</strong> Clique no botão "Passar" ou pressione 'P'</li>
+                </ul>
+                
+                <h3>📋 Regras Básicas</h3>
+                <ul>
+                    <li>Cada jogador começa com 7 peças</li>
+                    <li>Quem tem a maior dupla começa</li>
+                    <li>Conecte peças com números iguais</li>
+                    <li>Se não puder jogar, compre do estoque</li>
+                    <li>Se o estoque acabar, passe a vez</li>
+                </ul>
+                
+                <h3>🏆 Modalidades</h3>
+                <p><strong>Clássico:</strong> Tradicional jogo de dominó</p>
+                <p><strong>Bloqueio:</strong> Foque em bloquear o adversário</p>
+                <p><strong>Por Pontos:</strong> Primeiro a 100 pontos vence</p>
+                <p><strong>Duplo-Seis:</strong> Regras especiais para duplas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Estatísticas -->
+    <div id="modalEstatisticas" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📈 Suas Estatísticas</h2>
+                <span class="fechar">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>🎯 Clássico</h4>
+                        <p>Partidas: <span id="partidasClassico">0</span></p>
+                        <p>Vitórias: <span id="vitoriasClassico">0</span></p>
+                        <p>Taxa: <span id="taxaClassico">0%</span></p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>🔒 Bloqueio</h4>
+                        <p>Partidas: <span id="partidasBloqueio">0</span></p>
+                        <p>Vitórias: <span id="vitoriasBloqueio">0</span></p>
+                        <p>Taxa: <span id="taxaBloqueio">0%</span></p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>📊 Por Pontos</h4>
+                        <p>Partidas: <span id="partidasPontos">0</span></p>
+                        <p>Vitórias: <span id="vitoriasPontos">0</span></p>
+                        <p>Recorde: <span id="recordePontos">0</span></p>
+                    </div>
+                    <div class="stat-card">
+                        <h4>⚡ Duplo-Seis</h4>
+                        <p>Partidas: <span id="partidasDuplo">0</span></p>
+                        <p>Vitórias: <span id="vitoriasDuplo">0</span></p>
+                        <p>Taxa: <span id="taxaDuplo">0%</span></p>
+                    </div>
+                </div>
+                <div class="stats-gerais">
+                    <h4>📊 Estatísticas Gerais</h4>
+                    <p>Total de partidas: <span id="totalPartidas">0</span></p>
+                    <p>Total de vitórias: <span id="totalVitorias">0</span></p>
+                    <p>Sequência atual: <span id="sequenciaAtual">0</span></p>
+                    <p>Melhor sequência: <span id="melhorSequencia">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Fim de Jogo -->
+    <div id="modalFimJogo" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="tituloFimJogo">🏆 Fim de Jogo</h2>
+            </div>
+            <div class="modal-body">
+                <div id="resultadoJogo" class="resultado-jogo">
+                    <!-- Resultado será inserido dinamicamente -->
+                </div>
+                <div class="acoes-fim-jogo">
+                    <button id="btnJogarNovamente" class="btn-primario">🔄 Jogar Novamente</button>
+                    <button id="btnVoltarMenu" class="btn-secundario">← Voltar ao Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts do Jogo -->
+    <script src="js/pecas.js"></script>
+    <script src="js/tabuleiro.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

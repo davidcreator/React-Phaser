@@ -1,0 +1,29 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+h1 {
+    margin-top: 20px;
+}
+
+#quizCanvas {
+    border: 2px solid #333;
+    background-color: #fff;
+    display: block;
+    margin: 20px auto;
+}
+
+#status {
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    cursor: pointer;
+}

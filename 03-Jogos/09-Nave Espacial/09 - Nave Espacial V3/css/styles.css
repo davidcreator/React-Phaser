@@ -1,0 +1,32 @@
+/* Define o estilo do canvas para ocupar toda a tela */
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to bottom, #000428, #004e92);
+}
+
+canvas {
+    border: 1px solid white;
+}
+
+/* Estilo para a interface do usuário */
+#ui {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+}
+
+#lives .life {
+    margin-right: 5px;
+}

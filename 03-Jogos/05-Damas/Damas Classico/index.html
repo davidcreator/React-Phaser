@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Damas Clássico - Educativo</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- TELA INICIAL -->
+        <div id="mainScreen" class="main-screen fade-in">
+            <h1 class="main-title">🔴 DAMAS CLÁSSICO 🔴</h1>
+            <p class="subtitle">Jogo Educativo para Desenvolvimento de Games</p>
+            
+            <div class="game-modes">
+                <div class="mode-card selected" data-mode="classic">
+                    <span class="mode-icon">👥</span>
+                    <div class="mode-title">Modo Clássico</div>
+                    <div class="mode-description">Dois jogadores locais com regras tradicionais das damas</div>
+                </div>
+                
+                <div class="mode-card" data-mode="ai">
+                    <span class="mode-icon">🤖</span>
+                    <div class="mode-title">Contra IA</div>
+                    <div class="mode-description">Desafie a inteligência artificial em 3 níveis de dificuldade</div>
+                </div>
+                
+                <div class="mode-card" data-mode="timed">
+                    <span class="mode-icon">⏰</span>
+                    <div class="mode-title">Modo Cronometrado</div>
+                    <div class="mode-description">Jogue contra o tempo com turnos limitados</div>
+                </div>
+                
+                <div class="mode-card" data-mode="tutorial">
+                    <span class="mode-icon">🎓</span>
+                    <div class="mode-title">Tutorial Interativo</div>
+                    <div class="mode-description">Aprenda jogando com guias passo a passo</div>
+                </div>
+            </div>
+
+            <div id="difficultySelector" class="difficulty-selector">
+                <div class="difficulty-title">Escolha a Dificuldade da IA:</div>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn active" data-level="easy">🟢 Fácil</button>
+                    <button class="difficulty-btn" data-level="medium">🟡 Médio</button>
+                    <button class="difficulty-btn" data-level="hard">🔴 Difícil</button>
+                </div>
+            </div>
+
+            <div class="main-buttons">
+                <button class="btn" id="startGameBtn">🚀 Iniciar Jogo</button>
+                <button class="btn secondary" id="settingsBtn">⚙️ Configurações</button>
+                <button class="btn" id="tutorialBtn">📖 Como Jogar</button>
+            </div>
+        </div>
+
+        <!-- TELA DE JOGO -->
+        <div id="gameScreen" class="game-screen">
+            <div class="game-header">
+                <div class="game-title" id="gameMode">Damas Clássico</div>
+                <button class="back-btn" id="backBtn">← Voltar ao Menu</button>
+            </div>
+            
+            <div class="game-info">
+                <div class="player-info active" id="player1Info">
+                    <strong id="player1Name">Jogador 1 (Vermelho)</strong><br>
+                    Peças: <span id="redCount">12</span>
+                </div>
+                
+                <div id="timerDisplay" class="timer" style="display: none;">
+                    ⏰ <span id="timeLeft">05:00</span>
+                </div>
+                
+                <div class="player-info" id="player2Info">
+                    <strong id="player2Name">Jogador 2 (Preto)</strong><br>
+                    Peças: <span id="blackCount">12</span>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="480" height="480"></canvas>
+            
+            <div id="status">Vez do Jogador 1 (Vermelho)</div>
+            
+            <div class="game-controls">
+                <button class="btn" id="resetBtn">🔄 Novo Jogo</button>
+                <button class="btn" id="undoBtn">↶ Desfazer</button>
+                <button class="btn secondary" id="pauseBtn">⏸️ Pausar</button>
+                <button class="btn" id="hintBtn">💡 Dica</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURAÇÕES -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ Configurações do Jogo</h3>
+            
+            <div class="setting-group">
+                <label class="setting-label">Nome do Jogador 1:</label>
+                <input type="text" class="setting-input" id="player1NameInput" placeholder="Jogador 1" maxlength="15">
+            </div>
+            
+            <div class="setting-group">
+                <label class="setting-label">Nome do Jogador 2:</label>
+                <input type="text" class="setting-input" id="player2NameInput" placeholder="Jogador 2" maxlength="15">
+            </div>
+            
+            <div class="setting-group">
+                <label class="setting-label">Tempo por Turno (minutos):</label>
+                <input type="number" class="setting-input" id="timePerTurn" min="1" max="10" value="5">
+            </div>
+            
+            <div class="setting-group">
+                <label class="setting-label">Som dos Efeitos:</label>
+                <select class="setting-input" id="soundEnabled">
+                    <option value="true">Ativado</option>
+                    <option value="false">Desativado</option>
+                </select>
+            </div>
+            
+            <div class="game-controls">
+                <button class="btn" id="saveSettingsBtn">💾 Salvar</button>
+                <button class="btn secondary" id="cancelSettingsBtn">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tutorial" id="tutorial" style="display: none;">
+        <h3>Como Jogar Damas:</h3>
+        <ul>
+            <li><strong>Objetivo:</strong> Capture todas as peças do adversário ou bloqueie seus movimentos.</li>
+            <li><strong>Movimento:</strong> Peças se movem diagonalmente para casas vazias.</li>
+            <li><strong>Captura:</strong> Pule sobre peças adversárias para capturá-las.</li>
+            <li><strong>Dama:</strong> Ao chegar na última fileira, a peça vira dama e pode se mover para trás.</li>
+            <li><strong>Captura Obrigatória:</strong> Se você pode capturar, deve fazê-lo!</li>
+        </ul>
+        
+        <h3>Modalidades de Jogo:</h3>
+        <ul>
+            <li><strong>Clássico:</strong> Dois jogadores locais seguindo regras tradicionais</li>
+            <li><strong>Contra IA:</strong> Desafie diferentes níveis de inteligência artificial</li>
+            <li><strong>Cronometrado:</strong> Cada jogador tem tempo limitado para fazer seus movimentos</li>
+            <li><strong>Tutorial:</strong> Aprenda com dicas e sugestões durante o jogo</li>
+        </ul>
+        
+        <h3>Conceitos de Programação (Para Estudantes):</h3>
+        <ul>
+            <li><strong>Canvas API:</strong> Desenho de gráficos 2D em JavaScript</li>
+            <li><strong>Estruturas de Dados:</strong> Array 2D para representar o tabuleiro</li>
+            <li><strong>Detecção de Eventos:</strong> Mouse clicks e coordenadas</li>
+            <li><strong>Lógica de Jogo:</strong> Estados, validação de movimentos</li>
+            <li><strong>IA Básica:</strong> Algoritmos de decisão para jogadores artificiais</li>
+            <li><strong>Sistema de Turnos:</strong> Controle de tempo e alternância</li>
+        </ul>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

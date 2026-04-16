@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Clássico - Jogo Didático Avançado</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="gamepad-status" id="gamepadStatus">
+        <div id="gamepadIndicator">🎮 Gamepad: Desconectado</div>
+    </div>
+
+    <div class="game-container">
+        <!-- Tela Inicial -->
+        <div class="start-screen" id="startScreen">
+            <h1>🐍 Snake Clássico</h1>
+            <p style="margin-bottom: 30px; font-size: 1.2em; color: #ccc;">
+                Jogo Didático Avançado para Desenvolvimento de Games
+            </p>
+
+            <div class="controls-selection">
+                <h3>Escolha o Tipo de Controle:</h3>
+                <button class="control-btn active" id="keyboardBtn" onclick="selectControl('keyboard')">
+                    ⌨️ Teclado
+                </button>
+                <button class="control-btn" id="gamepadBtn" onclick="selectControl('gamepad')">
+                    🎮 Gamepad/Controle USB
+                </button>
+            </div>
+
+            <div class="game-modes">
+                <button class="mode-btn" onclick="startGame('classic')">
+                    🎯 Clássico<br>
+                    <small>Jogo tradicional</small>
+                </button>
+                <button class="mode-btn" onclick="startGame('speed')">
+                    ⚡ Velocidade<br>
+                    <small>Acelera com o tempo</small>
+                </button>
+                <button class="mode-btn" onclick="startGame('obstacles')">
+                    🧱 Obstáculos<br>
+                    <small>Paredes no mapa</small>
+                </button>
+                <button class="mode-btn" onclick="startGame('portal')">
+                    🌀 Portal<br>
+                    <small>Atravesse as paredes</small>
+                </button>
+                <button class="mode-btn" onclick="startGame('survival')">
+                    💀 Sobrevivência<br>
+                    <small>Comida ruim aparece</small>
+                </button>
+                <button class="mode-btn" onclick="startGame('rainbow')">
+                    🌈 Arco-íris<br>
+                    <small>Comidas coloridas</small>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tela de Jogo -->
+        <div class="game-screen" id="gameScreen">
+            <div class="game-header">
+                <div class="game-info">
+                    <div class="score">Pontos: <span id="scoreValue">0</span></div>
+                    <div class="level">Nível: <span id="levelValue">1</span></div>
+                    <div class="speed">Velocidade: <span id="speedValue">1</span></div>
+                </div>
+                <div class="mode-display" id="modeDisplay">Modo Clássico</div>
+            </div>
+            
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="game-controls">
+                <div class="controls-info" id="controlsInfo">
+                    <strong>Teclado:</strong><br>
+                    Setas ou WASD para mover<br>
+                    ESC para pausar
+                </div>
+                <div class="game-buttons">
+                    <button class="pause-btn" id="pauseBtn" onclick="togglePause()">⏸️ Pausar</button>
+                    <button class="menu-btn" onclick="backToMenu()">🏠 Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over -->
+    <div class="game-over" id="gameOver">
+        <h2>Game Over!</h2>
+        <div class="final-stats">
+            <p>Pontuação Final: <span id="finalScore">0</span></p>
+            <p>Nível Alcançado: <span id="finalLevel">1</span></p>
+            <p>Modo de Jogo: <span id="finalMode">Clássico</span></p>
+        </div>
+        <button class="restart-btn" onclick="restartGame()">🔄 Jogar Novamente</button>
+        <button class="restart-btn" onclick="backToMenu()">🏠 Menu Principal</button>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

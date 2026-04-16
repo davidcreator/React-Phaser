@@ -1,0 +1,428 @@
+/* Reset e configurações básicas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    overflow: hidden;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    max-width: 900px;
+    width: 90vw;
+    position: relative;
+}
+
+/* === TELA INICIAL === */
+.main-screen {
+    display: block;
+}
+
+.main-title {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    0% { text-shadow: 0 0 20px rgba(255, 107, 107, 0.5); }
+    100% { text-shadow: 0 0 30px rgba(254, 202, 87, 0.8); }
+}
+
+.subtitle {
+    font-size: 1.2em;
+    margin-bottom: 40px;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.game-modes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.mode-card {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 25px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.mode-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s;
+    opacity: 0;
+}
+
+.mode-card:hover::before {
+    animation: shimmer 1.5s infinite;
+    opacity: 1;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.mode-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: #feca57;
+    box-shadow: 0 15px 35px rgba(254, 202, 87, 0.3);
+}
+
+.mode-card.selected {
+    border-color: #feca57;
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(254, 202, 87, 0.3);
+}
+
+.mode-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.mode-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #feca57;
+}
+
+.mode-description {
+    font-size: 0.9em;
+    line-height: 1.4;
+    opacity: 0.8;
+}
+
+.difficulty-selector {
+    margin: 30px 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    display: none;
+}
+
+.difficulty-title {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    color: #feca57;
+}
+
+.difficulty-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.difficulty-btn {
+    padding: 10px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.difficulty-btn.active,
+.difficulty-btn:hover {
+    border-color: #feca57;
+    background: rgba(254, 202, 87, 0.2);
+    transform: scale(1.05);
+}
+
+.btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    font-size: 1.1em;
+    margin: 5px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn.secondary {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+}
+
+/* === TELA DE JOGO === */
+.game-screen {
+    display: none;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.game-title {
+    font-size: 2em;
+    background: linear-gradient(45deg, #ff6b6b, #feca57);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.back-btn {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    transform: scale(1.05);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.player-info {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px 25px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    min-width: 180px;
+}
+
+.player-info.active {
+    border-color: #feca57;
+    box-shadow: 0 0 20px rgba(254, 202, 87, 0.4);
+    transform: scale(1.05);
+}
+
+.timer {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 20px;
+    border-radius: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.2em;
+    color: #feca57;
+}
+
+#gameCanvas {
+    border: 3px solid #fff;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    background: #654321;
+    margin: 20px 0;
+}
+
+.game-controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+#status {
+    margin: 20px 0;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #feca57;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tutorial {
+    margin-top: 20px;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.tutorial h3 {
+    color: #feca57;
+    margin-bottom: 10px;
+}
+
+.tutorial ul {
+    margin-left: 20px;
+    line-height: 1.6;
+}
+
+/* === MODAL DE CONFIGURAÇÕES === */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal h3 {
+    color: #feca57;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.setting-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.setting-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.setting-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1em;
+}
+
+.setting-input:focus {
+    border-color: #feca57;
+    outline: none;
+}
+
+/* === RESPONSIVIDADE === */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .main-title {
+        font-size: 2.5em;
+    }
+    
+    .game-modes {
+        grid-template-columns: 1fr;
+    }
+    
+    #gameCanvas {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .player-info {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 2em;
+    }
+    
+    .mode-card {
+        padding: 20px;
+    }
+    
+    .difficulty-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 1em;
+    }
+}
+
+/* === ANIMAÇÕES === */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

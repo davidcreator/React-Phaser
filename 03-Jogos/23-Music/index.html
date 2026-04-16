@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guitar Hero Clone</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="gameInfo">
+        <div id="score">Pontuação: 0</div>
+        <div id="feedback"></div>
+        <div id="musicSelector">
+            <label for="music">Escolha a música:</label>
+            <select id="music">
+                <option value="01 If You Found This It's Probably T.mp3">01 If You Found This It's Probably T</option>
+                <option value="02 Brianstorm.mp3">02 Brianstorm</option>
+                <option value="03 Temptation Greets You Like Your N.mp3">03 Temptation Greets You Like Your N</option>
+            </select>
+        </div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <audio id="backgroundMusic"></audio>
+    <script src="js/audio.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Multi-Modalidades - Jogo Didático Avançado</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🏓 PONG MULTI-MODALIDADES</h1>
+        
+        <!-- Menu Principal -->
+        <div id="mainMenu" class="menu">
+            <div class="mode-selection">
+                <h2>🎯 Escolha o Modo de Jogo</h2>
+                <div class="mode-grid">
+                    <div class="mode-card" data-mode="classic">
+                        <div class="mode-icon">🏓</div>
+                        <h3>Clássico</h3>
+                        <p>Jogador vs CPU tradicional</p>
+                    </div>
+                    <div class="mode-card" data-mode="multiplayer">
+                        <div class="mode-icon">👥</div>
+                        <h3>2 Jogadores</h3>
+                        <p>Jogador vs Jogador local</p>
+                    </div>
+                    <div class="mode-card" data-mode="speed">
+                        <div class="mode-icon">⚡</div>
+                        <h3>Velocidade</h3>
+                        <p>Bola acelera constantemente</p>
+                    </div>
+                    <div class="mode-card" data-mode="multi-ball">
+                        <div class="mode-icon">⚽</div>
+                        <h3>Multi-Bola</h3>
+                        <p>Várias bolas simultaneamente</p>
+                    </div>
+                    <div class="mode-card" data-mode="obstacles">
+                        <div class="mode-icon">🧱</div>
+                        <h3>Obstáculos</h3>
+                        <p>Com blocos no meio do campo</p>
+                    </div>
+                    <div class="mode-card" data-mode="power-ups">
+                        <div class="mode-icon">⭐</div>
+                        <h3>Power-ups</h3>
+                        <p>Colete poderes especiais</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controller-setup">
+                <h3>🎮 Configuração de Controles</h3>
+                <div class="controller-info">
+                    <div class="controller-status">
+                        <div id="controller1Status" class="controller-item">
+                            <span>🎮 Controle 1: </span>
+                            <span class="status disconnected">Não Conectado</span>
+                            <button id="testController1" class="test-btn" disabled>Testar</button>
+                        </div>
+                        <div id="controller2Status" class="controller-item">
+                            <span>🎮 Controle 2: </span>
+                            <span class="status disconnected">Não Conectado</span>
+                            <button id="testController2" class="test-btn" disabled>Testar</button>
+                        </div>
+                    </div>
+                    <div class="keyboard-controls">
+                        <div>
+                            <strong>Jogador 1:</strong> W/S ou ↑/↓
+                        </div>
+                        <div>
+                            <strong>Jogador 2:</strong> I/K (no modo 2 jogadores)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interface do Jogo -->
+        <div id="gameInterface" class="game-interface" style="display: none;">
+            <div class="info-panel">
+                <div class="score">
+                    <span id="player1Label">Jogador 1: <span id="player1Score">0</span></span>
+                    <span id="player2Label">CPU: <span id="player2Score">0</span></span>
+                </div>
+                <div class="game-info">
+                    <div id="currentMode">Modo: Clássico</div>
+                    <div id="gameTimer">Tempo: 0:00</div>
+                </div>
+            </div>
+            
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+            
+            <div class="game-controls">
+                <button id="startBtn">🚀 Iniciar</button>
+                <button id="pauseBtn" disabled>⏸️ Pausar</button>
+                <button id="resetBtn">🔄 Reiniciar</button>
+                <button id="backToMenuBtn">🏠 Menu</button>
+            </div>
+        </div>
+        
+        <div class="educational-info">
+            <h3>📚 Conceitos Avançados de Programação:</h3>
+            <div class="concepts">
+                <div class="concept">
+                    <strong>Gamepad API:</strong> Suporte nativo a controles USB/Bluetooth
+                </div>
+                <div class="concept">
+                    <strong>State Management:</strong> Gerenciamento de estados complexos do jogo
+                </div>
+                <div class="concept">
+                    <strong>Modular Design:</strong> Diferentes modos com lógicas específicas
+                </div>
+                <div class="concept">
+                    <strong>Collision Systems:</strong> Múltiplos tipos de colisão e física
+                </div>
+                <div class="concept">
+                    <strong>Event Systems:</strong> Sistema de eventos para power-ups e efeitos
+                </div>
+                <div class="concept">
+                    <strong>Animation Systems:</strong> Partículas e efeitos visuais avançados
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

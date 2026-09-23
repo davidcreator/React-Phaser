@@ -30,7 +30,7 @@ export const PRESETS: PresetDef[] = [
     id: "hero",
     name: "Herói",
     emoji: "🦸",
-    file: "./sheets/hero.png",
+    file: "./sheets/transparente/hero.png",
     description: "Cavaleiro aventureiro — jogável",
     accent: "#38bdf8",
     anims: [
@@ -45,7 +45,7 @@ export const PRESETS: PresetDef[] = [
     id: "ogre",
     name: "Ogro",
     emoji: "👹",
-    file: "./sheets/ogre.png",
+    file: "./sheets/transparente/ogre.png",
     description: "Monstro bruto com clava",
     accent: "#84cc16",
     anims: [
@@ -60,7 +60,7 @@ export const PRESETS: PresetDef[] = [
     id: "slime",
     name: "Slime",
     emoji: "🟢",
-    file: "./sheets/slime.png",
+    file: "./sheets/transparente/slime.png",
     description: "Gosma saltitante fofa",
     accent: "#22c55e",
     anims: [
@@ -75,7 +75,7 @@ export const PRESETS: PresetDef[] = [
     id: "dragon",
     name: "Dragão",
     emoji: "🐉",
-    file: "./sheets/dragon.png",
+    file: "./sheets/transparente/dragon.png",
     description: "Dragão vermelho — chefe",
     accent: "#ef4444",
     anims: [

@@ -8,15 +8,29 @@ import {
   type NpcInstance,
   type HitboxConfig,
   type BlendMode,
+  type FrameEdit,
+  type FrameRect,
 } from "./types";
 import { useGame } from "./game/useGame";
-import type { LiveGameState } from "./game/SpriteScene";
-import { loadImageFromFile, buildMeta, guessFrameSize } from "./game/sliceSheet";
+import type {
+  AnimationEventTrigger,
+  LiveGameState,
+} from "./game/SpriteScene";
+import {
+  loadImageFromFile,
+  buildMeta,
+  getFrameCount,
+  getFrameRect,
+  guessFrameSize,
+} from "./game/sliceSheet";
 import {
   exportConfigJson,
   exportPhaserComponent,
   exportSpriteSheetImage,
   exportFullProject,
+  exportRuntimeManifest,
+  exportRuntimeScript,
+  exportAtlasJson,
   importProject,
 } from "./game/exportProject";
 import * as audio from "./audio";
@@ -29,8 +43,10 @@ import {
   Select,
 } from "./components/ui";
 import { AnimationsPanel } from "./components/AnimationsPanel";
+import { FrameRectEditor } from "./components/FrameRectEditor";
 import { NpcPanel } from "./components/NpcPanel";
-import { HitboxPanel, TYPE_COLORS } from "./components/HitboxPanel";
+import { HitboxPanel } from "./components/HitboxPanel";
+import { TYPE_COLORS } from "./components/hitboxConstants";
 import { Timeline } from "./components/Timeline";
 import { HelpModal } from "./components/HelpModal";
 import { PresetGallery } from "./components/PresetGallery";
@@ -40,6 +56,8 @@ let idCounter = 0;
 const uid = () => `a${Date.now().toString(36)}${idCounter++}`;
 
 type Tab = "anim" | "character" | "npc" | "hitbox" | "fx" | "sound" | "stage";
+type UiScale = "normal" | "large" | "xlarge";
+const UI_SCALES: UiScale[] = ["normal", "large", "xlarge"];
 
 export default function App() {
   const [config, setConfig] = useState<ProjectConfig>(emptyProject());
@@ -57,6 +75,7 @@ export default function App() {
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [inspectedFrame, setInspectedFrame] = useState(0);
   const [tab, setTab] = useState<Tab>("anim");
   const [showHelp, setShowHelp] = useState(true);
   const [showTimeline, setShowTimeline] = useState(true);
@@ -64,15 +83,21 @@ export default function App() {
   const [exportOpen, setExportOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uiScale, setUiScale] = useState<UiScale>("normal");
+  const [lastEvent, setLastEvent] = useState<string | null>(null);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const configRef = useRef(config);
   configRef.current = config;
   // trava a aplicação de config parciais enquanto um sheet novo carrega
   const loadingRef = useRef(false);
+  const loadRequestRef = useRef(0);
 
   const callbacks = useRef({
-    onState: (s: LiveGameState) => setLive(s),
+    onState: (s: LiveGameState) => {
+      setLive(s);
+      setInspectedFrame(s.activeFrame);
+    },
     onError: (msg: string) => {
       setErrorMsg(msg);
       setLoading(false);
@@ -85,12 +110,16 @@ export default function App() {
       const scene = sceneRef.current;
       if (scene && configRef.current.meta) scene.applyConfig(configRef.current);
     },
+    onAnimationEvent: ({ event, animationName, frame }: AnimationEventTrigger) => {
+      setLastEvent(`${event.name} · ${animationName} · frame ${frame}`);
+    },
   }).current;
 
   const { sceneRef } = useGame(stageRef, config, callbacks);
 
   // carrega um novo spritesheet de forma segura (com estado de loading/erro)
   const loadSheet = (newConfig: ProjectConfig) => {
+    const requestId = ++loadRequestRef.current;
     setErrorMsg(null);
     setLoading(true);
     loadingRef.current = true;
@@ -102,7 +131,7 @@ export default function App() {
     });
     // fallback de segurança caso onReady/onError nunca disparem
     window.setTimeout(() => {
-      if (loadingRef.current) {
+      if (requestId === loadRequestRef.current && loadingRef.current) {
         setLoading(false);
         loadingRef.current = false;
       }
@@ -123,7 +152,33 @@ export default function App() {
     config.stage,
     config.npcs,
     config.hitboxes,
+    config.frameEdits,
   ]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("spritelab-ui-scale");
+      if (stored === "normal" || stored === "large" || stored === "xlarge") {
+        setUiScale(stored);
+      }
+    } catch {
+      // Alguns contextos privados bloqueiam localStorage; use a escala padrão.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("spritelab-ui-scale", uiScale);
+    } catch {
+      // Preferência visual não deve impedir o uso do editor.
+    }
+  }, [uiScale]);
+
+  useEffect(() => {
+    if (!lastEvent) return;
+    const timer = window.setTimeout(() => setLastEvent(null), 1800);
+    return () => window.clearTimeout(timer);
+  }, [lastEvent]);
 
   useEffect(() => {
     if (config.sound.ambientEnabled) audio.startAmbient();
@@ -151,6 +206,7 @@ export default function App() {
       const newConfig = { ...emptyProject(), meta };
       setSelectedId(null);
       setEditingId(null);
+      setInspectedFrame(0);
       loadSheet(newConfig);
     } catch (e) {
       console.error(e);
@@ -166,6 +222,7 @@ export default function App() {
       const newConfig = await loadPreset(preset);
       setSelectedId(newConfig.animations[0]?.id ?? null);
       setEditingId(null);
+      setInspectedFrame(0);
       setShowPresets(false);
       loadSheet(newConfig);
     } catch (e) {
@@ -176,14 +233,16 @@ export default function App() {
   };
 
   const handleImportProject = async (file: File) => {
+    setErrorMsg(null);
     try {
-      const proj = await importProject(file);
-      const merged = { ...emptyProject(), ...proj };
-      setSelectedId(merged.animations[0]?.id ?? null);
+      const project = await importProject(file);
+      setSelectedId(project.animations[0]?.id ?? null);
       setEditingId(null);
-      loadSheet(merged);
+      setInspectedFrame(0);
+      loadSheet(project);
     } catch (e) {
-      setErrorMsg("Arquivo de projeto inválido.");
+      const message = e instanceof Error ? e.message : "Arquivo de projeto inválido.";
+      setErrorMsg(message);
       console.error(e);
     }
   };
@@ -195,6 +254,7 @@ export default function App() {
     my: number;
     sx: number;
     sy: number;
+    frameRects: FrameRect[] | null;
   }>) => {
     if (!config.meta) return;
     const m = config.meta;
@@ -208,10 +268,91 @@ export default function App() {
       patch.mx ?? m.marginX,
       patch.my ?? m.marginY,
       patch.sx ?? m.spacingX,
-      patch.sy ?? m.spacingY
+      patch.sy ?? m.spacingY,
+      "frameRects" in patch ? patch.frameRects : m.frameRects
     );
-    const newConfig = { ...configRef.current, meta };
+    const maxFrame = Math.max(0, meta.totalFrames - 1);
+    const animations = configRef.current.animations.map((animation) => ({
+      ...animation,
+      startFrame: Math.min(maxFrame, Math.max(0, animation.startFrame)),
+      endFrame: Math.min(maxFrame, Math.max(0, animation.endFrame)),
+      frameOrder: animation.frameOrder?.map((frame) =>
+        Math.min(maxFrame, Math.max(0, frame))
+      ) ?? null,
+    }));
+    const frameEdits = Object.fromEntries(
+      Object.entries(configRef.current.frameEdits).filter(
+        ([frame]) => Number(frame) >= 0 && Number(frame) <= maxFrame
+      )
+    );
+    const hitboxes = configRef.current.hitboxes.map((hitbox) => ({
+      ...hitbox,
+      frame:
+        hitbox.frame === null || hitbox.frame <= maxFrame ? hitbox.frame : null,
+    }));
+    const newConfig = {
+      ...configRef.current,
+      meta,
+      animations,
+      frameEdits,
+      hitboxes,
+    };
     loadSheet(newConfig);
+  };
+
+  const enterFreeFrameMode = () => {
+    if (!config.meta || config.meta.frameRects?.length) return;
+    const rects = Array.from({ length: config.meta.totalFrames }, (_, index) =>
+      getFrameRect(config.meta!, index)
+    ).filter((rect): rect is FrameRect => Boolean(rect));
+    rebuildImage({ frameRects: rects });
+  };
+
+  const updateFrameRects = (rects: FrameRect[]) => {
+    rebuildImage({ frameRects: rects });
+  };
+
+  const patchFrameEdit = (frame: number, patch: Partial<FrameEdit>) => {
+    const safeFrame = Math.max(0, Math.floor(frame));
+    setInspectedFrame(safeFrame);
+    // Ao começar um ajuste, congela o frame alvo. Assim o slider nunca grava
+    // valores em quadros diferentes porque a animação continuou tocando.
+    sceneRef.current?.setFrame(safeFrame);
+    const key = String(safeFrame);
+    setConfig((current) => ({
+      ...current,
+      frameEdits: {
+        ...current.frameEdits,
+        [key]: { ...current.frameEdits[key], ...patch },
+      },
+    }));
+  };
+
+  const clearFrameEdit = (frame: number) => {
+    const key = String(Math.max(0, Math.floor(frame)));
+    setConfig((current) => {
+      const frameEdits = { ...current.frameEdits };
+      delete frameEdits[key];
+      return { ...current, frameEdits };
+    });
+  };
+
+  const clearFrameOrigin = (frame: number) => {
+    const safeFrame = Math.max(0, Math.floor(frame));
+    setInspectedFrame(safeFrame);
+    sceneRef.current?.setFrame(safeFrame);
+    const key = String(safeFrame);
+    setConfig((current) => {
+      const edit = current.frameEdits[key];
+      if (!edit) return current;
+      const nextEdit = { ...edit };
+      delete nextEdit.originX;
+      delete nextEdit.originY;
+      const frameEdits = { ...current.frameEdits };
+      if (Object.keys(nextEdit).length) frameEdits[key] = nextEdit;
+      else delete frameEdits[key];
+      return { ...current, frameEdits };
+    });
   };
 
   // ---- animations ----
@@ -305,6 +446,8 @@ export default function App() {
       w: 0.4,
       h: 0.4,
       color: TYPE_COLORS[type],
+      frame: null,
+      enabled: true,
     };
     setConfig((c) => ({
       ...c,
@@ -333,15 +476,24 @@ export default function App() {
       animMapping: { ...c.animMapping, [slot]: v || null },
     }));
 
+  const selectFrame = (frame: number) => {
+    setInspectedFrame(Math.max(0, Math.floor(frame)));
+    sceneRef.current?.setFrame(frame);
+  };
+
   const selectedAnim = config.animations.find((a) => a.id === selectedId) ?? null;
+  const activeFrame = config.meta
+    ? Math.max(0, Math.min(config.meta.totalFrames - 1, inspectedFrame))
+    : 0;
+  const activeFrameEdit = config.frameEdits[String(activeFrame)] ?? {};
 
   return (
     <div
-      className="flex h-screen w-screen flex-col overflow-hidden bg-slate-950 text-slate-100"
+      className={`ui-root ui-scale-${uiScale} flex h-[100dvh] w-full min-w-0 flex-col overflow-hidden bg-slate-950 text-slate-100`}
       onClick={() => audio.resumeAudio()}
     >
       {/* Header */}
-      <header className="flex items-center gap-3 border-b border-slate-800 bg-slate-900 px-4 py-2.5">
+      <header className="flex min-h-14 flex-wrap items-center gap-3 border-b border-slate-800 bg-slate-900 px-3 py-2.5 sm:px-4">
         <div className="flex items-center gap-2">
           <span className="text-xl">🎮</span>
           <h1 className="text-lg font-bold tracking-tight">
@@ -351,12 +503,26 @@ export default function App() {
             Animation Studio · React + Phaser
           </span>
         </div>
-        <div className="flex-1" />
+        <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
         <StatusPill
           ok={live.gamepadConnected}
           label={live.gamepadConnected ? "🎮 Controle" : "🎮 Sem controle"}
         />
         <StatusPill ok label={`${live.fps} FPS`} neutral />
+        <button
+          type="button"
+          title="Aumentar o tamanho das letras"
+          aria-label={`Tamanho do texto: ${uiScale}. Clique para alterar`}
+          onClick={() =>
+            setUiScale((current) => {
+              const index = UI_SCALES.indexOf(current);
+              return UI_SCALES[(index + 1) % UI_SCALES.length];
+            })
+          }
+          className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-800"
+        >
+          Aa <span className="hidden sm:inline">{uiScale === "normal" ? "100%" : uiScale === "large" ? "115%" : "130%"}</span>
+        </button>
         <button
           onClick={() => setShowPresets(true)}
           className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-800"
@@ -375,9 +541,11 @@ export default function App() {
             type="file"
             accept="application/json"
             className="hidden"
-            onChange={(e) =>
-              e.target.files?.[0] && handleImportProject(e.target.files[0])
-            }
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.currentTarget.value = "";
+              if (file) void handleImportProject(file);
+            }}
           />
         </label>
         <div className="relative">
@@ -389,7 +557,7 @@ export default function App() {
             ⬇ Exportar
           </button>
           {exportOpen && (
-            <div className="absolute right-0 top-full z-30 mt-1 w-60 rounded-lg border border-slate-700 bg-slate-800 p-1 shadow-xl">
+            <div className="absolute right-0 top-full z-30 mt-1 w-72 max-w-[calc(100vw-1rem)] rounded-lg border border-slate-700 bg-slate-800 p-1 shadow-xl">
               <ExportItem
                 title="Projeto completo (.json)"
                 sub="Reimportável (inclui imagem)"
@@ -403,6 +571,30 @@ export default function App() {
                 sub="Configurações (sem imagem)"
                 onClick={() => {
                   exportConfigJson(config);
+                  setExportOpen(false);
+                }}
+              />
+              <ExportItem
+                title="Atlas JSON"
+                sub="Retângulos de frames para Phaser/web"
+                onClick={() => {
+                  exportAtlasJson(config);
+                  setExportOpen(false);
+                }}
+              />
+              <ExportItem
+                title="Runtime manifest (.json)"
+                sub="Configuração leve para seu jogo"
+                onClick={() => {
+                  exportRuntimeManifest(config);
+                  setExportOpen(false);
+                }}
+              />
+              <ExportItem
+                title="SpriteLabRuntime.ts"
+                sub="API Phaser com eventos e hitboxes"
+                onClick={() => {
+                  exportRuntimeScript(config);
                   setExportOpen(false);
                 }}
               />
@@ -425,14 +617,15 @@ export default function App() {
             </div>
           )}
         </div>
+        </div>
       </header>
 
       {/* Body */}
-      <div className="flex min-h-0 flex-1">
+      <div className="workspace-layout flex min-h-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
         {/* Stage + timeline */}
-        <main className="flex min-w-0 flex-1 flex-col bg-slate-900">
-          <div className="relative flex min-h-0 flex-1 flex-col">
-            <div ref={stageRef} className="min-h-0 flex-1" />
+        <main className="stage-main flex min-h-0 min-w-0 flex-1 flex-col bg-slate-900">
+          <div className="stage-viewport relative flex min-h-0 flex-1 flex-col">
+            <div ref={stageRef} className="stage-canvas min-h-0 w-full flex-1" />
 
             {/* overlay de carregamento */}
             {loading && (
@@ -480,9 +673,11 @@ export default function App() {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) =>
-                        e.target.files?.[0] && handleUpload(e.target.files[0])
-                      }
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.currentTarget.value = "";
+                        if (file) void handleUpload(file);
+                      }}
                     />
                   </label>
                   <button
@@ -511,6 +706,12 @@ export default function App() {
                 >
                   {live.onGround ? "no chão" : "no ar"}
                 </span>
+              </div>
+            )}
+
+            {lastEvent && config.meta && (
+              <div className="pointer-events-none absolute bottom-3 left-1/2 z-20 -translate-x-1/2 rounded-lg border border-fuchsia-400/40 bg-fuchsia-950/80 px-3 py-1.5 text-xs font-medium text-fuchsia-100 shadow-lg backdrop-blur">
+                ⚑ {lastEvent}
               </div>
             )}
 
@@ -564,12 +765,12 @@ export default function App() {
 
           {/* Timeline */}
           {config.meta && showTimeline && (
-            <div className="h-52 shrink-0 border-t border-slate-800 bg-slate-900">
+            <div className="stage-timeline h-48 shrink-0 border-t border-slate-800 bg-slate-900 sm:h-52">
               <Timeline
                 meta={config.meta}
                 anim={selectedAnim}
-                onScrub={(f) => sceneRef.current?.setFrame(f)}
-                onStep={(f) => sceneRef.current?.setFrame(f)}
+                onScrub={selectFrame}
+                onStep={selectFrame}
                 onPlay={() =>
                   selectedAnim && sceneRef.current?.playAnimation(selectedAnim.id)
                 }
@@ -581,7 +782,7 @@ export default function App() {
         </main>
 
         {/* Sidebar */}
-        <aside className="flex w-80 shrink-0 flex-col border-l border-slate-800 bg-slate-900">
+        <aside className="stage-sidebar flex min-h-0 max-h-[48dvh] w-full shrink-0 flex-col overflow-hidden border-t border-slate-800 bg-slate-900 lg:max-h-none lg:w-80 lg:border-l lg:border-t-0">
           <div className="border-b border-slate-800 p-3">
             <label className="block cursor-pointer rounded-lg border border-dashed border-slate-600 bg-slate-800/40 py-2.5 text-center text-xs font-semibold text-slate-300 hover:border-sky-500 hover:text-sky-300">
               {config.meta ? "🔄 Trocar spritesheet" : "📤 Enviar Spritesheet"}
@@ -589,9 +790,11 @@ export default function App() {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) =>
-                  e.target.files?.[0] && handleUpload(e.target.files[0])
-                }
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  e.currentTarget.value = "";
+                  if (file) void handleUpload(file);
+                }}
               />
             </label>
             {config.meta && (
@@ -638,37 +841,128 @@ export default function App() {
               <div className="min-h-0 flex-1 overflow-y-auto">
                 {tab === "anim" && (
                   <>
-                    <Section title="Grade de Frames" icon="🔲" defaultOpen={false}>
+                    <Section title="Leitura do Spritesheet" icon="🔲" defaultOpen={false}>
+                      {!config.meta.frameRects?.length ? (
+                        <>
+                          <div className="grid grid-cols-2 gap-2">
+                            <NumberField
+                              label="Larg. frame"
+                              value={config.meta.frameWidth}
+                              min={1}
+                              onChange={(v) => rebuildImage({ fw: v || 1 })}
+                            />
+                            <NumberField
+                              label="Alt. frame"
+                              value={config.meta.frameHeight}
+                              min={1}
+                              onChange={(v) => rebuildImage({ fh: v || 1 })}
+                            />
+                            <NumberField
+                              label="Margem"
+                              value={config.meta.marginX}
+                              min={0}
+                              onChange={(v) => rebuildImage({ mx: v, my: v })}
+                            />
+                            <NumberField
+                              label="Espaço"
+                              value={config.meta.spacingX}
+                              min={0}
+                              onChange={(v) => rebuildImage({ sx: v, sy: v })}
+                            />
+                          </div>
+                          <p className="text-[10px] text-slate-500">
+                            {config.meta.columns} col × {config.meta.rows} lin ={" "}
+                            {config.meta.totalFrames} frames
+                          </p>
+                          <button
+                            type="button"
+                            onClick={enterFreeFrameMode}
+                            className="w-full rounded-lg border border-amber-500/40 bg-amber-500/10 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20"
+                          >
+                            ✨ Editar áreas livremente
+                          </button>
+                          <p className="text-[10px] text-slate-500">
+                            Crie, mova e redimensione cada quadro diretamente sobre a imagem.
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-[10px] text-amber-200/80">
+                            Modo livre ativo: cada quadro possui posição e tamanho independentes.
+                          </p>
+                          <FrameRectEditor
+                            meta={config.meta}
+                            onChange={updateFrameRects}
+                            onSelectFrame={selectFrame}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => rebuildImage({ frameRects: null })}
+                            className="w-full rounded-lg bg-slate-800 py-2 text-xs text-slate-300 hover:bg-slate-700"
+                          >
+                            ↺ Voltar para grade uniforme
+                          </button>
+                        </>
+                      )}
+                    </Section>
+
+                    <Section title="Ajuste do quadro ativo" icon="🎯" defaultOpen={false}>
+                      <p className="text-[10px] text-slate-500">
+                        Frame {activeFrame}: ajustes adicionais sem alterar a imagem original.
+                        A origem X/Y fica na seção Transformação do Sprite.
+                      </p>
                       <div className="grid grid-cols-2 gap-2">
-                        <NumberField
-                          label="Larg. frame"
-                          value={config.meta.frameWidth}
-                          min={1}
-                          onChange={(v) => rebuildImage({ fw: v || 1 })}
+                        <Slider
+                          label="Escala X"
+                          value={activeFrameEdit.scaleX ?? 1}
+                          min={0.1}
+                          max={3}
+                          step={0.05}
+                          onChange={(v) => patchFrameEdit(activeFrame, { scaleX: v })}
                         />
-                        <NumberField
-                          label="Alt. frame"
-                          value={config.meta.frameHeight}
-                          min={1}
-                          onChange={(v) => rebuildImage({ fh: v || 1 })}
-                        />
-                        <NumberField
-                          label="Margem"
-                          value={config.meta.marginX}
-                          min={0}
-                          onChange={(v) => rebuildImage({ mx: v, my: v })}
-                        />
-                        <NumberField
-                          label="Espaço"
-                          value={config.meta.spacingX}
-                          min={0}
-                          onChange={(v) => rebuildImage({ sx: v, sy: v })}
+                        <Slider
+                          label="Escala Y"
+                          value={activeFrameEdit.scaleY ?? 1}
+                          min={0.1}
+                          max={3}
+                          step={0.05}
+                          onChange={(v) => patchFrameEdit(activeFrame, { scaleY: v })}
                         />
                       </div>
-                      <p className="text-[10px] text-slate-500">
-                        {config.meta.columns} col × {config.meta.rows} lin ={" "}
-                        {config.meta.totalFrames} frames
-                      </p>
+                      <Slider
+                        label="Rotação"
+                        value={activeFrameEdit.rotation ?? 0}
+                        min={-180}
+                        max={180}
+                        onChange={(v) => patchFrameEdit(activeFrame, { rotation: v })}
+                      />
+                      <Slider
+                        label="Opacidade"
+                        value={activeFrameEdit.alpha ?? 1}
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        onChange={(v) => patchFrameEdit(activeFrame, { alpha: v })}
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Toggle
+                          label="Flip X"
+                          value={activeFrameEdit.flipX ?? false}
+                          onChange={(v) => patchFrameEdit(activeFrame, { flipX: v })}
+                        />
+                        <Toggle
+                          label="Flip Y"
+                          value={activeFrameEdit.flipY ?? false}
+                          onChange={(v) => patchFrameEdit(activeFrame, { flipY: v })}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => clearFrameEdit(activeFrame)}
+                        className="w-full rounded bg-slate-800 py-1.5 text-xs text-slate-300 hover:bg-slate-700"
+                      >
+                        Limpar ajustes do frame
+                      </button>
                     </Section>
 
                     <Section title="Animações" icon="🎬">
@@ -684,6 +978,8 @@ export default function App() {
                         onDelete={deleteAnimation}
                         onDuplicate={duplicateAnimation}
                         onPlay={playAnimation}
+                        onPreviewFrame={selectFrame}
+                        activeFrame={activeFrame}
                       />
                     </Section>
 
@@ -738,6 +1034,15 @@ export default function App() {
                         onChange={(v) => patchCharacter({ speed: v })}
                       />
                       <Slider
+                        label="Multiplicador de corrida"
+                        value={config.character.runMultiplier}
+                        min={1}
+                        max={3.5}
+                        step={0.05}
+                        suffix="x"
+                        onChange={(v) => patchCharacter({ runMultiplier: v })}
+                      />
+                      <Slider
                         label="Aceleração (suavização)"
                         value={config.character.accel}
                         min={0.02}
@@ -760,6 +1065,31 @@ export default function App() {
                             min={100}
                             max={2500}
                             onChange={(v) => patchCharacter({ gravity: v })}
+                          />
+                          <Slider
+                            label="Velocidade máxima de queda"
+                            value={config.character.maxFallSpeed}
+                            min={100}
+                            max={3000}
+                            onChange={(v) => patchCharacter({ maxFallSpeed: v })}
+                          />
+                          <Slider
+                            label="Coyote time"
+                            value={config.character.coyoteTime}
+                            min={0}
+                            max={300}
+                            step={10}
+                            suffix=" ms"
+                            onChange={(v) => patchCharacter({ coyoteTime: v })}
+                          />
+                          <Slider
+                            label="Buffer do pulo"
+                            value={config.character.jumpBuffer}
+                            min={0}
+                            max={300}
+                            step={10}
+                            suffix=" ms"
+                            onChange={(v) => patchCharacter({ jumpBuffer: v })}
                           />
                           <Slider
                             label="Controle no ar"
@@ -820,23 +1150,36 @@ export default function App() {
                         step={0.05}
                         onChange={(v) => patchCharacter({ opacity: v })}
                       />
-                      <div className="grid grid-cols-2 gap-2">
-                        <Slider
-                          label="Origem X"
-                          value={config.character.originX}
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          onChange={(v) => patchCharacter({ originX: v })}
-                        />
-                        <Slider
-                          label="Origem Y"
-                          value={config.character.originY}
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          onChange={(v) => patchCharacter({ originY: v })}
-                        />
+                      <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
+                        <p className="mb-2 text-[10px] text-amber-200/80">
+                          Origem do frame ativo: <b>{activeFrame}</b>. Estes controles
+                          não alteram os outros quadros.
+                        </p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Slider
+                            label="Origem X"
+                            value={activeFrameEdit.originX ?? config.character.originX}
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            onChange={(v) => patchFrameEdit(activeFrame, { originX: v })}
+                          />
+                          <Slider
+                            label="Origem Y"
+                            value={activeFrameEdit.originY ?? config.character.originY}
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            onChange={(v) => patchFrameEdit(activeFrame, { originY: v })}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => clearFrameOrigin(activeFrame)}
+                          className="mt-2 w-full rounded bg-slate-800 px-2 py-1 text-[10px] text-slate-300 hover:bg-slate-700"
+                        >
+                          Usar origem padrão neste frame
+                        </button>
                       </div>
                     </Section>
 
@@ -861,7 +1204,7 @@ export default function App() {
                         />
                       )}
                       <Select
-                        label="Ease de transição"
+                        label="Ease do squash"
                         value={config.character.animBlendEase}
                         options={EASE_OPTIONS}
                         onChange={(v) =>
@@ -888,6 +1231,7 @@ export default function App() {
                   <Section title="Caixas de Colisão" icon="🟩">
                     <HitboxPanel
                       hitboxes={config.hitboxes}
+                      frameCount={getFrameCount(config.meta)}
                       showHitboxes={config.stage.showHitboxes}
                       onToggleShow={(v) => patchStage({ showHitboxes: v })}
                       onAdd={addHitbox}
@@ -1002,6 +1346,28 @@ export default function App() {
                         patchFx({ blendMode: v as BlendMode })
                       }
                     />
+                    <Toggle
+                      label="Glow (WebGL)"
+                      value={config.fx.glowEnabled}
+                      onChange={(v) => patchFx({ glowEnabled: v })}
+                    />
+                    {config.fx.glowEnabled && (
+                      <>
+                        <ColorField
+                          label="Cor glow"
+                          value={config.fx.glowColor}
+                          onChange={(v) => patchFx({ glowColor: v })}
+                        />
+                        <Slider
+                          label="Força glow"
+                          value={config.fx.glowStrength}
+                          min={0}
+                          max={20}
+                          step={0.5}
+                          onChange={(v) => patchFx({ glowStrength: v })}
+                        />
+                      </>
+                    )}
                   </Section>
                 )}
 
@@ -1055,25 +1421,53 @@ export default function App() {
                       onChange={(v) => patchSound({ actionEnabled: v })}
                     />
                     {config.sound.actionEnabled && (
-                      <>
-                        <SoundRow
-                          label="Freq. ação"
-                          value={config.sound.actionFreq}
-                          onChange={(v) => patchSound({ actionFreq: v })}
-                          onTest={() => audio.playAction(config.sound.actionFreq)}
-                        />
-                        <SoundRow
-                          label="Freq. pulo"
-                          value={config.sound.jumpFreq}
-                          onChange={(v) => patchSound({ jumpFreq: v })}
-                          onTest={() =>
-                            audio.previewTone(
-                              config.sound.jumpFreq,
-                              config.sound.waveform
-                            )
-                          }
-                        />
-                      </>
+                      <SoundRow
+                        label="Freq. ação"
+                        value={config.sound.actionFreq}
+                        onChange={(v) => patchSound({ actionFreq: v })}
+                        onTest={() =>
+                          audio.playAction(
+                            config.sound.actionFreq,
+                            config.sound.waveform
+                          )
+                        }
+                      />
+                    )}
+                    <Toggle
+                      label="Som de pulo"
+                      value={config.sound.jumpEnabled}
+                      onChange={(v) => patchSound({ jumpEnabled: v })}
+                    />
+                    {config.sound.jumpEnabled && (
+                      <SoundRow
+                        label="Freq. pulo"
+                        value={config.sound.jumpFreq}
+                        onChange={(v) => patchSound({ jumpFreq: v })}
+                        onTest={() =>
+                          audio.previewTone(
+                            config.sound.jumpFreq,
+                            config.sound.waveform
+                          )
+                        }
+                      />
+                    )}
+                    <Toggle
+                      label="Som de aterrissagem"
+                      value={config.sound.landEnabled}
+                      onChange={(v) => patchSound({ landEnabled: v })}
+                    />
+                    {config.sound.landEnabled && (
+                      <SoundRow
+                        label="Freq. aterrissagem"
+                        value={config.sound.landFreq}
+                        onChange={(v) => patchSound({ landFreq: v })}
+                        onTest={() =>
+                          audio.previewTone(
+                            config.sound.landFreq,
+                            config.sound.waveform
+                          )
+                        }
+                      />
                     )}
                     <Toggle
                       label="Som ambiente"
@@ -1094,11 +1488,38 @@ export default function App() {
                       suffix="x"
                       onChange={(v) => patchStage({ zoom: v })}
                     />
+                    <Toggle
+                      label="Câmera acompanha player"
+                      value={config.stage.cameraFollow}
+                      onChange={(v) => patchStage({ cameraFollow: v })}
+                    />
+                    {config.stage.cameraFollow && (
+                      <Slider
+                        label="Suavidade da câmera"
+                        value={config.stage.cameraLerp}
+                        min={0.01}
+                        max={0.5}
+                        step={0.01}
+                        onChange={(v) => patchStage({ cameraLerp: v })}
+                      />
+                    )}
                     <ColorField
                       label="Cor de fundo"
                       value={config.stage.bgColor}
                       onChange={(v) => patchStage({ bgColor: v })}
                     />
+                    <Toggle
+                      label="Gradiente de fundo"
+                      value={config.stage.bgGradient}
+                      onChange={(v) => patchStage({ bgGradient: v })}
+                    />
+                    {config.stage.bgGradient && (
+                      <ColorField
+                        label="Cor inferior"
+                        value={config.stage.bgColor2}
+                        onChange={(v) => patchStage({ bgColor2: v })}
+                      />
+                    )}
                     <Toggle
                       label="Mostrar grade"
                       value={config.stage.showGrid}
@@ -1152,11 +1573,11 @@ export default function App() {
 
       {showPresets && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-2 backdrop-blur-sm sm:items-center sm:p-4"
           onClick={() => setShowPresets(false)}
         >
           <div
-            className="w-full max-w-2xl rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+            className="my-2 max-h-[calc(100dvh-1rem)] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-2xl border border-slate-700 bg-slate-900 p-4 shadow-2xl sm:my-0 sm:p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">

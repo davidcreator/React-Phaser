@@ -1,14 +1,10 @@
 import type { HitboxConfig } from "../types";
-import { Slider, Select, Toggle } from "./ui";
-
-const TYPE_COLORS: Record<HitboxConfig["type"], string> = {
-  hurtbox: "#22c55e",
-  hitbox: "#ef4444",
-  collision: "#3b82f6",
-};
+import { NumberField, Slider, Select, Toggle } from "./ui";
+import { TYPE_COLORS } from "./hitboxConstants";
 
 export function HitboxPanel({
   hitboxes,
+  frameCount,
   showHitboxes,
   onToggleShow,
   onAdd,
@@ -16,6 +12,7 @@ export function HitboxPanel({
   onDelete,
 }: {
   hitboxes: HitboxConfig[];
+  frameCount: number;
   showHitboxes: boolean;
   onToggleShow: (v: boolean) => void;
   onAdd: (type: HitboxConfig["type"]) => void;
@@ -93,6 +90,20 @@ export function HitboxPanel({
             }
           />
           <div className="grid grid-cols-2 gap-2">
+            <NumberField
+              label="Frame (-1 = todos)"
+              value={hb.frame ?? -1}
+              min={-1}
+              max={Math.max(-1, frameCount - 1)}
+              onChange={(v) => onUpdate(hb.id, { frame: v < 0 ? null : v })}
+            />
+            <Toggle
+              label="Ativa"
+              value={hb.enabled}
+              onChange={(v) => onUpdate(hb.id, { enabled: v })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
             <Slider
               label="X"
               value={hb.x}
@@ -151,5 +162,3 @@ function AddBtn({
     </button>
   );
 }
-
-export { TYPE_COLORS };

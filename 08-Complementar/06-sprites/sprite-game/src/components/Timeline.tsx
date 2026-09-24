@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { AnimationConfig, SpriteSheetMeta } from "../types";
+import { getFrameCount, getFrameRect } from "../game/sliceSheet";
 
 // Timeline de animação estilo Aseprite / Unity Animator:
 // - playhead / scrubbing
@@ -28,6 +29,7 @@ export function Timeline({
   const [pos, setPos] = useState(0); // índice dentro da sequência
   const [onion, setOnion] = useState(false);
   const rafRef = useRef<number | null>(null);
+  const posRef = useRef(0);
   const accRef = useRef(0);
   const lastRef = useRef(0);
 
@@ -41,11 +43,17 @@ export function Timeline({
   useEffect(() => {
     setPlaying(false);
     setPos(0);
-  }, [anim?.id]);
+    posRef.current = 0;
+    accRef.current = 0;
+    lastRef.current = 0;
+  }, [anim?.id, anim?.startFrame, anim?.endFrame, anim?.frameOrder?.join(",")]);
 
   useEffect(() => {
     if (!playing || !anim || sequence.length === 0) {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      accRef.current = 0;
+      lastRef.current = 0;
       return;
     }
     const step = (t: number) => {
@@ -53,24 +61,25 @@ export function Timeline({
       const dt = t - lastRef.current;
       lastRef.current = t;
       accRef.current += dt;
-      const frameDur = 1000 / anim.frameRate;
+      const frameDur = 1000 / Math.max(1, anim.frameRate);
       while (accRef.current >= frameDur) {
         accRef.current -= frameDur;
-        setPos((p) => {
-          const next = (p + 1) % sequence.length;
-          onStep(sequence[next]);
-          return next;
-        });
+        const next = (posRef.current + 1) % sequence.length;
+        posRef.current = next;
+        setPos(next);
+        onStep(sequence[next]);
       }
       rafRef.current = requestAnimationFrame(step);
     };
     rafRef.current = requestAnimationFrame(step);
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      accRef.current = 0;
       lastRef.current = 0;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, anim?.id, anim?.frameRate, sequence.length]);
+  }, [playing, anim?.id, anim?.frameRate, sequence.join(",")]);
 
   if (!anim) {
     return (
@@ -81,6 +90,7 @@ export function Timeline({
   }
 
   const currentFrame = sequence[pos] ?? sequence[0];
+  const events = anim.events ?? [];
 
   const handlePlay = () => {
     onPlay();
@@ -93,16 +103,18 @@ export function Timeline({
   const handleStop = () => {
     onStop();
     setPlaying(false);
+    posRef.current = 0;
     setPos(0);
   };
   const stepBy = (delta: number) => {
+    if (sequence.length === 0) return;
     setPlaying(false);
     onPause();
-    setPos((p) => {
-      const next = (p + delta + sequence.length) % sequence.length;
-      onStep(sequence[next]);
-      return next;
-    });
+    const next =
+      (posRef.current + delta + sequence.length) % sequence.length;
+    posRef.current = next;
+    setPos(next);
+    onStep(sequence[next]);
   };
 
   const aspect = meta.frameHeight / meta.frameWidth;
@@ -161,6 +173,34 @@ export function Timeline({
         </div>
       </div>
 
+      {events.length > 0 && (
+        <div className="flex min-w-0 items-center gap-2 overflow-x-auto border-b border-slate-800 bg-fuchsia-500/5 px-3 py-1.5 text-[10px]">
+          <span className="shrink-0 font-semibold text-fuchsia-200">⚑ Gatilhos</span>
+          {events.map((event) => {
+            const eventPos = sequence.findIndex((frame) => frame === event.frame);
+            return (
+              <button
+                key={event.id}
+                type="button"
+                title={`${event.name} · frame ${event.frame}`}
+                onClick={() => {
+                  if (eventPos >= 0) {
+                    setPlaying(false);
+                    onPause();
+                    posRef.current = eventPos;
+                    setPos(eventPos);
+                  }
+                  onScrub(event.frame);
+                }}
+                className="shrink-0 rounded border border-fuchsia-500/30 bg-fuchsia-500/10 px-2 py-0.5 text-fuchsia-100 hover:bg-fuchsia-500/20"
+              >
+                {event.name} <span className="font-mono text-fuchsia-300">@{event.frame}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* preview + onion */}
       <div className="flex items-center gap-4 px-3 py-2">
         <div className="flex items-end gap-1">
@@ -197,6 +237,7 @@ export function Timeline({
               const p = parseInt(e.target.value);
               setPlaying(false);
               onPause();
+              posRef.current = p;
               setPos(p);
               onScrub(sequence[p]);
             }}
@@ -217,6 +258,7 @@ export function Timeline({
               onClick={() => {
                 setPlaying(false);
                 onPause();
+                posRef.current = i;
                 setPos(i);
                 onScrub(f);
               }}
@@ -281,17 +323,27 @@ function FrameThumb({
   ghost?: "prev" | "next";
   bare?: boolean;
 }) {
-  const col = frame % meta.columns;
-  const row = Math.floor(frame / meta.columns);
-  const aspect = meta.frameHeight / meta.frameWidth;
+  const safeFrame = Math.max(0, Math.min(getFrameCount(meta) - 1, Math.floor(frame)));
+  const frameRect = getFrameRect(meta, safeFrame) ?? {
+    x: 0,
+    y: 0,
+    width: meta.frameWidth,
+    height: meta.frameHeight,
+  };
   const w = size;
-  const h = size * aspect;
+  const h = size * (frameRect.height / Math.max(1, frameRect.width));
+  const sourceScale = w / Math.max(1, frameRect.width);
   const style: React.CSSProperties = {
     width: w,
     height: h,
     backgroundImage: `url(${meta.dataUrl})`,
-    backgroundPosition: `-${col * w}px -${row * h}px`,
-    backgroundSize: `${meta.columns * w}px ${meta.rows * h}px`,
+    backgroundPosition: `-${frameRect.x * sourceScale}px -${
+      frameRect.y * sourceScale
+    }px`,
+    backgroundSize: `${meta.imageWidth * sourceScale}px ${
+      meta.imageHeight * sourceScale
+    }px`,
+    backgroundRepeat: "no-repeat",
     imageRendering: "pixelated",
     opacity: ghost ? 0.4 : 1,
     filter: ghost === "prev" ? "sepia(1) hue-rotate(150deg)" : ghost === "next" ? "sepia(1) hue-rotate(300deg)" : undefined,

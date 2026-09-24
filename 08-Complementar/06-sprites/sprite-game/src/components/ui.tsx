@@ -85,7 +85,15 @@ export function NumberField({
         value={value}
         min={min}
         max={max}
-        onChange={(e) => onChange(parseInt(e.target.value) || 0)}
+        onChange={(e) => {
+          const parsed = e.target.valueAsNumber;
+          if (!Number.isFinite(parsed)) return;
+          const clamped = Math.min(
+            max ?? parsed,
+            Math.max(min ?? parsed, Math.trunc(parsed))
+          );
+          onChange(clamped);
+        }}
         className="w-20 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-right font-mono text-slate-100 focus:border-sky-500 focus:outline-none"
       />
     </label>
@@ -102,10 +110,13 @@ export function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-2 text-xs">
+    <div className="flex items-center justify-between gap-2 text-xs">
       <span className="text-slate-400">{label}</span>
       <button
         type="button"
+        role="switch"
+        aria-checked={value}
+        aria-label={label}
         onClick={() => onChange(!value)}
         className={`relative h-5 w-9 rounded-full transition-colors ${
           value ? "bg-sky-500" : "bg-slate-700"
@@ -117,7 +128,7 @@ export function Toggle({
           }`}
         />
       </button>
-    </label>
+    </div>
   );
 }
 

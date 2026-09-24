@@ -3,14 +3,24 @@ import type {
   ProjectConfig,
   SpriteSheetMeta,
   AnimationConfig,
+  AnimationEvent,
   NpcInstance,
 } from "../types";
+import { getFrameCount, getFrameRect } from "./sliceSheet";
 import * as audio from "../audio";
+
+export interface AnimationEventTrigger {
+  animationId: string;
+  animationName: string;
+  frame: number;
+  event: AnimationEvent;
+}
 
 export interface SceneCallbacks {
   onState: (s: LiveGameState) => void;
   onError?: (msg: string) => void;
   onReady?: () => void;
+  onAnimationEvent?: (trigger: AnimationEventTrigger) => void;
 }
 
 export interface LiveGameState {
@@ -49,6 +59,7 @@ export class SpriteScene extends Phaser.Scene {
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private keys?: Record<string, Phaser.Input.Keyboard.Key>;
   private gridGraphics?: Phaser.GameObjects.Graphics;
+  private gradientGraphics?: Phaser.GameObjects.Graphics;
   private hitboxGraphics?: Phaser.GameObjects.Graphics;
   private bgRect?: Phaser.GameObjects.Rectangle;
   private floor?: Phaser.GameObjects.Rectangle;
@@ -65,6 +76,10 @@ export class SpriteScene extends Phaser.Scene {
   private padJumpPrev = false;
   private padActionPrev = false;
   private velX = 0;
+  private lastGroundedAt = 0;
+  private hasGroundedOnce = false;
+  private wasGroundedLastFrame = false;
+  private jumpQueuedUntil = 0;
   private timelineFrame: number | null = null; // scrubbing manual
   private isPaused = false;
   private squashTween?: Phaser.Tweens.Tween;
@@ -72,6 +87,10 @@ export class SpriteScene extends Phaser.Scene {
   private pendingConfig: ProjectConfig | null = null;
   private texSeq = 0; // sequência para gerar keys únicos por spritesheet
   private currentTexKey = "";
+  private sheetLoadId = 0;
+  private currentFrameCount = 0;
+  private animationKeys = new Set<string>();
+  private lastDispatchedFrame = "";
 
   constructor() {
     super("SpriteScene");
@@ -94,15 +113,17 @@ export class SpriteScene extends Phaser.Scene {
     this.rebuildFromConfig(cfg);
     this.scale.on("resize", () => {
       this.drawStageDecor();
+      this.cameras.main.setBounds(0, 0, this.scale.width, this.scale.height);
       if (this.physicsBody) {
         this.physics.world.setBounds(
           0,
           0,
           this.scale.width,
-          this.scale.height -
-            (this.config.stage.showFloor ? this.config.stage.floorHeight : 0)
+          this.getWorldHeight()
         );
+        this.keepActorsVisible();
       }
+      this.syncCamera();
     });
   }
 
@@ -111,6 +132,7 @@ export class SpriteScene extends Phaser.Scene {
       .rectangle(0, 0, 10, 10, 0x0f172a)
       .setOrigin(0, 0)
       .setDepth(-10);
+    this.gradientGraphics = this.add.graphics().setDepth(-9);
     this.gridGraphics = this.add.graphics().setDepth(-8);
     this.floor = this.add
       .rectangle(0, 0, 10, 10, 0x1e293b)
@@ -120,24 +142,66 @@ export class SpriteScene extends Phaser.Scene {
     this.drawStageDecor();
   }
 
+  private getFloorHeight() {
+    if (!this.config.stage.showFloor) return 0;
+    return Math.min(
+      Math.max(0, this.config.stage.floorHeight),
+      Math.max(0, this.scale.height - 1)
+    );
+  }
+
+  private getWorldHeight() {
+    return Math.max(1, this.scale.height - this.getFloorHeight());
+  }
+
+  private frameName(index: number) {
+    return `frame-${Math.max(0, Math.floor(index))}`;
+  }
+
+  private frameIndexFromName(name: string) {
+    const match = /^frame-(\d+)$/.exec(name);
+    return match ? Number(match[1]) : Math.max(0, parseInt(name, 10) || 0);
+  }
+
+  private currentFrameIndex() {
+    return this.frameIndexFromName(this.player?.frame.name ?? "");
+  }
+
   private drawStageDecor() {
     const w = this.scale.width;
     const h = this.scale.height;
     const { stage } = this.config;
 
+    const bgColor = Phaser.Display.Color.HexStringToColor(stage.bgColor).color;
+    const bgColor2 = Phaser.Display.Color.HexStringToColor(stage.bgColor2).color;
     if (this.bgRect) {
       this.bgRect.setSize(w, h);
-      this.bgRect.setFillStyle(
-        Phaser.Display.Color.HexStringToColor(stage.bgColor).color
-      );
+      this.bgRect.setFillStyle(bgColor);
+    }
+    if (this.gradientGraphics) {
+      this.gradientGraphics.clear();
+      if (stage.bgGradient) {
+        this.gradientGraphics.fillGradientStyle(
+          bgColor,
+          bgColor,
+          bgColor2,
+          bgColor2,
+          1,
+          1,
+          1,
+          1
+        );
+        this.gradientGraphics.fillRect(0, 0, w, h);
+      }
     }
     this.cameras.main.setBackgroundColor(stage.bgColor);
 
     if (this.floor) {
       if (stage.showFloor) {
+        const floorHeight = Math.min(Math.max(0, stage.floorHeight), h);
         this.floor.setVisible(true);
-        this.floor.setPosition(0, h - stage.floorHeight);
-        this.floor.setSize(w, stage.floorHeight);
+        this.floor.setPosition(0, h - floorHeight);
+        this.floor.setSize(w, floorHeight);
         this.floor.setFillStyle(
           Phaser.Display.Color.HexStringToColor(stage.bgColor).darken(35).color
         );
@@ -171,26 +235,67 @@ export class SpriteScene extends Phaser.Scene {
   loadSpriteSheet(meta: SpriteSheetMeta, cb: (ok: boolean) => void) {
     // Usa um key novo a cada carga para nunca reutilizar textura removida
     // (evita frames "fantasma" e erros de referência ao trocar de sheet).
+    // O token também impede que uma imagem antiga, carregada fora de ordem,
+    // sobrescreva o spritesheet escolhido por último.
+    const loadId = ++this.sheetLoadId;
     const newKey = `spritesheet_${++this.texSeq}`;
     const img = new Image();
     img.onload = () => {
+      if (loadId !== this.sheetLoadId) return;
       try {
-        // valida dimensões do frame contra a imagem realmente decodificada
-        const fw = Math.max(1, Math.min(meta.frameWidth, img.naturalWidth));
-        const fh = Math.max(1, Math.min(meta.frameHeight, img.naturalHeight));
+        // Sempre montamos um atlas JSON. Assim o modo tradicional de grade e
+        // o modo livre usam exatamente o mesmo runtime e cada quadro pode ter
+        // um retângulo independente.
+        const sourceMeta = {
+          ...meta,
+          imageWidth: img.naturalWidth,
+          imageHeight: img.naturalHeight,
+        };
+        const count = getFrameCount(meta);
+        const rects = Array.from({ length: count }, (_, index) => {
+          const rect = getFrameRect(sourceMeta, index);
+          if (!rect) return null;
+          const x = Math.max(0, Math.min(img.naturalWidth - 1, rect.x));
+          const y = Math.max(0, Math.min(img.naturalHeight - 1, rect.y));
+          return {
+            x,
+            y,
+            w: Math.max(1, Math.min(rect.width, img.naturalWidth - x)),
+            h: Math.max(1, Math.min(rect.height, img.naturalHeight - y)),
+          };
+        }).filter((rect): rect is { x: number; y: number; w: number; h: number } => Boolean(rect));
+        if (!rects.length) {
+          console.warn("[SpriteLab] spritesheet não possui quadros válidos.");
+          cb(false);
+          return;
+        }
         if (this.textures.exists(newKey)) this.textures.remove(newKey);
-        this.textures.addSpriteSheet(newKey, img, {
-          frameWidth: fw,
-          frameHeight: fh,
-          margin: meta.marginX || 0,
-          spacing: meta.spacingX || 0,
+        const frames = Object.fromEntries(
+          rects.map((rect, index) => [
+            this.frameName(index),
+            {
+              frame: rect,
+              rotated: false,
+              trimmed: false,
+            },
+          ])
+        );
+        this.textures.addAtlasJSONHash(newKey, img, {
+          frames,
+          meta: {
+            image: meta.fileName,
+            size: { w: img.naturalWidth, h: img.naturalHeight },
+            scale: "1",
+          },
         });
         const frameTotal = this.textures.get(newKey).frameTotal - 1; // -1 = __BASE
         if (frameTotal <= 0) {
           console.warn("[SpriteLab] spritesheet gerou 0 frames.");
+          this.textures.remove(newKey);
           cb(false);
           return;
         }
+        this.currentFrameCount = Math.min(rects.length, frameTotal);
         // remove a textura antiga só depois que a nova está pronta
         const old = this.currentTexKey;
         this.currentTexKey = newKey;
@@ -200,14 +305,30 @@ export class SpriteScene extends Phaser.Scene {
         cb(true);
       } catch (err) {
         console.error("[SpriteLab] erro ao fatiar spritesheet:", err);
+        if (this.textures.exists(newKey)) this.textures.remove(newKey);
         cb(false);
       }
     };
     img.onerror = () => {
+      if (loadId !== this.sheetLoadId) return;
       console.error("[SpriteLab] falha ao carregar a imagem do spritesheet.");
       cb(false);
     };
     img.src = meta.dataUrl;
+  }
+
+  private setAudioVolume(volume: number) {
+    try {
+      audio.setMasterVolume(volume);
+    } catch (error) {
+      // Web Audio pode não existir (ou estar bloqueado) em alguns browsers.
+      console.warn("[SpriteLab] áudio indisponível:", error);
+    }
+  }
+
+  private clearTrails() {
+    this.trailGroup.forEach((ghost) => ghost.destroy());
+    this.trailGroup = [];
   }
 
   rebuildFromConfig(config: ProjectConfig) {
@@ -218,19 +339,50 @@ export class SpriteScene extends Phaser.Scene {
       return;
     }
     this.drawStageDecor();
-    audio.setMasterVolume(config.sound.masterVolume);
+    this.setAudioVolume(config.sound.masterVolume);
+    this.sheetLoadId++;
+    this.timelineFrame = null;
+    this.isPaused = false;
+    this.overrideAnim = null;
+    this.currentAnimName = "-";
+    this.lastDispatchedFrame = "";
+    this.lastGroundedAt = 0;
+    this.hasGroundedOnce = false;
+    this.wasGroundedLastFrame = false;
+    this.jumpQueuedUntil = 0;
+    this.clearTrails();
 
     if (!config.meta) {
       this.ready = false;
-      if (this.player) {
-        this.player.destroy();
-        this.player = undefined;
-      }
+      this.player?.destroy();
+      this.player = undefined;
+      this.physicsBody = undefined;
       this.clearNpcs();
+      this.particleEmitter?.destroy();
+      this.particleEmitter = undefined;
+      this.animationKeys.forEach((key) => {
+        if (this.anims.exists(key)) this.anims.remove(key);
+      });
+      this.animationKeys.clear();
+      if (this.currentTexKey && this.textures.exists(this.currentTexKey)) {
+        this.textures.remove(this.currentTexKey);
+      }
+      this.currentTexKey = "";
+      this.currentFrameCount = 0;
       return;
     }
 
+    // Mantém a cena em estado de loading até a nova textura estar pronta; isso
+    // evita que física, hitboxes e NPCs continuem usando frames antigos.
     this.ready = false;
+    this.player?.destroy();
+    this.player = undefined;
+    this.physicsBody = undefined;
+    this.clearNpcs();
+    if (this.particleEmitter) {
+      this.particleEmitter.destroy();
+      this.particleEmitter = undefined;
+    }
     this.loadSpriteSheet(config.meta, (ok) => {
       if (!ok) {
         this.callbacks.onError?.("Não foi possível fatiar este spritesheet.");
@@ -249,7 +401,7 @@ export class SpriteScene extends Phaser.Scene {
     const prevMode = this.config.character.movementMode;
     this.config = config;
     this.drawStageDecor();
-    audio.setMasterVolume(config.sound.masterVolume);
+    this.setAudioVolume(config.sound.masterVolume);
     if (this.currentTexKey && this.textures.exists(this.currentTexKey))
       this.buildAnimations(config.animations);
 
@@ -263,7 +415,7 @@ export class SpriteScene extends Phaser.Scene {
           0,
           0,
           this.scale.width,
-          this.scale.height - (config.stage.showFloor ? config.stage.floorHeight : 0)
+          this.getWorldHeight()
         );
         if (prevMode !== config.character.movementMode) {
           this.physicsBody.setVelocity(0, 0);
@@ -271,6 +423,7 @@ export class SpriteScene extends Phaser.Scene {
       }
     }
     this.cameras.main.setZoom(config.stage.zoom);
+    this.syncCamera();
     this.setupParticles();
     this.syncNpcs();
   }
@@ -293,13 +446,124 @@ export class SpriteScene extends Phaser.Scene {
     } else {
       this.player.clearTint();
     }
+
+    // Glow é um Pre FX do Phaser 3.60+. Ele é ignorado em renderizadores
+    // Canvas, mas não deve impedir o teste do sprite nesses ambientes.
+    if (this.player.preFX) {
+      this.player.preFX.clear();
+      if (this.config.fx.glowEnabled) {
+        try {
+          this.player.preFX.addGlow(
+            Phaser.Display.Color.HexStringToColor(this.config.fx.glowColor).color,
+            this.config.fx.glowStrength,
+            0
+          );
+        } catch {
+          // Pre FX só existe no pipeline WebGL.
+        }
+      }
+    }
+    this.applyFrameEdit();
+  }
+
+  private applyFrameEdit() {
+    if (!this.player) return;
+    const c = this.config.character;
+    const edit = this.config.frameEdits[String(this.currentFrameIndex())];
+    const scaleX = c.scale * (c.scaleX / 100) * (edit?.scaleX ?? 1);
+    const scaleY = c.scale * (c.scaleY / 100) * (edit?.scaleY ?? 1);
+    this.player.setScale(scaleX, scaleY);
+    this.player.setOrigin(edit?.originX ?? c.originX, edit?.originY ?? c.originY);
+    this.player.setAngle(c.rotation + (edit?.rotation ?? 0));
+    this.player.setAlpha(c.opacity * (edit?.alpha ?? 1));
+    const facing = c.flipOnDirection ? this.facingLeft : false;
+    this.player.setFlipX(facing !== Boolean(edit?.flipX));
+    this.player.setFlipY(Boolean(edit?.flipY));
+  }
+
+  private applyNpcFrameEdit(npc: NpcObj) {
+    const edit = this.config.frameEdits[String(this.frameIndexFromName(npc.sprite.frame.name))];
+    const scaleX = npc.data.scale * (edit?.scaleX ?? 1);
+    const scaleY = npc.data.scale * (edit?.scaleY ?? 1);
+    npc.sprite.setScale(scaleX, scaleY);
+    npc.sprite.setOrigin(edit?.originX ?? 0.5, edit?.originY ?? 0.5);
+    npc.sprite.setAngle(edit?.rotation ?? 0);
+    npc.sprite.setAlpha(edit?.alpha ?? 1);
+    const behaviorFlip =
+      npc.data.behavior === "idle" ? npc.data.flipX : npc.dir < 0;
+    npc.sprite.setFlipX(Boolean(behaviorFlip) !== Boolean(edit?.flipX));
+    npc.sprite.setFlipY(Boolean(edit?.flipY));
+  }
+
+  private keepActorsVisible() {
+    const width = Math.max(1, this.scale.width);
+    const height = Math.max(1, this.scale.height);
+    const playerFloor =
+      this.config.character.movementMode === "platformer"
+        ? this.getWorldHeight()
+        : height;
+
+    const clampSprite = (sprite: Phaser.GameObjects.Sprite, bottom: number) => {
+      const displayWidth = Math.max(1, sprite.displayWidth);
+      const displayHeight = Math.max(1, sprite.displayHeight);
+      const minX = displayWidth >= width ? width / 2 : displayWidth * sprite.originX;
+      const maxX =
+        displayWidth >= width
+          ? width / 2
+          : width - displayWidth * (1 - sprite.originX);
+      const minY = displayHeight >= bottom ? bottom / 2 : displayHeight * sprite.originY;
+      const maxY =
+        displayHeight >= bottom
+          ? bottom / 2
+          : bottom - displayHeight * (1 - sprite.originY);
+      sprite.x = Phaser.Math.Clamp(sprite.x, minX, Math.max(minX, maxX));
+      sprite.y = Phaser.Math.Clamp(sprite.y, minY, Math.max(minY, maxY));
+    };
+
+    if (this.player) {
+      const beforeX = this.player.x;
+      const beforeY = this.player.y;
+      clampSprite(this.player, playerFloor);
+      if (this.physicsBody && (beforeX !== this.player.x || beforeY !== this.player.y)) {
+        this.physicsBody.updateFromGameObject();
+        this.physicsBody.setVelocity(0, 0);
+        this.velX = 0;
+      }
+    }
+
+    this.npcs.forEach((npc) => clampSprite(npc.sprite, height));
+  }
+
+  private syncCamera() {
+    if (!this.player) return;
+    this.cameras.main.setBounds(0, 0, this.scale.width, this.scale.height);
+    if (this.config.stage.cameraFollow) {
+      this.cameras.main.startFollow(
+        this.player,
+        true,
+        this.config.stage.cameraLerp,
+        this.config.stage.cameraLerp
+      );
+    } else {
+      this.cameras.main.stopFollow();
+      this.cameras.main.centerOn(this.scale.width / 2, this.scale.height / 2);
+    }
   }
 
   private buildAnimations(anims: AnimationConfig[]) {
     const tex = this.currentTexKey;
     if (!tex || !this.textures.exists(tex)) return;
-    // total real de frames disponíveis (frameTotal inclui o __BASE)
-    const maxFrame = Math.max(0, this.textures.get(tex).frameTotal - 2);
+    // Interrompe a animação antiga antes de remover/recriar as definições.
+    // Sem isso, o sprite podia continuar preso a um objeto Animation removido.
+    const previousKey = this.currentAnimName;
+    this.player?.anims.stop();
+    this.currentAnimName = "-";
+    // total real de frames disponíveis (o atlas também possui __BASE)
+    const maxFrame = Math.max(0, this.currentFrameCount - 1);
+    this.animationKeys.forEach((key) => {
+      if (this.anims.exists(key)) this.anims.remove(key);
+    });
+    this.animationKeys.clear();
 
     anims.forEach((a) => {
       const key = `anim-${a.id}`;
@@ -309,9 +573,10 @@ export class SpriteScene extends Phaser.Scene {
         if (a.frameOrder && a.frameOrder.length) {
           frames = a.frameOrder
             .map((f) => Phaser.Math.Clamp(f, 0, maxFrame))
-            .map((f) => ({ key: tex, frame: f }));
+            .map((f) => ({ key: tex, frame: this.frameName(f) }));
         } else {
-          // clampa o range para nunca pedir frames inexistentes
+          // Atlases usam nomes de frame, portanto generateFrameNumbers não é
+          // adequado aqui. Mantemos a mesma semântica de início/fim.
           const start = Phaser.Math.Clamp(
             Math.min(a.startFrame, a.endFrame),
             0,
@@ -322,7 +587,10 @@ export class SpriteScene extends Phaser.Scene {
             start,
             maxFrame
           );
-          frames = this.anims.generateFrameNumbers(tex, { start, end });
+          frames = Array.from({ length: end - start + 1 }, (_, offset) => ({
+            key: tex,
+            frame: this.frameName(start + offset),
+          }));
         }
         if (!frames.length) return;
         this.anims.create({
@@ -332,25 +600,39 @@ export class SpriteScene extends Phaser.Scene {
           repeat: a.repeat,
           yoyo: a.yoyo,
         });
+        this.animationKeys.add(key);
       } catch (err) {
         console.warn(`[SpriteLab] falha ao criar animação "${a.name}":`, err);
       }
     });
+
+    if (this.player) {
+      if (this.timelineFrame !== null) {
+        const safeFrame = Phaser.Math.Clamp(this.timelineFrame, 0, maxFrame);
+        this.timelineFrame = safeFrame;
+        this.player.setFrame(this.frameName(safeFrame));
+        this.player.anims.pause();
+        this.applyFrameEdit();
+      } else if (previousKey !== "-" && this.anims.exists(previousKey)) {
+        this.player.play(previousKey, true);
+        this.currentAnimName = previousKey;
+      }
+    }
   }
 
   private spawnPlayer() {
     const c = this.config.character;
-    const startX = this.scale.width / 2;
+    const startX = this.scale.width / 2 + c.offsetX;
     const startY =
-      c.movementMode === "platformer"
+      (c.movementMode === "platformer"
         ? this.scale.height -
-          (this.config.stage.showFloor ? this.config.stage.floorHeight : 0) -
+          this.getFloorHeight() -
           (this.config.meta!.frameHeight * c.scale) / 2
-        : this.scale.height / 2;
+        : this.scale.height / 2) + c.offsetY;
 
     if (this.player) this.player.destroy();
     this.player = this.add
-      .sprite(startX, startY, this.currentTexKey, 0)
+      .sprite(startX, startY, this.currentTexKey, this.frameName(0))
       .setDepth(10);
     this.applyPlayerTransform();
     this.physics.add.existing(this.player);
@@ -360,13 +642,13 @@ export class SpriteScene extends Phaser.Scene {
       0,
       0,
       this.scale.width,
-      this.scale.height -
-        (this.config.stage.showFloor ? this.config.stage.floorHeight : 0)
+      this.getWorldHeight()
     );
     const plat = c.movementMode === "platformer";
     this.physicsBody.setAllowGravity(plat);
     if (plat) this.physicsBody.setGravityY(c.gravity);
     this.cameras.main.setZoom(this.config.stage.zoom);
+    this.syncCamera();
     this.playMapped("idle");
   }
 
@@ -394,7 +676,7 @@ export class SpriteScene extends Phaser.Scene {
       quantity: 1,
       frequency: -1,
       tint: color,
-      blendMode: "ADD",
+      blendMode: this.config.fx.blendMode === "NORMAL" ? "NORMAL" : "ADD",
     });
     this.particleEmitter.setDepth(5);
   }
@@ -421,7 +703,7 @@ export class SpriteScene extends Phaser.Scene {
       let obj = this.npcs.find((n) => n.data.id === data.id);
       if (!obj) {
         const sprite = this.add
-          .sprite(data.x, data.y, this.currentTexKey, 0)
+          .sprite(data.x, data.y, this.currentTexKey, this.frameName(0))
           .setDepth(8);
         obj = { sprite, data, dir: 1, originX: data.x };
         this.npcs.push(obj);
@@ -443,8 +725,9 @@ export class SpriteScene extends Phaser.Scene {
       const key = data.animId ? `anim-${data.animId}` : null;
       const wantKey = key && this.anims.exists(key) ? key : null;
       const cur = s.anims.currentAnim?.key ?? null;
-      if (wantKey && cur !== wantKey) s.play(wantKey);
+      if (wantKey && (cur !== wantKey || !s.anims.isPlaying)) s.play(wantKey);
       else if (!wantKey) s.stop();
+      this.applyNpcFrameEdit(obj);
     });
   }
 
@@ -453,7 +736,7 @@ export class SpriteScene extends Phaser.Scene {
     this.clearNpcs();
     this.config.npcs.forEach((data) => {
       const sprite = this.add
-        .sprite(data.x, data.y, this.currentTexKey, 0)
+        .sprite(data.x, data.y, this.currentTexKey, this.frameName(0))
         .setDepth(8);
       sprite.setScale(data.scale);
       sprite.setFlipX(data.flipX);
@@ -481,6 +764,7 @@ export class SpriteScene extends Phaser.Scene {
         const dx = this.player.x - n.sprite.x;
         if (Math.abs(dx) > 30) {
           const dir = Math.sign(dx);
+          n.dir = dir;
           n.sprite.x += dir * d.speed * dt;
           n.sprite.setFlipX(dir < 0);
         }
@@ -490,19 +774,22 @@ export class SpriteScene extends Phaser.Scene {
         n.sprite.setFlipX(n.dir < 0);
         n.sprite.x = Phaser.Math.Clamp(n.sprite.x, 20, this.scale.width - 20);
       }
+      this.applyNpcFrameEdit(n);
     });
   }
 
-  private playMapped(slot: keyof ProjectConfig["animMapping"]) {
-    if (this.timelineFrame !== null || this.isPaused) return;
+  private playMapped(slot: keyof ProjectConfig["animMapping"]): boolean {
+    if (this.timelineFrame !== null || this.isPaused) return false;
     const id = this.config.animMapping[slot];
-    if (!id || !this.player) return;
+    if (!id || !this.player) return false;
     const key = `anim-${id}`;
-    if (!this.anims.exists(key)) return;
-    if (this.currentAnimName !== key) {
+    if (!this.anims.exists(key)) return false;
+    if (this.currentAnimName !== key || !this.player.anims.isPlaying) {
+      this.lastDispatchedFrame = "";
       this.player.play(key, true);
       this.currentAnimName = key;
     }
+    return true;
   }
 
   // ---- API externa (timeline / preview) ----
@@ -512,6 +799,7 @@ export class SpriteScene extends Phaser.Scene {
     if (this.anims.exists(key)) {
       this.timelineFrame = null;
       this.isPaused = false;
+      this.lastDispatchedFrame = "";
       this.player.play(key, true);
       this.currentAnimName = key;
       this.overrideAnim = key;
@@ -531,11 +819,15 @@ export class SpriteScene extends Phaser.Scene {
 
   // define frame manual (scrubbing / step)
   setFrame(frameIndex: number) {
-    if (!this.player) return;
+    if (!this.player || !this.currentTexKey || !this.textures.exists(this.currentTexKey)) return;
+    const maxFrame = Math.max(0, this.currentFrameCount - 1);
+    const safeFrame = Phaser.Math.Clamp(Math.floor(frameIndex), 0, maxFrame);
     this.isPaused = true;
-    this.timelineFrame = frameIndex;
+    this.timelineFrame = safeFrame;
+    this.lastDispatchedFrame = "";
     this.player.anims.pause();
-    this.player.setFrame(frameIndex);
+    this.player.setFrame(this.frameName(safeFrame));
+    this.applyFrameEdit();
   }
 
   clearFrameLock() {
@@ -576,8 +868,9 @@ export class SpriteScene extends Phaser.Scene {
   private doSquash(sx: number, sy: number) {
     if (!this.player || !this.config.fx.squashStretch) return;
     const c = this.config.character;
-    const baseX = c.scale * (c.scaleX / 100);
-    const baseY = c.scale * (c.scaleY / 100);
+    const edit = this.config.frameEdits[String(this.currentFrameIndex())];
+    const baseX = c.scale * (c.scaleX / 100) * (edit?.scaleX ?? 1);
+    const baseY = c.scale * (c.scaleY / 100) * (edit?.scaleY ?? 1);
     this.squashTween?.stop();
     this.player.setScale(baseX * sx, baseY * sy);
     this.squashTween = this.tweens.add({
@@ -585,15 +878,20 @@ export class SpriteScene extends Phaser.Scene {
       scaleX: baseX,
       scaleY: baseY,
       duration: 200,
-      ease: "Back.easeOut",
+      ease: c.animBlendEase,
     });
   }
 
   triggerAction() {
     if (!this.player) return;
-    this.playMapped("action");
+    // Bloqueia a máquina de estados até a animação de ação terminar. Antes,
+    // overrideAnim era zerado pelo update imediatamente após este método e o
+    // ataque era substituído por idle/walk no mesmo frame.
+    this.overrideAnim = this.playMapped("action")
+      ? this.currentAnimName
+      : null;
     if (this.config.sound.actionEnabled)
-      audio.playAction(this.config.sound.actionFreq);
+      audio.playAction(this.config.sound.actionFreq, this.config.sound.waveform);
     if (this.config.fx.shakeOnAction)
       this.cameras.main.shake(150, this.config.fx.shakeIntensity);
     if (this.config.fx.flashOnAction)
@@ -607,6 +905,30 @@ export class SpriteScene extends Phaser.Scene {
     this.doSquash(1.25, 0.8);
   }
 
+  private dispatchAnimationEvents() {
+    if (!this.player || this.timelineFrame !== null) return;
+    const animationId = this.currentAnimName.replace("anim-", "");
+    const animation = this.config.animations.find((item) => item.id === animationId);
+    if (!animation?.events?.length) {
+      this.lastDispatchedFrame = "";
+      return;
+    }
+    const frame = this.currentFrameIndex();
+    const marker = `${this.currentAnimName}:${frame}:${this.player.frame.name}`;
+    if (marker === this.lastDispatchedFrame) return;
+    this.lastDispatchedFrame = marker;
+    animation.events
+      .filter((event) => event.frame === frame)
+      .forEach((event) => {
+        this.callbacks.onAnimationEvent?.({
+          animationId: animation.id,
+          animationName: animation.name,
+          frame,
+          event,
+        });
+      });
+  }
+
   private drawHitboxes() {
     const g = this.hitboxGraphics;
     if (!g) return;
@@ -617,11 +939,15 @@ export class SpriteScene extends Phaser.Scene {
     const h = p.displayHeight;
     const left = p.x - w * p.originX;
     const top = p.y - h * p.originY;
+    const frame = this.currentFrameIndex();
     this.config.hitboxes.forEach((hb) => {
+      if (!hb.enabled || (hb.frame !== null && hb.frame !== frame)) return;
       const col = Phaser.Display.Color.HexStringToColor(hb.color).color;
       g.lineStyle(2, col, 0.9);
       g.fillStyle(col, 0.15);
-      const rx = left + hb.x * w;
+      const rx = p.flipX
+        ? left + (1 - hb.x - hb.w) * w
+        : left + hb.x * w;
       const ry = top + hb.y * h;
       const rw = hb.w * w;
       const rh = hb.h * h;
@@ -631,7 +957,8 @@ export class SpriteScene extends Phaser.Scene {
   }
 
   private getGamepad(): Gamepad | null {
-    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    if (typeof navigator === "undefined" || !navigator.getGamepads) return null;
+    const pads = navigator.getGamepads();
     for (const p of pads) if (p) return p;
     return null;
   }
@@ -639,12 +966,22 @@ export class SpriteScene extends Phaser.Scene {
   resetPlayer() {
     if (!this.player || !this.physicsBody) return;
     const c = this.config.character;
+    const x = this.scale.width / 2 + c.offsetX;
     const y =
-      c.movementMode === "platformer"
-        ? this.scale.height / 2
-        : this.scale.height / 2;
-    this.player.setPosition(this.scale.width / 2, y);
+      (c.movementMode === "platformer"
+        ? this.scale.height -
+          this.getFloorHeight() -
+          (this.config.meta ? (this.config.meta.frameHeight * c.scale) / 2 : 0)
+        : this.scale.height / 2) + c.offsetY;
+    this.player.setPosition(x, y);
     this.physicsBody.setVelocity(0, 0);
+    this.velX = 0;
+    this.facingLeft = false;
+    this.lastGroundedAt = 0;
+    this.hasGroundedOnce = false;
+    this.wasGroundedLastFrame = false;
+    this.jumpQueuedUntil = 0;
+    this.player.setFlipX(false);
     this.overrideAnim = null;
     this.jumpsUsed = 0;
     this.clearFrameLock();
@@ -711,9 +1048,15 @@ export class SpriteScene extends Phaser.Scene {
       this.padActionPrev = gp.buttons[2]?.pressed ?? false;
     }
 
-    const speed = c.speed * (run ? 1.7 : 1);
+    const speed = c.speed * (run ? c.runMultiplier : 1);
     let moving = false;
-    const onGround = body.blocked.down || body.touching.down;
+    const onGround =
+      c.movementMode === "topdown" || body.blocked.down || body.touching.down;
+    const landed =
+      c.movementMode === "platformer" &&
+      onGround &&
+      this.hasGroundedOnce &&
+      !this.wasGroundedLastFrame;
 
     if (c.movementMode === "platformer") {
       let target = 0;
@@ -732,49 +1075,72 @@ export class SpriteScene extends Phaser.Scene {
       if (Math.abs(this.velX) < 2 && target === 0) this.velX = 0;
       body.setVelocityX(this.velX);
 
-      if (onGround) this.jumpsUsed = 0;
-      const maxJumps = c.doubleJump ? 2 : 1;
-      if (jump && this.jumpsUsed < maxJumps) {
+      if (onGround) {
+        this.jumpsUsed = 0;
+        this.lastGroundedAt = time;
+        this.hasGroundedOnce = true;
+      }
+      if (jump) this.jumpQueuedUntil = time + c.jumpBuffer;
+      const inCoyoteWindow =
+        this.hasGroundedOnce && time - this.lastGroundedAt <= c.coyoteTime;
+      const jumpPending = jump || this.jumpQueuedUntil > time;
+      const groundedJumpAvailable =
+        (onGround || inCoyoteWindow) && this.jumpsUsed === 0;
+      const airJumpAvailable = c.doubleJump && !onGround && this.jumpsUsed < 2;
+      if (jumpPending && (groundedJumpAvailable || airJumpAvailable)) {
         body.setVelocityY(-c.jumpPower);
         this.jumpsUsed++;
+        this.jumpQueuedUntil = 0;
         this.playMapped("jump");
         this.overrideAnim = null;
-        if (this.config.sound.actionEnabled)
-          audio.playTone(this.config.sound.jumpFreq, 0.15, this.config.sound.waveform, 0.25);
+        if (this.config.sound.jumpEnabled)
+          audio.playTone(
+            this.config.sound.jumpFreq,
+            0.15,
+            this.config.sound.waveform,
+            0.25
+          );
         this.doSquash(0.8, 1.25);
       }
+      if (body.velocity.y > c.maxFallSpeed) body.setVelocityY(c.maxFallSpeed);
     } else {
-      body.setVelocity(0, 0);
-      if (left) {
-        body.setVelocityX(-speed);
-        moving = true;
-        this.facingLeft = true;
+      let inputX = Number(right) - Number(left);
+      let inputY = Number(down) - Number(up);
+      moving = inputX !== 0 || inputY !== 0;
+      if (moving) {
+        const length = Math.hypot(inputX, inputY);
+        inputX /= length;
+        inputY /= length;
+        if (inputX < 0) this.facingLeft = true;
+        if (inputX > 0) this.facingLeft = false;
       }
-      if (right) {
-        body.setVelocityX(speed);
-        moving = true;
-        this.facingLeft = false;
+      const targetX = inputX * speed;
+      const targetY = inputY * speed;
+      const lerp = Phaser.Math.Clamp(c.accel * 2, 0.02, 1);
+      body.setVelocity(
+        Phaser.Math.Linear(body.velocity.x, targetX, lerp),
+        Phaser.Math.Linear(body.velocity.y, targetY, lerp)
+      );
+    }
+
+    if (landed) {
+      if (this.config.sound.landEnabled) {
+        audio.playTone(
+          this.config.sound.landFreq,
+          0.1,
+          this.config.sound.waveform,
+          0.2
+        );
       }
-      if (up) {
-        body.setVelocityY(-speed);
-        moving = true;
-      }
-      if (down) {
-        body.setVelocityY(speed);
-        moving = true;
-      }
-      if (moving && left === right && up === down) {
-        // normalize diagonal
-        body.velocity.normalize().scale(speed);
-      }
+      this.doSquash(1.2, 0.8);
     }
 
     if (action) {
       this.triggerAction();
-      this.overrideAnim = null;
     }
 
-    if (c.flipOnDirection && !c.rotation) this.player.setFlipX(this.facingLeft);
+    this.applyFrameEdit();
+    this.dispatchAnimationEvents();
 
     const inAir = c.movementMode === "platformer" && !onGround;
     const falling = inAir && body.velocity.y > 30;
@@ -789,7 +1155,10 @@ export class SpriteScene extends Phaser.Scene {
         else this.playMapped("walk");
         const stepInterval = run ? 180 : 260;
         if (this.config.sound.stepEnabled && time - this.lastStep > stepInterval) {
-          audio.playStep(this.config.sound.stepFreq);
+          audio.playStep(
+            this.config.sound.stepFreq,
+            this.config.sound.waveform
+          );
           this.lastStep = time;
         }
         if (this.particleEmitter && Math.random() > 0.6) {
@@ -807,6 +1176,7 @@ export class SpriteScene extends Phaser.Scene {
       this.overrideAnim = null;
     }
 
+    this.wasGroundedLastFrame = onGround;
     if (this.stateTimer > 70) {
       this.stateTimer = 0;
       this.emitState();
@@ -816,16 +1186,24 @@ export class SpriteScene extends Phaser.Scene {
   private emitState() {
     const p = this.player;
     const body = this.physicsBody;
+    const animationId = this.currentAnimName.replace("anim-", "");
+    const animation = this.config.animations.find((a) => a.id === animationId);
     this.callbacks.onState({
       x: p ? Math.round(p.x) : 0,
       y: p ? Math.round(p.y) : 0,
       vx: body ? Math.round(body.velocity.x) : 0,
       vy: body ? Math.round(body.velocity.y) : 0,
-      currentAnim: this.currentAnimName.replace("anim-", ""),
-      onGround: body ? body.blocked.down || body.touching.down : false,
+      // A UI deve exibir o nome legível, não o id interno gerado pelo editor.
+      currentAnim: animation?.name ?? (this.currentAnimName === "-" ? "-" : animationId),
+      onGround:
+        this.config.character.movementMode === "topdown"
+          ? true
+          : body
+            ? body.blocked.down || body.touching.down
+            : false,
       fps: Math.round(this.game.loop.actualFps),
       gamepadConnected: !!this.getGamepad(),
-      activeFrame: p ? parseInt(p.frame.name) || 0 : 0,
+      activeFrame: p ? this.currentFrameIndex() : 0,
       jumps: this.jumpsUsed,
     });
   }

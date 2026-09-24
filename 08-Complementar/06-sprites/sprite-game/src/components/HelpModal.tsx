@@ -1,11 +1,11 @@
 export function HelpModal({ onClose }: { onClose: () => void }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-2 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
-        className="max-h-[85vh] w-full max-w-2xl overflow-auto rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+        className="my-2 max-h-[calc(100dvh-1rem)] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-2xl border border-slate-700 bg-slate-900 p-4 shadow-2xl sm:my-0 sm:max-h-[90dvh] sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -44,7 +44,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
           </Step>
 
           <Step n="4" title="Controlar o personagem">
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
               <KeyRow k="← → / A D" d="Mover" />
               <KeyRow k="↑ / W" d="Cima (top-down)" />
               <KeyRow k="Espaço / K" d="Pular" />
@@ -63,8 +63,10 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
             Na aba <b>🧍 NPCs</b> adicione personagens com IA simples (patrulha,
             seguir, vagar) — como em Unity/Godot. Na aba <b>🟩 Boxes</b> defina{" "}
             <b>hurtbox / hitbox / colisão</b> (estilo engines de luta). Na aba{" "}
-            <b>🏃 Player</b> ajuste escala X/Y, rotação, origem, opacidade,
-            pulo duplo, controle no ar e curvas de <b>ease</b>.
+            <b>🏃 Player</b> ajuste escala X/Y, rotação e opacidade. Origem X/Y
+            pode ser ajustada somente no frame ativo, sem afetar os demais quadros;
+            também há pulo duplo, coyote time, buffer de pulo, controle no ar e
+            curvas de <b>ease</b>.
           </Step>
 
           <Step n="6" title="Efeitos visuais e sonoros">
@@ -74,7 +76,14 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
             no palco para aproximar/afastar a câmera.
           </Step>
 
-          <Step n="7" title="Exportar / Importar">
+          <Step n="7" title="Eventos de gameplay por frame">
+            Dentro da animação, use <b>⚑ Marcador</b> para criar eventos como
+            <b> attack_start</b>, <b>footstep</b> ou <b>hurtbox_on</b>. Escolha
+            o tipo e um payload opcional. No runtime, esses eventos são emitidos
+            exatamente quando o frame entra em cena para seu script reagir.
+          </Step>
+
+          <Step n="8" title="Exportar / Importar para a web">
             Use <b>⬇ Exportar</b> para baixar:
             <ul className="mt-1 list-disc space-y-1 pl-5 text-xs">
               <li>
@@ -82,11 +91,17 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
                 <b>📂 Importar</b> (inclui a imagem).
               </li>
               <li>
-                <b>config.json</b> — todas as configurações (sem a imagem).
+                <b>Atlas JSON</b> — retângulos reais, inclusive no modo livre.
               </li>
               <li>
-                <b>PhaserSprite.tsx</b> — componente React + Phaser pronto com
-                todas as animações registradas.
+                <b>Runtime manifest</b> — configurações leves para produção.
+              </li>
+              <li>
+                <b>SpriteLabRuntime.ts</b> — API Phaser com animações, eventos,
+                overrides de frame e consulta de hitboxes.
+              </li>
+              <li>
+                <b>PhaserSprite.tsx</b> — componente React + Phaser pronto.
               </li>
               <li>
                 <b>Spritesheet (PNG)</b> — imagem original.

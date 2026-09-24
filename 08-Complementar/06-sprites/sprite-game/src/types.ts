@@ -14,6 +14,16 @@ export type EaseType =
   | "Bounce.easeOut"
   | "Elastic.easeOut";
 
+export type AnimationEventKind = "script" | "sound" | "hitbox" | "fx";
+
+export interface AnimationEvent {
+  id: string;
+  frame: number;
+  kind: AnimationEventKind;
+  name: string;
+  payload: string;
+}
+
 export interface AnimationConfig {
   id: string;
   name: string;
@@ -25,9 +35,30 @@ export interface AnimationConfig {
   // avançado
   frameOrder: number[] | null; // ordem customizada dos frames (override)
   color: string; // cor da faixa na timeline
+  // Gatilhos para sincronizar gameplay, som, hitboxes e scripts externos.
+  events?: AnimationEvent[];
 }
 
 export type MovementMode = "topdown" | "platformer";
+
+export interface FrameRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+// Ajustes opcionais aplicados somente a um frame, sem destruir a imagem fonte.
+export interface FrameEdit {
+  originX?: number;
+  originY?: number;
+  scaleX?: number;
+  scaleY?: number;
+  rotation?: number;
+  alpha?: number;
+  flipX?: boolean;
+  flipY?: boolean;
+}
 
 export interface SpriteSheetMeta {
   fileName: string;
@@ -39,7 +70,9 @@ export interface SpriteSheetMeta {
   totalFrames: number;
   columns: number;
   rows: number;
-  // slicing avançado
+  // slicing avançado — quando preenchido, cada frame pode ter um retângulo
+  // independente e o runtime usa uma textura atlas em vez de uma grade fixa.
+  frameRects: FrameRect[] | null;
   marginX: number;
   marginY: number;
   spacingX: number;
@@ -74,7 +107,10 @@ export interface SoundConfig {
   stepFreq: number;
   actionEnabled: boolean;
   actionFreq: number;
+  jumpEnabled: boolean;
   jumpFreq: number;
+  landEnabled: boolean;
+  landFreq: number;
   ambientEnabled: boolean;
   waveform: OscillatorType;
 }
@@ -87,7 +123,11 @@ export interface CharacterConfig {
   offsetX: number;
   offsetY: number;
   speed: number;
+  runMultiplier: number;
   accel: number; // aceleração (0-1, suavização)
+  maxFallSpeed: number;
+  coyoteTime: number;
+  jumpBuffer: number;
   jumpPower: number;
   gravity: number;
   airControl: number; // 0-1
@@ -97,9 +137,9 @@ export interface CharacterConfig {
   tint: string;
   tintEnabled: boolean;
   opacity: number;
-  originX: number;
-  originY: number;
-  animBlendEase: EaseType;
+  originX: number; // origem padrão para frames sem ajuste individual
+  originY: number; // origem padrão para frames sem ajuste individual
+  animBlendEase: EaseType; // easing usado no squash & stretch
 }
 
 export interface HitboxConfig {
@@ -111,6 +151,8 @@ export interface HitboxConfig {
   w: number; // 0-1 relativo ao frame
   h: number;
   color: string;
+  frame: number | null; // null = todos os frames
+  enabled: boolean;
 }
 
 export interface StageConfig {
@@ -122,6 +164,8 @@ export interface StageConfig {
   showFloor: boolean;
   floorHeight: number;
   parallax: boolean;
+  cameraFollow: boolean;
+  cameraLerp: number;
   zoom: number; // câmera zoom
   showHitboxes: boolean;
 }
@@ -145,6 +189,7 @@ export interface NpcInstance {
 export interface ProjectConfig {
   version: string;
   meta: SpriteSheetMeta | null;
+  frameEdits: Record<string, FrameEdit>;
   character: CharacterConfig;
   animations: AnimationConfig[];
   animMapping: {
@@ -171,7 +216,11 @@ export const defaultCharacter: CharacterConfig = {
   offsetX: 0,
   offsetY: 0,
   speed: 200,
+  runMultiplier: 1.7,
   accel: 0.2,
+  maxFallSpeed: 1600,
+  coyoteTime: 90,
+  jumpBuffer: 120,
   jumpPower: 520,
   gravity: 980,
   airControl: 0.7,
@@ -212,7 +261,10 @@ export const defaultSound: SoundConfig = {
   stepFreq: 220,
   actionEnabled: true,
   actionFreq: 520,
+  jumpEnabled: true,
   jumpFreq: 660,
+  landEnabled: true,
+  landFreq: 180,
   ambientEnabled: false,
   waveform: "square",
 };
@@ -226,13 +278,16 @@ export const defaultStage: StageConfig = {
   showFloor: true,
   floorHeight: 60,
   parallax: false,
+  cameraFollow: false,
+  cameraLerp: 0.08,
   zoom: 1,
   showHitboxes: false,
 };
 
 export const emptyProject = (): ProjectConfig => ({
-  version: "2.0.0",
+  version: "3.1.0",
   meta: null,
+  frameEdits: {},
   character: { ...defaultCharacter },
   animations: [],
   animMapping: {

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { SpriteSheetMeta } from "../types";
+import { getFrameCount, getFrameRect } from "../game/sliceSheet";
 
 export function FramePicker({
   meta,
@@ -15,28 +16,20 @@ export function FramePicker({
   onFrameClick?: (index: number) => void;
 }) {
   const frames = useMemo(() => {
-    const out: { index: number; col: number; row: number }[] = [];
-    let i = 0;
-    for (let r = 0; r < meta.rows; r++) {
-      for (let c = 0; c < meta.columns; c++) {
-        out.push({ index: i, col: c, row: r });
-        i++;
-      }
-    }
-    return out;
+    return Array.from({ length: getFrameCount(meta) }, (_, index) => ({
+      index,
+      rect: getFrameRect(meta, index),
+    })).filter((frame): frame is { index: number; rect: NonNullable<ReturnType<typeof getFrameRect>> } => Boolean(frame.rect));
   }, [meta]);
 
   const displayFrame = 48; // px per cell in the picker
-  const aspect = meta.frameHeight / meta.frameWidth;
-  const cellW = displayFrame;
-  const cellH = displayFrame * aspect;
 
   return (
     <div className="overflow-auto rounded-lg border border-slate-700 bg-slate-950/60 p-2">
       <div
         className="grid gap-1"
         style={{
-          gridTemplateColumns: `repeat(${meta.columns}, ${cellW}px)`,
+          gridTemplateColumns: `repeat(${meta.frameRects?.length ? Math.min(8, Math.max(1, meta.frameRects.length)) : meta.columns}, ${displayFrame}px)`,
           width: "fit-content",
         }}
       >
@@ -47,6 +40,9 @@ export function FramePicker({
             f.index >= Math.min(selectStart, selectEnd) &&
             f.index <= Math.max(selectStart, selectEnd);
           const isActive = activeFrame === f.index;
+          const cellW = displayFrame;
+          const cellH = displayFrame * (f.rect.height / Math.max(1, f.rect.width));
+          const sourceScale = cellW / Math.max(1, f.rect.width);
           return (
             <button
               key={f.index}
@@ -64,8 +60,13 @@ export function FramePicker({
                 width: cellW,
                 height: cellH,
                 backgroundImage: `url(${meta.dataUrl})`,
-                backgroundPosition: `-${f.col * cellW}px -${f.row * cellH}px`,
-                backgroundSize: `${meta.columns * cellW}px ${meta.rows * cellH}px`,
+                backgroundPosition: `-${f.rect.x * sourceScale}px -${
+                  f.rect.y * sourceScale
+                }px`,
+                backgroundSize: `${meta.imageWidth * sourceScale}px ${
+                  meta.imageHeight * sourceScale
+                }px`,
+                backgroundRepeat: "no-repeat",
                 imageRendering: "pixelated",
               }}
             >

@@ -1,0 +1,32 @@
+{
+  "name": "pong-classico",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pong Clássico refatorado com React + Phaser — tela inicial, níveis, controles, vidas e ranking",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test:store": "esbuild tests/store.test.ts --bundle --format=esm --platform=node --outfile=node_modules/.cache/store.test.mjs --log-level=warning && node node_modules/.cache/store.test.mjs",
+    "test:smoke": "node tests/smoke.mjs",
+    "test:e2e": "node tests/gameover.mjs",
+    "test": "npm run test:store && npm run test:smoke && npm run test:e2e"
+  },
+  "dependencies": {
+    "phaser": "^4.2.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "esbuild": "^0.28.2",
+    "playwright-core": "^1.63.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}

@@ -1,35 +1,74 @@
-# Breakout
+# Breakout Clássico
 
-## Descrição
-Breakout é um jogo de arcade clássico onde o jogador controla uma paleta para rebater uma bola contra uma parede de tijolos. O objetivo é destruir todos os tijolos sem deixar a bola cair.
+Reimplementação do jogo Breakout com **React 19**, **Phaser 3 Arcade Physics** e **Vite**. O projeto é uma versão de desenvolvimento baseada no repositório público [davidcreator/Breakout-Classico](https://github.com/davidcreator/Breakout-Classico).
 
-## História
-Breakout foi desenvolvido pela Atari, Inc. e lançado em 13 de maio de 1976[^1^][1]. O jogo foi idealizado por Nolan Bushnell e Steve Bristow, e influenciado pelo jogo de arcade Pong, também da Atari[^2^][2]. Steve Wozniak e Steve Jobs também estiveram envolvidos no desenvolvimento do hardware do jogo[^2^][2]. Breakout foi posteriormente adaptado para várias plataformas, incluindo o Atari 2600, e gerou uma sequência chamada Super Breakout[^1^][1].
+## Começar
 
-## Informações Técnicas
-- **Plataformas**: Arcade, Atari 2600, Computadores
-- **Gênero**: Ação
-- **Modos de Jogo**: Single-player, Multiplayer
-- **Controles**: Paleta controlada por botões ou controles analógicos
+**Requisitos:** Node.js 20+ e npm 10+ recomendados.
 
-## Como Funciona
-1. **Movimento**: O jogador move a paleta horizontalmente para rebater a bola.
-2. **Objetivo**: Destruir todos os tijolos na tela rebatendo a bola contra eles.
-3. **Desafios**: A bola aumenta de velocidade a cada rebatida, e o jogador perde uma vida se a bola passar pela paleta.
+```bash
+npm ci
+npm run dev
+```
 
-## Por Que é uma Boa Base para Iniciantes
-Desenvolver um jogo como Breakout é uma excelente introdução ao desenvolvimento de jogos por várias razões:
-- **Simplicidade**: As mecânicas básicas são fáceis de entender e implementar.
-- **Lógica de Jogo**: Ensina conceitos fundamentais como detecção de colisão, controle de movimento e gerenciamento de estado.
-- **Expansibilidade**: Pode ser facilmente expandido com novos recursos, como diferentes níveis de dificuldade e power-ups.
-- **Ferramentas**: Pode ser desenvolvido usando diversas ferramentas e linguagens de programação, como Python, JavaScript, e C#.
+Abra no navegador a URL exibida pelo Vite (por padrão, `http://localhost:5173`). Execute os comandos na pasta que contém este `README.md` e `package.json`. **Não abra `index.html` por `file://`**: a aplicação usa módulos ES e precisa de um servidor HTTP.
 
-## Recursos Adicionais
-- [História do Breakout](https://pt.wikipedia.org/wiki/Breakout_(jogo_eletrônico))))) - Um artigo detalhado sobre a história do jogo[^1^][1].
-- Desenvolvimento de Jogos com Python - Um guia para começar a desenvolver jogos com Python e Pygame.
+Se o terminal disser `vite: not found`, rode `npm ci` na raiz do projeto e tente novamente.
 
-## Conclusão
-Breakout não é apenas um marco na história dos videogames, mas também uma excelente plataforma de aprendizado para desenvolvedores iniciantes. Sua simplicidade e a possibilidade de expansão fazem dele um projeto ideal para quem está começando no mundo do desenvolvimento de jogos.
+## Validar e gerar build
 
-[^1^][1]: Wikipédia - Breakout (jogo eletrônico)
-[^2^][2]: Bojogá - Breakout (Atari, 1976)
+```bash
+npm test        # testes das regras puras (Vitest)
+npm run build   # build de produção em dist/
+npm run preview # preview local do build, após npm run build
+npm audit       # auditoria de dependências
+```
+
+## Modos de jogo
+
+- **Clássico:** três vidas, score, níveis progressivos e uma vida bônus a cada três níveis.
+- **Sobrevivência:** uma vida inicial e ondas sem fim; dificuldade crescente e power-up de vida extra.
+- **Duelo local:** dois jogadores no mesmo dispositivo; vence quem fizer cinco pontos. Power-ups ficam desativados para manter o equilíbrio.
+
+## Controles
+
+- **Clássico/Sobrevivência:** `A`/`D` ou `←`/`→` para mover a barra.
+- **Duelo:** Jogador 1 usa `A`/`D`; Jogador 2 usa `←`/`→`.
+- **Lançar:** `Espaço`, clique ou toque no campo. Após o lançamento, `Espaço` pausa/continua.
+- **Reiniciar:** `R` ou botão de reinício na interface.
+- **Touch:** toque/clique move a barra para o ponto selecionado; arraste para continuar.
+- **Gamepad:** D-pad ou analógico esquerdo. O segundo controle atua como Jogador 2 no Duelo.
+
+## Documentação
+
+A documentação detalhada está em [`docs/`](./docs/README.md). Para aprender a programar jogos usando este projeto como referência, comece pelo [Guia didático React + Phaser](./docs/GUIA-DIDATICO-REACT-PHASER.md) e pratique com [Exercícios práticos](./docs/EXERCICIOS-PRATICOS.md).
+
+- [Instalação, execução e preview](./docs/SETUP.md)
+- [Regras e controles](./docs/CONTROLES-E-REGRAS.md)
+- [Arquitetura React + Phaser](./docs/ARQUITETURA.md)
+- [QA e checklist manual](./docs/QA-CHECKLIST.md)
+- [Solução de problemas](./docs/TROUBLESHOOTING.md)
+- [Auditoria e correções](./docs/AUDITORIA-E-CORRECOES.md)
+- [Histórico de alterações](./docs/CHANGELOG.md)
+
+## Estrutura principal
+
+```text
+src/
+├── App.jsx                  # Menu, HUD e telas React
+├── main.jsx                 # Entrada da aplicação
+├── styles.css               # Interface responsiva
+└── game/
+    ├── PhaserCanvas.jsx     # Ciclo de vida da instância Phaser
+    ├── BreakoutScene.js     # Cena, física, input e progressão
+    ├── rules.js             # Regras puras
+    └── rules.test.js        # Testes unitários das regras
+```
+
+## Limites conhecidos
+
+- O modo Duelo é local; não há multiplayer pela internet.
+- A suite automatizada cobre regras puras; colisões, renderização e dispositivos precisam passar pelo checklist manual em [`docs/QA-CHECKLIST.md`](./docs/QA-CHECKLIST.md).
+- Phaser é carregado sob demanda ao entrar no jogo. O build pode avisar sobre o tamanho bruto do chunk da engine; consulte [solução de problemas](./docs/TROUBLESHOOTING.md).
+
+Se a aplicação não iniciar, confira primeiro [Solução de problemas](./docs/TROUBLESHOOTING.md) e [Instalação e execução](./docs/SETUP.md).

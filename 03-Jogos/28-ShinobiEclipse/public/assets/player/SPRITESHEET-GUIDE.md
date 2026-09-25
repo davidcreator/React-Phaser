@@ -26,3 +26,4 @@ Each sheet contains a 4 x 4 grid. Frames are read from left to right and top to 
 ## Runtime treatment
 
 The game removes the light generation matte with an edge flood-fill before registering each sheet in Phaser. The resulting CanvasTexture has a transparent alpha background. If any external sheet fails to load, the built-in vector ninja keeps the mission playable.
+> Pipeline, convenções e validação: veja [`docs/ASSETS.md`](../../../docs/ASSETS.md) (fonte canônica).

@@ -1,0 +1,17 @@
+# Dependencies / build
+node_modules/
+dist/
+*.local
+
+# Logs e temporários
+*.log
+tmp/
+.cache/
+
+# Ambiente
+.env
+.env.*
+
+# SO
+.DS_Store
+Thumbs.db

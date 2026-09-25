@@ -1,12 +1,13 @@
 {
-  "name": "react-vite-tailwind",
+  "name": "shinobi-eclipse",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "node tests/e2e-smoke.mjs"
   },
   "dependencies": {
     "clsx": "2.1.1",
@@ -21,9 +22,11 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.1",
+    "playwright": "^1.63.0",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.3.2",
     "vite-plugin-singlefile": "2.3.0"
-  }
+  },
+  "description": "Jogo de plataforma/aventura 2D (React 19 + Phaser 4 + Vite 7) - Shinobi Eclipse"
 }

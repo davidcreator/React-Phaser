@@ -16,4 +16,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  // Ambientes de preview/embed (ex.: sandbox *.e2b.app) e rede local.
+  server: {
+    host: "0.0.0.0",
+    allowedHosts: [".e2b.app"],
+  },
+  preview: {
+    host: "0.0.0.0",
+    allowedHosts: [".e2b.app"],
+  },
 });

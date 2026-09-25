@@ -18,3 +18,4 @@ Every file is a 4 x 4 sheet with 256 x 256 cells. Frames are read left to right,
 - `onyx-elite-ninja.png`: tall armored odachi elite with the highest damage and health
 
 At runtime the light generation matte is removed with an edge flood-fill before each image is registered as a transparent Phaser CanvasTexture. Every caste has an independent procedural fallback.
+> Pipeline, convenções e validação: veja [`docs/ASSETS.md`](../../../docs/ASSETS.md) (fonte canônica).

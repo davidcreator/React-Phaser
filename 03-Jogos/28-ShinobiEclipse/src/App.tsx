@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import { AudioDirector, type SoundEffect } from "./game/audio";
 import {
   gameCommands,
+  LEVEL_META,
   ShadowScene,
   type ControlMode,
   type Difficulty,
@@ -12,7 +13,7 @@ import {
   type HudData,
 } from "./game/ShadowScene";
 
-type Screen = "menu" | "options" | "guide" | "game";
+type Screen = "menu" | "levels" | "options" | "guide" | "game";
 type GameOverlay = "pause" | "gameOver" | "victory" | null;
 
 interface AppSettings extends GameSettings {
@@ -40,12 +41,68 @@ const INITIAL_HUD: HudData = {
   shurikenReady: true,
 };
 
+// FIX meta do HUD: total derivado das fases reais (fonte única de verdade na cena).
+const TOTAL_TARGETS = LEVEL_META.reduce((sum, level) => sum + level.enemies, 0);
+
 const INITIAL_GAME_STATE: GameStartState = {
   level: 1,
   lives: 4,
   kills: 0,
   rewardedAt: 0,
 };
+
+// ===== Progresso: rank, pontuação e dificuldades concluídas por área =====
+export type Rank = "S" | "A" | "B" | "C" | "D";
+
+interface LevelStats {
+  kills: number;
+  lives: number;
+  health: number;
+}
+
+interface LevelRecord {
+  completed: boolean;
+  bestScore: number;
+  bestRank: Rank;
+  completedDifficulties: Difficulty[];
+  bestRankByDifficulty: Partial<Record<Difficulty, Rank>>;
+}
+
+type Progress = Partial<Record<number, LevelRecord>>;
+
+const PROGRESS_KEY = "shinobi-eclipse-progress";
+const RANK_ORDER: Rank[] = ["D", "C", "B", "A", "S"];
+const DIFF_SCORE_MULT: Record<Difficulty, number> = { easy: 1, normal: 1.5, hard: 2 };
+const DIFF_RANK_BONUS: Record<Difficulty, number> = { easy: 1, normal: 1.12, hard: 1.25 };
+
+/** Pontuação = base (1000) + abates + vidas restantes + vitalidade, x multiplicador. */
+function scoreFor(stats: LevelStats, difficulty: Difficulty) {
+  const raw = 1000 + stats.kills * 50 + stats.lives * 300 + stats.health * 3;
+  return { raw, score: Math.round(raw * DIFF_SCORE_MULT[difficulty]) };
+}
+
+/** Rank considera o desempenho cru com bônus da dificuldade (S exige quase-perfeição). */
+function rankFor(stats: LevelStats, difficulty: Difficulty): Rank {
+  const adjusted = scoreFor(stats, difficulty).raw * DIFF_RANK_BONUS[difficulty];
+  if (adjusted >= 3000) return "S";
+  if (adjusted >= 2600) return "A";
+  if (adjusted >= 2200) return "B";
+  if (adjusted >= 1800) return "C";
+  return "D";
+}
+
+function loadProgress(): Progress {
+  try {
+    const value = window.localStorage.getItem(PROGRESS_KEY);
+    return value ? (JSON.parse(value) as Progress) : {};
+  } catch {
+    return {};
+  }
+}
+
+function difficultyLabel(difficulty: Difficulty) {
+  return difficulty === "easy" ? "FACIL" : difficulty === "normal" ? "NORMAL" : "DIFICIL";
+}
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("menu");
@@ -56,8 +113,54 @@ export default function App() {
   const [runId, setRunId] = useState(0);
   const [gameStartState, setGameStartState] = useState<GameStartState>(INITIAL_GAME_STATE);
   const [changingLevel, setChangingLevel] = useState(false);
+  const [progress, setProgress] = useState<Progress>(() => loadProgress());
+  const [selectedLevel, setSelectedLevel] = useState(1);
+  const [lastResult, setLastResult] = useState<{ level: number; rank: Rank; score: number; stats: LevelStats } | null>(null);
+  const [transitionArea, setTransitionArea] = useState<{ level: number; name: string } | null>(null);
   const [gamepadConnected, setGamepadConnected] = useState(() => Boolean(navigator.getGamepads?.().some(Boolean)));
   const audioRef = useRef<AudioDirector | null>(null);
+  const settingsRef = useRef(settings);
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
+
+  /** Registra conclusão de fase: rank, melhor pontuação e dificuldade. */
+  const applyRecord = useCallback((level: number, stats: LevelStats) => {
+    const difficulty = settingsRef.current.difficulty;
+    const rank = rankFor(stats, difficulty);
+    const { score } = scoreFor(stats, difficulty);
+    setLastResult({ level, rank, score, stats });
+    setProgress((current) => {
+      const prev = current[level];
+      const bestRankByDifficulty = { ...(prev?.bestRankByDifficulty ?? {}) };
+      const previousRank = bestRankByDifficulty[difficulty];
+      if (!previousRank || RANK_ORDER.indexOf(rank) > RANK_ORDER.indexOf(previousRank)) {
+        bestRankByDifficulty[difficulty] = rank;
+      }
+      const completedDifficulties =
+        prev?.completedDifficulties?.includes(difficulty)
+          ? prev.completedDifficulties
+          : [...(prev?.completedDifficulties ?? []), difficulty];
+      const bestRank =
+        prev && RANK_ORDER.indexOf(prev.bestRank) > RANK_ORDER.indexOf(rank) ? prev.bestRank : rank;
+      const next: Progress = {
+        ...current,
+        [level]: {
+          completed: true,
+          bestScore: Math.max(prev?.bestScore ?? 0, score),
+          bestRank,
+          completedDifficulties,
+          bestRankByDifficulty,
+        },
+      };
+      try {
+        window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(next));
+      } catch {
+        // armazenamento indisponível — o progresso vive só nesta sessão
+      }
+      return next;
+    });
+  }, []);
 
   if (!audioRef.current) audioRef.current = new AudioDirector();
 
@@ -100,22 +203,28 @@ export default function App() {
     navigate(next);
   };
 
-  const startGame = () => {
+  const startGame = (level = 1) => {
     interactiveSound();
-    setHud(INITIAL_HUD);
-    setGameStartState(INITIAL_GAME_STATE);
+    setSelectedLevel(level);
+    setHud({ ...INITIAL_HUD, level, enemies: LEVEL_META[level - 1]?.enemies ?? 8 });
+    setGameStartState({ level, lives: 4, kills: 0, rewardedAt: 0 });
     setChangingLevel(false);
     setOverlay(null);
+    setLastResult(null);
+    setTransitionArea(null);
     setRunId((value) => value + 1);
     setScreen("game");
   };
 
   const restartGame = () => {
     interactiveSound();
-    setHud(INITIAL_HUD);
-    setGameStartState(INITIAL_GAME_STATE);
+    const meta = LEVEL_META[selectedLevel - 1];
+    setHud({ ...INITIAL_HUD, level: selectedLevel, enemies: meta?.enemies ?? 8 });
+    setGameStartState({ level: selectedLevel, lives: 4, kills: 0, rewardedAt: 0 });
     setChangingLevel(false);
     setOverlay(null);
+    setLastResult(null);
+    setTransitionArea(null);
     setRunId((value) => value + 1);
   };
 
@@ -130,21 +239,31 @@ export default function App() {
     if (signal.type === "ready") setChangingLevel(false);
     if (signal.type === "pause") setOverlay(signal.paused ? "pause" : null);
     if (signal.type === "gameOver") setOverlay("gameOver");
-    if (signal.type === "victory") setOverlay("victory");
+    if (signal.type === "victory") {
+      // Última área concluída: registra rank/pontos e mostra no modal de vitória.
+      applyRecord(signal.level, signal.stats);
+      setOverlay("victory");
+    }
+    if (signal.type === "levelClear") {
+      // Área intermediária concluída (campanha segue para a próxima): registra progresso.
+      applyRecord(signal.level, signal.stats);
+    }
     if (signal.type === "nextLevel") {
+      const meta = LEVEL_META[signal.state.level - 1];
       setChangingLevel(true);
       setGameStartState(signal.state);
+      setTransitionArea({ level: signal.state.level, name: meta?.name ?? `AREA 0${signal.state.level}` });
       setHud({
         health: 100,
         lives: signal.state.lives,
         kills: signal.state.kills,
-        enemies: 12,
-        level: 2,
+        enemies: meta?.enemies ?? 8,
+        level: signal.state.level,
         shurikenReady: true,
       });
       setRunId((value) => value + 1);
     }
-  }, []);
+  }, [applyRecord]);
 
   const resumeGame = () => {
     interactiveSound();
@@ -195,20 +314,21 @@ export default function App() {
           <div className="hero-copy">
             <p className="eyebrow">A LENDA DA LUA VERMELHA</p>
             <h1 id="game-title"><span>SHINOBI</span> ECLIPSE</h1>
-            <p className="hero-line">Uma fortaleza. Vinte alvos. Quatro vidas.</p>
+            <p className="hero-line">Seis areas. {TOTAL_TARGETS} alvos. Quatro vidas.</p>
             <div className="menu-actions">
-              <button className="primary-button" onClick={startGame}>
+              <button className="primary-button" onClick={() => startGame(1)}>
                 <span>INICIAR MISSAO</span><b>ENTER</b>
               </button>
+              <button className="secondary-button" onClick={() => navigate("levels")}>AREAS</button>
               <button className="secondary-button" onClick={() => openSubscreen("options")}>OPCOES</button>
             </div>
           </div>
 
           <HeroNinja />
           <footer className="menu-footer">
-            <span>02 AREAS</span>
+            <span>0{LEVEL_META.length} AREAS</span>
             <i />
-            <span>20 ALVOS</span>
+            <span>{TOTAL_TARGETS} ALVOS</span>
             <i />
             <span>{settings.difficulty.toUpperCase()}</span>
           </footer>
@@ -229,7 +349,15 @@ export default function App() {
         <GuideScreen
           control={settings.control}
           onBack={() => navigate(returnScreen)}
-          onPlay={startGame}
+          onPlay={() => startGame(1)}
+        />
+      )}
+
+      {screen === "levels" && (
+        <LevelSelectScreen
+          progress={progress}
+          onBack={() => navigate("menu")}
+          onPlay={(level) => startGame(level)}
         />
       )}
 
@@ -244,11 +372,13 @@ export default function App() {
             onSound={sound}
           />
           <GameHud hud={hud} control={settings.control} onPause={pauseGame} />
-          {changingLevel && <LevelTransition />}
+          {changingLevel && <LevelTransition result={lastResult} area={transitionArea} />}
           {overlay && (
             <GameModal
               mode={overlay}
               hud={hud}
+              result={lastResult}
+              difficulty={settings.difficulty}
               onResume={resumeGame}
               onRestart={restartGame}
               onMenu={returnToMenu}
@@ -339,15 +469,24 @@ function GameViewport({
         if (sceneActive && host.querySelector("canvas")) revealGame(attempt);
       }, 700);
 
+      // FIX watchdog: em conexão lenta os sheets (~7MB) não chegam em 3s e o
+      // jogo anterior era DESTRUÍDO e recriado em loop, reiniciando o download.
+      // Agora o timeout nunca destrói um boot vivo: se o canvas/scene existem,
+      // revela o jogo; só faz fallback AUTO->CANVAS uma única vez e, no limite,
+      // mostra o estado de erro com botão "TENTAR NOVAMENTE".
       bootTimer = window.setTimeout(() => {
         if (attempt !== activeAttempt || disposed) return;
+        if (host.querySelector("canvas") && (game?.scene.isActive("shadow-run") ?? false)) {
+          revealGame(attempt);
+          return;
+        }
         if (!finalAttempt) {
           setLoadState("loading");
           boot(renderer === Phaser.AUTO ? Phaser.CANVAS : Phaser.AUTO, true);
-        } else {
+        } else if (!host.querySelector("canvas")) {
           setLoadState("error");
         }
-      }, finalAttempt ? 7000 : 3000);
+      }, finalAttempt ? 12000 : 3500);
     };
 
     // Let Phaser select the best renderer first, then retry with Canvas on restricted hosts.
@@ -375,13 +514,25 @@ function GameViewport({
   );
 }
 
-function LevelTransition() {
+function LevelTransition({
+  result,
+  area,
+}: {
+  result: { level: number; rank: Rank; score: number } | null;
+  area: { level: number; name: string } | null;
+}) {
   return (
     <div className="level-transition" role="status" aria-live="polite">
       <p>PORTOES INTERNOS ABERTOS</p>
-      <h2>AREA 02</h2>
+      <h2>AREA {String(area?.level ?? 2).padStart(2, "0")}</h2>
       <span />
-      <b>FORTALEZA DA LUA VERMELHA</b>
+      {result && (
+        <div className="result-rank transition-rank">
+          <span className={`rank-badge rank-${result.rank}`}>{result.rank}</span>
+          <b>AREA {String(result.level).padStart(2, "0")} CONCLUIDA · {result.score.toLocaleString("pt-BR")} PTS</b>
+        </div>
+      )}
+      <b className="transition-foot">{area?.name ?? "FORTALEZA DA LUA VERMELHA"}</b>
     </div>
   );
 }
@@ -400,7 +551,7 @@ function GameHud({ hud, control, onPause }: { hud: HudData; control: ControlMode
         </div>
         <div className="status-readout">
           <div><span>VIDAS</span><strong>{String(hud.lives).padStart(2, "0")}</strong></div>
-          <div><span>ABATES</span><strong>{String(hud.kills).padStart(2, "0")} / 20</strong></div>
+          <div><span>ABATES</span><strong>{String(hud.kills).padStart(2, "0")} / {TOTAL_TARGETS}</strong></div>
           <button className="pause-button" onClick={onPause} aria-label="Pausar jogo">II</button>
         </div>
       </div>
@@ -426,14 +577,23 @@ function GameControls({ control, shurikenReady }: { control: ControlMode; shurik
   const holdProps = (action: "left" | "right") => ({
     onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      event.currentTarget.setPointerCapture(event.pointerId);
+      // FIX crash/input preso: setPointerCapture pode falhar (pointer já solto);
+      // sem o try/catch o pointerup correspondente nunca chega e o personagem
+      // fica andando para sempre em uma direção.
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch {
+        // pointer já inativo — seguir sem capture
+      }
       dispatchGameAction(action, true);
     },
     onPointerUp: (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
       dispatchGameAction(action, false);
     },
+    onLostPointerCapture: () => dispatchGameAction(action, false),
     onPointerCancel: () => dispatchGameAction(action, false),
+    onContextMenu: (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault(),
   });
   const tap = (action: Exclude<VirtualAction, "left" | "right">) => (event: React.PointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -462,20 +622,28 @@ function GameControls({ control, shurikenReady }: { control: ControlMode; shurik
 function GameModal({
   mode,
   hud,
+  result,
+  difficulty,
   onResume,
   onRestart,
   onMenu,
 }: {
   mode: Exclude<GameOverlay, null>;
   hud: HudData;
+  result: { level: number; rank: Rank; score: number; stats: LevelStats } | null;
+  difficulty: Difficulty;
   onResume: () => void;
   onRestart: () => void;
   onMenu: () => void;
 }) {
   const content = {
     pause: { eyebrow: "MISSAO SUSPENSA", title: "PAUSA", detail: "A noite espera pelo seu proximo movimento." },
-    gameOver: { eyebrow: "TODAS AS VIDAS PERDIDAS", title: "FIM DA MISSAO", detail: `${hud.kills} dos 20 alvos foram eliminados.` },
-    victory: { eyebrow: "FORTALEZA LIBERTADA", title: "MISSAO CUMPRIDA", detail: `20 alvos eliminados com ${hud.lives} ${hud.lives === 1 ? "vida" : "vidas"} restante${hud.lives === 1 ? "" : "s"}.` },
+    gameOver: { eyebrow: "TODAS AS VIDAS PERDIDAS", title: "FIM DA MISSAO", detail: `${hud.kills} dos ${TOTAL_TARGETS} alvos foram eliminados.` },
+    victory: {
+      eyebrow: "FORTALEZA LIBERTADA",
+      title: "MISSAO CUMPRIDA",
+      detail: `Area ${String(result?.level ?? 1).padStart(2, "0")} concluida com ${hud.lives} ${hud.lives === 1 ? "vida" : "vidas"} restante${hud.lives === 1 ? "" : "s"} — campanha de ${LEVEL_META.length} areas completa.`,
+    },
   }[mode];
   return (
     <div className="modal-backdrop page-enter" role="dialog" aria-modal="true" aria-label={content.title}>
@@ -484,6 +652,15 @@ function GameModal({
         <h2>{content.title}</h2>
         <span className="blade-rule" />
         <div className="result-stats"><span>ABATES <b>{hud.kills}</b></span><span>AREA <b>{hud.level}</b></span><span>VIDAS <b>{hud.lives}</b></span></div>
+        {mode === "victory" && result && (
+          <div className="result-rank">
+            <span className={`rank-badge rank-${result.rank}`}>{result.rank}</span>
+            <div className="result-rank-score">
+              <b>{result.score.toLocaleString("pt-BR")} PTS</b>
+              <span>AREA {String(result.level).padStart(2, "0")} · {difficultyLabel(difficulty)} · ABATES {result.stats.kills}</span>
+            </div>
+          </div>
+        )}
         <p className="modal-detail">{content.detail}</p>
         <div className="modal-actions">
           {mode === "pause" && <button className="primary-button" onClick={onResume}><span>CONTINUAR</span><b>ESC</b></button>}
@@ -492,6 +669,73 @@ function GameModal({
         </div>
       </div>
     </div>
+  );
+}
+
+function LevelSelectScreen({
+  progress,
+  onBack,
+  onPlay,
+}: {
+  progress: Progress;
+  onBack: () => void;
+  onPlay: (level: number) => void;
+}) {
+  // 6 áreas em cadeia: cada uma libera ao concluir a anterior.
+  const levels = LEVEL_META.map((meta) => ({
+    id: meta.id,
+    name: meta.name,
+    detail: `${meta.enemies} alvos · ${meta.flavor}`,
+    locked: meta.id > 1 && !progress[meta.id - 1]?.completed,
+  }));
+  const completedCount = levels.filter((level) => progress[level.id]?.completed).length;
+  return (
+    <section className="subscreen levels-screen page-enter" aria-labelledby="levels-title">
+      <SubscreenHeader title="SELECAO DE AREA" onBack={onBack} />
+      <div className="levels-layout">
+        <div className="levels-intro">
+          <p className="eyebrow">REGISTRO DA MISSAO</p>
+          <h1 id="levels-title">ESCOLHA SUA<br />AREA</h1>
+          <p>Cada area registra seu rank, a melhor pontuacao e as dificuldades concluidas.</p>
+          <p className="levels-progress"><b>{completedCount}/{LEVEL_META.length}</b> AREAS CONCLUIDAS</p>
+        </div>
+        <div className="level-cards">
+          {levels.map((level) => {
+            const record = progress[level.id];
+            const status = level.locked ? "BLOQUEADA" : record?.completed ? "CONCLUIDA" : "DISPONIVEL";
+            return (
+              <article key={level.id} className={`level-card${record?.completed ? " completed" : ""}${level.locked ? " locked" : ""}`}>
+                <header>
+                  <span className="level-tag">AREA {String(level.id).padStart(2, "0")}</span>
+                  <span className={`level-status ${record?.completed ? "done" : level.locked ? "" : "available"}`}>{status}</span>
+                </header>
+                <h2>{level.name}</h2>
+                <p className="level-detail">{level.detail}</p>
+                <div className="level-score">
+                  <span className={`rank-badge rank-${record?.bestRank ?? "D"}${record ? "" : " empty"}`}>{record?.bestRank ?? "—"}</span>
+                  <div>
+                    <b>{record ? record.bestScore.toLocaleString("pt-BR") : "0"}</b>
+                    <span>MELHOR PONTUACAO</span>
+                  </div>
+                </div>
+                <div className="diff-chips" aria-label="Dificuldades concluidas">
+                  {(["easy", "normal", "hard"] as Difficulty[]).map((difficulty) => (
+                    <i key={difficulty} className={record?.completedDifficulties?.includes(difficulty) ? "on" : "off"}>
+                      {difficultyLabel(difficulty)}
+                    </i>
+                  ))}
+                </div>
+                {level.locked && <p className="lock-hint">Conclua a Area {String(level.id - 1).padStart(2, "0")} para liberar.</p>}
+                <button className="primary-button" disabled={level.locked} onClick={() => onPlay(level.id)}>
+                  <span>{level.locked ? "BLOQUEADA" : record?.completed ? "REJOGAR AREA" : "JOGAR AREA"}</span>
+                  {!level.locked && <b>{record?.completed ? "↻" : "▶"}</b>}
+                </button>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -604,7 +848,7 @@ function GuideScreen({ control, onBack, onPlay }: { control: ControlMode; onBack
         <div className="guide-intro">
           <p className="eyebrow">PROTOCOLO DA SOMBRA</p>
           <h1 id="guide-title">ELIMINE<br />TODOS.</h1>
-          <p>Limpe as duas areas da fortaleza. A cada 20 abates, uma vida extra e concedida.</p>
+          <p>Limpe as {LEVEL_META.length} areas da fortaleza e elimine os {TOTAL_TARGETS} alvos. A cada 20 abates, uma vida extra e concedida.</p>
           <button className="primary-button" onClick={onPlay}><span>INICIAR MISSAO</span></button>
         </div>
         <div className="field-manual">
@@ -686,8 +930,11 @@ function AnimatedNinjaSprite({ onReady }: { onReady: () => void }) {
       if (!sheetContext) return;
       sheetContext.drawImage(image, 0, 0);
       const imageData = sheetContext.getImageData(0, 0, sheet.width, sheet.height);
-      removeCheckerBackground(imageData, sheet.width, sheet.height);
-      sheetContext.putImageData(imageData, 0, 0);
+      // FIX jank: assets com alpha real (pipeline offline) nao passam pelo flood-fill.
+      if (imageData.data[3] >= 10) {
+        removeCheckerBackground(imageData, sheet.width, sheet.height);
+        sheetContext.putImageData(imageData, 0, 0);
+      }
 
       const frameWidth = Math.floor(sheet.width / 4);
       const frameHeight = Math.floor(sheet.height / 4);

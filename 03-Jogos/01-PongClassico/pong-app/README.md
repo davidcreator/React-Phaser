@@ -79,4 +79,4 @@ src/
 8. README real (clonável/executável), sem placeholders
 
 ---
-*Projeto educacional — refatorado em 25/09/2026 · House Software*
+*Projeto educacional — refatorado em 25/09/2026 · David Creator*

@@ -56,6 +56,33 @@ Este roadmap organiza o trabalho por validações de risco. Datas e tamanho de e
 - apresentação permanecer sem gore e limite máximo de 12 zumbis por rota continuar respeitado;
 - typecheck/build passarem e a meta 10+ permanecer identificada como não oficial, sujeita a revisão do build com armas.
 
+## M2.6 — Spritesheets veiculares v0.6 · implementado
+
+**Entregas implementadas:**
+- quatro spritesheets PNG transparentes de pixel art (96 × 80 px por quadro) e fontes SVG editáveis, uma por veículo;
+- animação cíclica das rodas conforme a velocidade e orientação física do veículo;
+- carregamento somente do carro selecionado e fallback para o desenho vetorial anterior;
+- documentação dos arquivos e script-fonte para regeneração.
+
+**Pronto quando:**
+- os quatro spritesheets forem carregados sem erros no runtime e a orientação/escala encaixar na pista;
+- a animação permanecer estável em movimento, salto, inclinação e capotamento;
+- os carros continuarem legíveis no tamanho de jogo e em dispositivos móveis.
+
+## M2.7 — Tilesets por fase e monstros v0.7 · implementação criada, playtest pendente
+
+**Entregas:**
+- quatro atlas ambientais de 48 tiles (32 × 32 px), cada um com PNG, SVG fonte, TSX externo para Tiled e manifesto JSON;
+- IDs semânticos comuns entre Posto 7, Viaduto Caído, Pátio de Sucata e Saída do Anel; marcos específicos da fase usados no parallax da corrida;
+- spritesheets PNG/SVG de Errante, Corredor, Saltador e Blindado, cada uma com quatro quadros transparentes de 64 × 64 px e animação integrada;
+- geradores Python, registries editáveis independentes da cena e documentação de edição;
+- geradores, typecheck e build executados com sucesso; atlas/monstros conferidos em dimensões, transparência, XML/JSON e resposta HTTP.
+
+**Pronto quando:**
+- todos os PNGs/TSX forem observados no runtime e as quatro fases exibirem seus marcos sem alterar a física;
+- ciclo de caminhada, barra de resistência, estados de derrota/desvio/contato e fallback forem observados em playtest;
+- um tileset puder ser aberto no Tiled e seus nomes/IDs corresponderem ao manifesto.
+
 ## M3 — Expansão da campanha
 
 **Entregas futuras:** expansão para 12 fases em três regiões; checkpoints; rotas alternativas de segurança/risco; medalhas e contrarrelógio local; áudio final e assets de produção.
@@ -89,7 +116,7 @@ Este roadmap organiza o trabalho por validações de risco. Datas e tamanho de e
 ## Próximas prioridades
 
 1. Fazer playtests reais das quatro rotas para medir a duração e ajustar combustível, pickups, obstáculos e danos.
-2. Testar a matriz de 4 fases × 4 veículos; verificar também munição, encontros com zumbis, colisões, capotamentos, escudos, reparos e quebras, mantendo as rotas recuperáveis.
+2. Playtestar os spritesheets de carros e monstros, os atlas por fase (parallax, contraste e IDs), e a matriz de 4 fases × 4 veículos; verificar também munição, encontros com zumbis, colisões, capotamentos, escudos, reparos e quebras, mantendo as rotas recuperáveis.
 3. Validar desbloqueios sequenciais, recompensas, save local e migração de um save v0.3 com upgrades da Fagulha.
 4. Revisar apresentação e controles em telas pequenas; confirmar que HUD, garagem e quatro cards de fase cabem e continuam legíveis.
 5. Fazer playtest real (incluindo toque/mobile) da arma e do dano, validar interseções de projéteis e balancear os pickups; executar `npm run typecheck`, `npm run build` e verificação HTTP da prévia.

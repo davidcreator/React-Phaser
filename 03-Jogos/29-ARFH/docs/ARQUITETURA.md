@@ -49,13 +49,20 @@ src/
     types.ts                 # resultado e callbacks tipados
     upgrades.ts              # categorias, custos e sanitização de upgrades
     scenes/RaceScene.ts      # simulação Phaser de corrida
+public/assets/sprites/cars/      # spritesheets atuais dos veículos
+public/assets/sprites/monsters/  # PNG/SVG dos quatro monstros
+public/assets/tilesets/stages/   # atlas PNG/SVG/TSX/JSON por fase
+src/game/monsters/registry.ts    # mapeamento dos spritesheets de monstros
+src/game/tilesets/registry.ts    # atlas e marcos por fase
+scripts/generate_stage_tilesets.py
+scripts/generate_monster_spritesheets.py
 ```
 
 ## 5. Conteúdo e layout
 
 - `content.ts` é a fonte de verdade para IDs, atributos, paletas, tema, comprimento, quantidades e ordem de monstros.
 - `stageLayout.ts` gera coordenadas determinísticas de rampas, obstáculos, pickups e monstros a partir dos dados da fase.
-- `RaceScene` usa o layout e a paleta recebidos para dimensionar o mundo, o cenário, o HUD e as regras físicas.
+- `RaceScene` usa o layout e a paleta recebidos para dimensionar mundo, HUD e física. Carrega o PNG do veículo selecionado; carrega também o tileset da fase (32 × 32 por tile) para marcos em parallax e as quatro spritesheets de monstros (64 × 64 por quadro). Os desenhos usam filtro `NEAREST`; o mapa físico e o fallback vetorial dos monstros permanecem independentes das imagens.
 - Para novas rotas, manter no máximo 12 zumbis por fase; tiros podem neutralizá-los (+500 uma única vez), contatos causam dano mecânico ao carro e desvios não pontuam.
 
 ## 6. Input e simulação

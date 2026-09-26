@@ -2,7 +2,7 @@
 
 Protótipo de corrida arcade 2D lateral, desenvolvido com **React + Phaser 3 + TypeScript**. Prepare o veículo, atravesse rotas pós-apocalípticas e alcance os postos de evacuação. Dispare contra zumbis estilizados, administre munição e proteja o carro; colisões, capotamentos e pousos sem as rodas no chão afetam a condição mecânica. Os efeitos são sem gore.
 
-> **Status — protótipo v0.5:** quatro fases jogáveis e quatro veículos selecionáveis, com desbloqueios sequenciais, atributos próprios, seis categorias de melhorias, arma com munição limitada, pickups e dano/reparo de veículo. A meta 10+ é editorial e não representa uma classificação oficial.
+> **Status — protótipo v0.7:** quatro fases jogáveis, tilesets ambientais separados e editáveis por fase, spritesheets animados para os quatro monstros, além de quatro veículos, desbloqueios sequenciais, melhorias, arma com munição limitada, pickups e dano/reparo. Os spritesheets dos carros foram mantidos sem alteração. A meta 10+ é editorial e não representa uma classificação oficial.
 
 ## Rodar localmente
 
@@ -20,6 +20,8 @@ npm run typecheck
 npm run build
 npm run preview
 ```
+
+Para regenerar os atlas/folhas editáveis depois de alterar SVGs, execute `npm run assets:tilesets` ou `npm run assets:monsters` (Python 3 e ImageMagick).
 
 ## Campanha jogável
 
@@ -63,16 +65,34 @@ As teclas podem ser remapeadas em **Opções → Controles**. Em telas pequenas 
 - O contato com obstáculo, zumbi ou terreno altera apenas condição/velocidade do veículo; não há dano a ocupantes.
 - A meta 10+ é provisória e não oficial; não é uma garantia de classificação pela loja, IARC ou Ministério da Justiça.
 
+## Spritesheets dos carros
+
+Os quatro spritesheets atuais dos carros foram mantidos sem alteração. Arquivos PNG/SVG em `public/assets/sprites/cars/`; detalhes em [docs/SPRITESHEETS_CARROS.md](docs/SPRITESHEETS_CARROS.md).
+
+## Tilesets por fase
+
+Cada uma das quatro fases tem um atlas ambiental próprio com 48 tiles de 32 × 32 px. PNG para o jogo, SVG editável, `.tsx` para abrir no Tiled e JSON com nomes/IDs ficam em `public/assets/tilesets/stages/<fase>/`. A cena usa marcos da fase em parallax; a geometria física continua separada. Instruções: [docs/TILESETS_FASES.md](docs/TILESETS_FASES.md).
+
+## Spritesheets dos monstros
+
+Errante, Corredor, Saltador e Blindado têm folhas PNG animadas com quatro quadros de 64 × 64 px, SVGs editáveis e manifesto em `public/assets/sprites/monsters/`. As folhas estão integradas à corrida. Instruções: [docs/SPRITESHEETS_MONSTROS.md](docs/SPRITESHEETS_MONSTROS.md).
+
 ## Estrutura
 
 ```text
 .
 ├── docs/                   # GDD e documentação de design/produção
+├── public/assets/sprites/cars/ # Spritesheets dos veículos (mantidos)
+├── public/assets/sprites/monsters/ # Spritesheets de monstros
+├── public/assets/tilesets/stages/ # Atlas editáveis por fase
+├── scripts/                # Geradores de assets
 ├── src/
 │   ├── App.tsx             # Shell React, campanha, garagem e progressão
 │   ├── game/
 │   │   ├── content.ts      # Dados tipados de fases, carros e desbloqueios
 │   │   ├── stageLayout.ts  # Geração determinística de layouts por fase
+│   │   ├── monsters/       # Registro independente dos spritesheets
+│   │   ├── tilesets/       # Registro dos atlas por fase
 │   │   └── scenes/         # Cena Phaser de corrida
 │   └── styles.css          # Interface e layout responsivo
 ├── index.html
@@ -86,6 +106,9 @@ As teclas podem ser remapeadas em **Opções → Controles**. Em telas pequenas 
 - [Índice da documentação](docs/README.md)
 - [GDD](docs/GDD_v0.1.md)
 - [Arquitetura técnica](docs/ARQUITETURA.md)
+- [Spritesheets dos carros](docs/SPRITESHEETS_CARROS.md)
+- [Tilesets ambientais por fase](docs/TILESETS_FASES.md)
+- [Spritesheets dos monstros](docs/SPRITESHEETS_MONSTROS.md)
 - [Política de conteúdo e classificação](docs/POLITICA_DE_CONTEUDO_E_CLASSIFICACAO.md)
 - [UI/UX — telas, menus e sistema visual](docs/UI_UX.md)
 - [Roadmap e critérios de pronto](docs/ROADMAP.md)

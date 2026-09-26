@@ -46,7 +46,8 @@ As fases são liberadas em sequência e as já concluídas podem ser repetidas. 
 ### Garagem
 
 - Seletor da frota: **Fagulha** (inicial), **Corisco**, **Vaga-Lume** e **Aurora**; bloqueios mostram quantas missões faltam.
-- Ilustração, categoria, papel e atributos do veículo selecionado.
+- Ilustração, categoria, papel e atributos do veículo selecionado; a arte mostra a arma veicular estilizada.
+- Spritesheets PNG em pixel art integradas na corrida, com fontes SVG editáveis, quatro quadros por carro e animação das rodas conforme a velocidade.
 - Seis melhorias compráveis por sucata: motor, pneus, suspensão, tanque, para-choque e armamento; até três níveis cada. O armamento aumenta dano, cadência e capacidade de munição.
 - Níveis de upgrade são individuais por carro, enquanto a sucata é compartilhada. Mudanças ficam salvas em `localStorage`.
 - A corrida inicia com o veículo e a rota atualmente selecionados. Melhorias antigas do save são migradas para a Fagulha.

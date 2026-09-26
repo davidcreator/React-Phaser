@@ -1,0 +1,303 @@
+{
+  "stageId": "patio-sucata",
+  "stageName": "Pátio de Sucata",
+  "region": "Pedreira Clara",
+  "tileWidth": 32,
+  "tileHeight": 32,
+  "columns": 8,
+  "rows": 6,
+  "tileCount": 48,
+  "tiledTileset": "tileset.tsx",
+  "atlasPng": "tileset.png",
+  "atlasSvg": "tileset.svg",
+  "tiles": [
+    {
+      "id": 0,
+      "key": "asfalto_base",
+      "name": "Asfalto base",
+      "category": "pavimento"
+    },
+    {
+      "id": 1,
+      "key": "asfalto_trincado",
+      "name": "Asfalto trincado",
+      "category": "pavimento"
+    },
+    {
+      "id": 2,
+      "key": "asfalto_remendado",
+      "name": "Asfalto remendado",
+      "category": "pavimento"
+    },
+    {
+      "id": 3,
+      "key": "faixa_central",
+      "name": "Faixa central",
+      "category": "pavimento"
+    },
+    {
+      "id": 4,
+      "key": "borda_asfalto",
+      "name": "Borda do asfalto",
+      "category": "pavimento"
+    },
+    {
+      "id": 5,
+      "key": "terra_compactada",
+      "name": "Terra compactada",
+      "category": "terreno"
+    },
+    {
+      "id": 6,
+      "key": "brita",
+      "name": "Brita",
+      "category": "terreno"
+    },
+    {
+      "id": 7,
+      "key": "entulho",
+      "name": "Entulho baixo",
+      "category": "terreno"
+    },
+    {
+      "id": 8,
+      "key": "concreto",
+      "name": "Concreto",
+      "category": "pavimento"
+    },
+    {
+      "id": 9,
+      "key": "concreto_quebrado",
+      "name": "Concreto rachado",
+      "category": "pavimento"
+    },
+    {
+      "id": 10,
+      "key": "chapa_metal",
+      "name": "Chapa metálica",
+      "category": "pavimento"
+    },
+    {
+      "id": 11,
+      "key": "chapa_enferrujada",
+      "name": "Chapa enferrujada",
+      "category": "pavimento"
+    },
+    {
+      "id": 12,
+      "key": "lama",
+      "name": "Lama",
+      "category": "terreno"
+    },
+    {
+      "id": 13,
+      "key": "grama",
+      "name": "Grama",
+      "category": "terreno"
+    },
+    {
+      "id": 14,
+      "key": "marcas_pneu",
+      "name": "Marcas de pneu",
+      "category": "terreno"
+    },
+    {
+      "id": 15,
+      "key": "grade_drenagem",
+      "name": "Grade de drenagem",
+      "category": "pavimento"
+    },
+    {
+      "id": 16,
+      "key": "muro",
+      "name": "Muro baixo",
+      "category": "estrutura"
+    },
+    {
+      "id": 17,
+      "key": "muro_rachado",
+      "name": "Muro rachado",
+      "category": "estrutura"
+    },
+    {
+      "id": 18,
+      "key": "barreira_concreto",
+      "name": "Barreira de concreto",
+      "category": "estrutura"
+    },
+    {
+      "id": 19,
+      "key": "guardrail",
+      "name": "Guardrail",
+      "category": "estrutura"
+    },
+    {
+      "id": 20,
+      "key": "bloqueio",
+      "name": "Bloqueio de estrada",
+      "category": "estrutura"
+    },
+    {
+      "id": 21,
+      "key": "rampa",
+      "name": "Rampa de sucata",
+      "category": "estrutura"
+    },
+    {
+      "id": 22,
+      "key": "pilar",
+      "name": "Pilar de sustentação",
+      "category": "estrutura"
+    },
+    {
+      "id": 23,
+      "key": "borda_quebrada",
+      "name": "Borda de ponte quebrada",
+      "category": "estrutura"
+    },
+    {
+      "id": 24,
+      "key": "tambor",
+      "name": "Tambor",
+      "category": "objeto"
+    },
+    {
+      "id": 25,
+      "key": "caixa",
+      "name": "Caixa de suprimentos",
+      "category": "objeto"
+    },
+    {
+      "id": 26,
+      "key": "pilha_sucata",
+      "name": "Pilha de sucata",
+      "category": "objeto"
+    },
+    {
+      "id": 27,
+      "key": "cone",
+      "name": "Cone de sinalização",
+      "category": "objeto"
+    },
+    {
+      "id": 28,
+      "key": "placa_rota",
+      "name": "Placa de rota",
+      "category": "objeto"
+    },
+    {
+      "id": 29,
+      "key": "bomba",
+      "name": "Bomba de combustível abandonada",
+      "category": "objeto"
+    },
+    {
+      "id": 30,
+      "key": "poste",
+      "name": "Poste de iluminação",
+      "category": "objeto"
+    },
+    {
+      "id": 31,
+      "key": "destroco",
+      "name": "Destroços",
+      "category": "objeto"
+    },
+    {
+      "id": 32,
+      "key": "marco_a",
+      "name": "Marco de fase A",
+      "category": "marco"
+    },
+    {
+      "id": 33,
+      "key": "marco_b",
+      "name": "Marco de fase B",
+      "category": "marco"
+    },
+    {
+      "id": 34,
+      "key": "marco_c",
+      "name": "Marco de fase C",
+      "category": "marco"
+    },
+    {
+      "id": 35,
+      "key": "marco_d",
+      "name": "Marco de fase D",
+      "category": "marco"
+    },
+    {
+      "id": 36,
+      "key": "marco_e",
+      "name": "Marco de fase E",
+      "category": "marco"
+    },
+    {
+      "id": 37,
+      "key": "marco_f",
+      "name": "Marco de fase F",
+      "category": "marco"
+    },
+    {
+      "id": 38,
+      "key": "marco_g",
+      "name": "Marco de fase G",
+      "category": "marco"
+    },
+    {
+      "id": 39,
+      "key": "marco_h",
+      "name": "Marco de fase H",
+      "category": "marco"
+    },
+    {
+      "id": 40,
+      "key": "arbusto",
+      "name": "Arbusto",
+      "category": "vegetação"
+    },
+    {
+      "id": 41,
+      "key": "arvore_seca",
+      "name": "Árvore seca",
+      "category": "vegetação"
+    },
+    {
+      "id": 42,
+      "key": "arvore",
+      "name": "Árvore",
+      "category": "vegetação"
+    },
+    {
+      "id": 43,
+      "key": "cipos",
+      "name": "Cipós",
+      "category": "vegetação"
+    },
+    {
+      "id": 44,
+      "key": "pedregulho",
+      "name": "Pedregulho",
+      "category": "rocha"
+    },
+    {
+      "id": 45,
+      "key": "rocha",
+      "name": "Rocha",
+      "category": "rocha"
+    },
+    {
+      "id": 46,
+      "key": "refletor",
+      "name": "Refletor",
+      "category": "objeto"
+    },
+    {
+      "id": 47,
+      "key": "placa_quebrada",
+      "name": "Placa quebrada",
+      "category": "objeto"
+    }
+  ]
+}

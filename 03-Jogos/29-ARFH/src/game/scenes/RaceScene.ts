@@ -3,6 +3,8 @@ import type { CarDefinition, MonsterKind, StageDefinition } from '../content';
 import { isTouchActionActive, type GameAction, type KeyBindings } from '../input';
 import { createStageLayout, type MonsterLayout, type ObstacleLayout, type PickupLayout, type RampLayout } from '../stageLayout';
 import type { RaceCallbacks, RaceOutcome, RaceResult } from '../types';
+import { MONSTER_SPRITES } from '../monsters/registry';
+import { STAGE_TILESETS } from '../tilesets/registry';
 import type { UpgradeLevels } from '../upgrades';
 
 const VIEW_WIDTH = 1280;
@@ -58,11 +60,14 @@ export class RaceScene extends Phaser.Scene {
   };
 
   private keys!: Record<GameAction, Phaser.Input.Keyboard.Key[]>;
-  private carGraphic!: Phaser.GameObjects.Graphics;
+  private carGraphic: Phaser.GameObjects.Graphics | null = null;
+  private carSprite: Phaser.GameObjects.Sprite | null = null;
   private trackGraphic!: Phaser.GameObjects.Graphics;
   private pickupGraphic!: Phaser.GameObjects.Graphics;
   private monsterGraphic!: Phaser.GameObjects.Graphics;
+  private monsterHealthGraphic!: Phaser.GameObjects.Graphics;
   private projectileGraphic!: Phaser.GameObjects.Graphics;
+  private readonly monsterSprites = new Map<MonsterLayout, Phaser.GameObjects.Sprite>();
   private readonly projectiles: Projectile[] = [];
   private hudGraphic!: Phaser.GameObjects.Graphics;
   private hudStats!: Phaser.GameObjects.Text;
@@ -93,6 +98,8 @@ export class RaceScene extends Phaser.Scene {
   private feedback = 'Acelere e controle a inclinação nas rampas.';
   private completed = false;
 
+  private get carTextureKey(): string { return `car-${this.vehicle.id}`; }
+
   constructor(callbacks: RaceCallbacks, bindings: KeyBindings, upgrades: UpgradeLevels, stage: StageDefinition, vehicle: CarDefinition) {
     super({ key: 'RaceScene' });
     this.callbacks = callbacks;
@@ -107,6 +114,26 @@ export class RaceScene extends Phaser.Scene {
     this.monsters = layout.monsters;
   }
 
+  preload(): void {
+    this.load.spritesheet(
+      this.carTextureKey,
+      `/assets/sprites/cars/${this.vehicle.id}.png`,
+      { frameWidth: 96, frameHeight: 80 },
+    );
+
+    const tileset = STAGE_TILESETS[this.stage.id];
+    this.load.spritesheet(tileset.key, tileset.url, {
+      frameWidth: tileset.frameWidth,
+      frameHeight: tileset.frameHeight,
+    });
+    for (const sheet of Object.values(MONSTER_SPRITES)) {
+      this.load.spritesheet(sheet.key, sheet.url, {
+        frameWidth: sheet.frameWidth,
+        frameHeight: sheet.frameHeight,
+      });
+    }
+  }
+
   create(): void {
     this.cameras.main.setBounds(0, 0, this.worldWidth, VIEW_HEIGHT);
     this.fuelCapacity = this.vehicle.fuelCapacity + this.upgrades.tank * 40;
@@ -114,15 +141,26 @@ export class RaceScene extends Phaser.Scene {
     this.ammoCapacity = 26 + this.upgrades.weapon * 10;
     this.ammo = this.ammoCapacity;
     this.drawBackground();
+    this.drawStageTilesetScenery();
     this.drawTrack();
     this.drawStaticProps();
 
     this.car.y = this.roadY(this.car.x) - CAR_HALF_HEIGHT;
-    this.carGraphic = this.add.graphics().setDepth(12);
-    this.drawCar();
+    if (this.textures.exists(this.carTextureKey)) {
+      this.textures.get(this.carTextureKey).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      this.carSprite = this.add.sprite(this.car.x, this.car.y, this.carTextureKey, 0)
+        .setOrigin(0.5, 0.5875)
+        .setDepth(12);
+    } else {
+      // Fallback vetorial mantém o carro visível se um arquivo de spritesheet falhar ao carregar.
+      this.carGraphic = this.add.graphics().setDepth(12);
+      this.drawCar();
+    }
 
     this.pickupGraphic = this.add.graphics().setDepth(8);
-    this.monsterGraphic = this.add.graphics().setDepth(9);
+    this.monsterGraphic = this.add.graphics().setDepth(8.8);
+    this.monsterHealthGraphic = this.add.graphics().setDepth(10);
+    this.prepareMonsterSprites();
     this.projectileGraphic = this.add.graphics().setDepth(14);
     this.hudGraphic = this.add.graphics().setScrollFactor(0).setDepth(100);
     this.hudStats = this.add.text(42, 34, '', {
@@ -175,8 +213,13 @@ export class RaceScene extends Phaser.Scene {
     }
     if (this.completed) return;
 
-    this.carGraphic.setPosition(this.car.x, this.car.y);
-    this.carGraphic.setRotation(this.car.angle);
+    if (this.carSprite) {
+      this.carSprite.setPosition(this.car.x, this.car.y).setRotation(this.car.angle);
+      const wheelFrameRate = Phaser.Math.Clamp(this.car.vx / 65, 1.2, 8);
+      this.carSprite.setFrame(this.car.vx > 12 ? Math.floor(this.elapsed * wheelFrameRate) % 4 : 0);
+    } else {
+      this.carGraphic?.setPosition(this.car.x, this.car.y).setRotation(this.car.angle);
+    }
     this.cameras.main.scrollX = Phaser.Math.Clamp(this.car.x - 300, 0, this.worldWidth - VIEW_WIDTH);
     this.drawPickups();
     this.drawMonsters();
@@ -378,6 +421,47 @@ export class RaceScene extends Phaser.Scene {
     return ROAD_Y_BASE + Math.sin(x / 190) * 18 + Math.sin(x / 470) * 15 + Math.sin(x / 92) * 3;
   }
 
+  private prepareMonsterSprites(): void {
+    for (const sheet of Object.values(MONSTER_SPRITES)) {
+      if (this.textures.exists(sheet.key)) {
+        this.textures.get(sheet.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      }
+    }
+
+    for (const monster of this.monsters) {
+      const sheet = MONSTER_SPRITES[monster.kind];
+      if (!this.textures.exists(sheet.key)) continue;
+      const sprite = this.add.sprite(0, 0, sheet.key, 0)
+        .setOrigin(0.5, 0.52)
+        .setDepth(9)
+        .setVisible(false);
+      this.monsterSprites.set(monster, sprite);
+    }
+  }
+
+  private drawStageTilesetScenery(): void {
+    const tileset = STAGE_TILESETS[this.stage.id];
+    if (!this.textures.exists(tileset.key)) return;
+    this.textures.get(tileset.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+
+    // The atlas remains independently editable in Tiled; these landmark cells
+    // are only a light parallax pass behind the road and gameplay props.
+    const parallax = 0.36;
+    const count = 54;
+    const visibleWorldSpan = this.worldWidth * parallax;
+    const step = visibleWorldSpan / (count + 1);
+    for (let index = 0; index < count; index += 1) {
+      const frame = tileset.backdropFrames[(index * 5 + Math.floor(index / 3)) % tileset.backdropFrames.length];
+      const x = step * (index + 1);
+      const y = 432 + Math.sin(index * 1.73) * 31 + (index % 3) * 5;
+      this.add.image(x, y, tileset.key, frame)
+        .setOrigin(0.5, 1)
+        .setScale(4)
+        .setScrollFactor(parallax, 1)
+        .setDepth(-4);
+    }
+  }
+
   private drawBackground(): void {
     const palette = this.stage.palette;
     const sky = this.add.graphics().setDepth(-30);
@@ -551,6 +635,7 @@ export class RaceScene extends Phaser.Scene {
 
   private drawCar(): void {
     const graphic = this.carGraphic;
+    if (!graphic) return;
     const paint = this.vehicle.paint;
     const glass = this.vehicle.glass;
     const trim = this.vehicle.trim;
@@ -673,71 +758,96 @@ export class RaceScene extends Phaser.Scene {
 
   private drawMonsters(): void {
     this.monsterGraphic.clear();
+    this.monsterHealthGraphic.clear();
+
     for (const monster of this.monsters) {
-      if (monster.defeated || monster.diverted || monster.contacted) continue;
+      const sprite = this.monsterSprites.get(monster);
+      if (monster.defeated || monster.diverted || monster.contacted) {
+        sprite?.setVisible(false);
+        continue;
+      }
+
       const { x, y } = this.monsterPosition(monster);
       const style = MONSTER_STYLE[monster.kind];
-      const armored = monster.kind === 'armored';
-      const runner = monster.kind === 'runner';
-      const width = armored ? 44 : runner ? 29 : 35;
-      const headRadius = armored ? 15 : 14;
-
+      const width = monster.kind === 'armored' ? 44 : monster.kind === 'runner' ? 29 : 35;
       this.monsterGraphic.fillStyle(0x1e2923, 0.24);
       this.monsterGraphic.fillEllipse(x, this.roadY(x) - 4, width + 10, 10);
-      // Silhuetas cartunescas de zumbis: formas simples, sem ferimentos nem gore.
-      this.monsterGraphic.lineStyle(6, style.body, 1);
-      this.monsterGraphic.beginPath();
-      this.monsterGraphic.moveTo(x - 8, y + 15);
-      this.monsterGraphic.lineTo(x - 13, y + 29);
-      this.monsterGraphic.moveTo(x + 8, y + 15);
-      this.monsterGraphic.lineTo(x + 13, y + 29);
-      this.monsterGraphic.moveTo(x - 11, y - 5);
-      this.monsterGraphic.lineTo(x - 21, y + 8);
-      this.monsterGraphic.moveTo(x + 11, y - 5);
-      this.monsterGraphic.lineTo(x + 21, y + 5);
-      this.monsterGraphic.strokePath();
 
-      this.monsterGraphic.fillStyle(style.body, 1);
-      this.monsterGraphic.fillEllipse(x, y + 7, width, armored ? 33 : 31);
-      this.monsterGraphic.fillCircle(x, y - 12, headRadius);
-      this.monsterGraphic.fillStyle(style.light, 1);
-      if (monster.kind === 'walker') {
-        this.monsterGraphic.fillEllipse(x - 13, y - 1, 8, 13);
-        this.monsterGraphic.fillEllipse(x + 12, y + 10, 10, 7);
-      } else if (runner) {
-        this.monsterGraphic.fillRoundedRect(x - 5, y + 1, 22, 5, 2);
-        this.monsterGraphic.fillCircle(x + 7, y - 21, 3);
-      } else if (monster.kind === 'leaper') {
-        this.monsterGraphic.fillEllipse(x - 16, y + 19, 13, 8);
-        this.monsterGraphic.fillEllipse(x + 16, y + 19, 13, 8);
-        this.monsterGraphic.fillTriangle(x - 10, y - 22, x - 7, y - 37, x - 1, y - 20);
+      if (sprite) {
+        const sheet = MONSTER_SPRITES[monster.kind];
+        const frame = Math.floor(this.elapsed * sheet.walkRate + monster.x * 0.001) % sheet.frameCount;
+        sprite.setVisible(true).setPosition(x, y + 1).setFrame(frame);
       } else {
-        this.monsterGraphic.fillRoundedRect(x - 21, y - 4, 42, 20, 7);
-        this.monsterGraphic.lineStyle(2, style.body, 0.95);
-        this.monsterGraphic.beginPath();
-        this.monsterGraphic.moveTo(x - 12, y - 3);
-        this.monsterGraphic.lineTo(x - 10, y + 12);
-        this.monsterGraphic.moveTo(x, y - 4);
-        this.monsterGraphic.lineTo(x + 1, y + 13);
-        this.monsterGraphic.moveTo(x + 12, y - 3);
-        this.monsterGraphic.lineTo(x + 13, y + 10);
-        this.monsterGraphic.strokePath();
+        // Procedural vector fallback keeps encounters visible if a PNG is missing.
+        this.drawMonsterFallback(monster, x, y, style);
       }
-
-      this.monsterGraphic.fillStyle(style.accent, 1);
-      this.monsterGraphic.fillCircle(x - 5, y - 13, 3);
-      this.monsterGraphic.fillCircle(x + 5, y - 13, 3);
-      this.monsterGraphic.fillStyle(0x24312b, 1);
-      this.monsterGraphic.fillCircle(x - 5, y - 13, 1.3);
-      this.monsterGraphic.fillCircle(x + 5, y - 13, 1.3);
 
       if (monster.maxHealth > 1 && monster.health < monster.maxHealth) {
-        this.monsterGraphic.fillStyle(0x24312b, 0.92);
-        this.monsterGraphic.fillRoundedRect(x - 18, y - 39, 36, 5, 2);
-        this.monsterGraphic.fillStyle(0xf0c75e, 1);
-        this.monsterGraphic.fillRoundedRect(x - 17, y - 38, 34 * monster.health / monster.maxHealth, 3, 1);
+        this.monsterHealthGraphic.fillStyle(0x24312b, 0.92);
+        this.monsterHealthGraphic.fillRoundedRect(x - 18, y - 42, 36, 5, 2);
+        this.monsterHealthGraphic.fillStyle(0xf0c75e, 1);
+        this.monsterHealthGraphic.fillRoundedRect(x - 17, y - 41, 34 * monster.health / monster.maxHealth, 3, 1);
       }
     }
+  }
+
+  private drawMonsterFallback(
+    monster: MonsterLayout,
+    x: number,
+    y: number,
+    style: { name: string; body: number; light: number; accent: number },
+  ): void {
+    const armored = monster.kind === 'armored';
+    const runner = monster.kind === 'runner';
+    const width = armored ? 44 : runner ? 29 : 35;
+    const headRadius = armored ? 15 : 14;
+
+    // Simplified, friendly silhouettes; no wounds, blood or realistic injury.
+    this.monsterGraphic.lineStyle(6, style.body, 1);
+    this.monsterGraphic.beginPath();
+    this.monsterGraphic.moveTo(x - 8, y + 15);
+    this.monsterGraphic.lineTo(x - 13, y + 29);
+    this.monsterGraphic.moveTo(x + 8, y + 15);
+    this.monsterGraphic.lineTo(x + 13, y + 29);
+    this.monsterGraphic.moveTo(x - 11, y - 5);
+    this.monsterGraphic.lineTo(x - 21, y + 8);
+    this.monsterGraphic.moveTo(x + 11, y - 5);
+    this.monsterGraphic.lineTo(x + 21, y + 5);
+    this.monsterGraphic.strokePath();
+
+    this.monsterGraphic.fillStyle(style.body, 1);
+    this.monsterGraphic.fillEllipse(x, y + 7, width, armored ? 33 : 31);
+    this.monsterGraphic.fillCircle(x, y - 12, headRadius);
+    this.monsterGraphic.fillStyle(style.light, 1);
+    if (monster.kind === 'walker') {
+      this.monsterGraphic.fillEllipse(x - 13, y - 1, 8, 13);
+      this.monsterGraphic.fillEllipse(x + 12, y + 10, 10, 7);
+    } else if (runner) {
+      this.monsterGraphic.fillRoundedRect(x - 5, y + 1, 22, 5, 2);
+      this.monsterGraphic.fillCircle(x + 7, y - 21, 3);
+    } else if (monster.kind === 'leaper') {
+      this.monsterGraphic.fillEllipse(x - 16, y + 19, 13, 8);
+      this.monsterGraphic.fillEllipse(x + 16, y + 19, 13, 8);
+      this.monsterGraphic.fillTriangle(x - 10, y - 22, x - 7, y - 37, x - 1, y - 20);
+    } else {
+      this.monsterGraphic.fillRoundedRect(x - 21, y - 4, 42, 20, 7);
+      this.monsterGraphic.lineStyle(2, style.body, 0.95);
+      this.monsterGraphic.beginPath();
+      this.monsterGraphic.moveTo(x - 12, y - 3);
+      this.monsterGraphic.lineTo(x - 10, y + 12);
+      this.monsterGraphic.moveTo(x, y - 4);
+      this.monsterGraphic.lineTo(x + 1, y + 13);
+      this.monsterGraphic.moveTo(x + 12, y - 3);
+      this.monsterGraphic.lineTo(x + 13, y + 10);
+      this.monsterGraphic.strokePath();
+    }
+
+    this.monsterGraphic.fillStyle(style.accent, 1);
+    this.monsterGraphic.fillCircle(x - 5, y - 13, 3);
+    this.monsterGraphic.fillCircle(x + 5, y - 13, 3);
+    this.monsterGraphic.fillStyle(0x24312b, 1);
+    this.monsterGraphic.fillCircle(x - 5, y - 13, 1.3);
+    this.monsterGraphic.fillCircle(x + 5, y - 13, 1.3);
   }
 
   private drawProjectiles(): void {
@@ -755,11 +865,11 @@ export class RaceScene extends Phaser.Scene {
     if (this.muzzleFlash > 0) {
       this.projectileGraphic.fillStyle(0xffed9b, 0.86);
       this.projectileGraphic.fillPoints([
-        { x: this.car.x + 57, y: this.car.y - 18 },
-        { x: this.car.x + 75, y: this.car.y - 23 },
-        { x: this.car.x + 67, y: this.car.y - 15 },
-        { x: this.car.x + 77, y: this.car.y - 10 },
-        { x: this.car.x + 57, y: this.car.y - 12 },
+        { x: this.car.x + 38, y: this.car.y - 36 },
+        { x: this.car.x + 51, y: this.car.y - 41 },
+        { x: this.car.x + 47, y: this.car.y - 35 },
+        { x: this.car.x + 53, y: this.car.y - 31 },
+        { x: this.car.x + 38, y: this.car.y - 31 }
       ], true);
     }
   }
@@ -776,8 +886,8 @@ export class RaceScene extends Phaser.Scene {
     this.ammo -= 1;
     this.muzzleFlash = 0.075;
     this.projectiles.push({
-      x: this.car.x + 48,
-      y: this.car.y - 17,
+      x: this.car.x + 38,
+      y: this.car.y - 36,
       damage: 1 + this.upgrades.weapon,
     });
   }

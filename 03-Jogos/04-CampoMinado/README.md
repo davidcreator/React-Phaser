@@ -1,170 +1,101 @@
-# 💣 Campo Minado - Projeto Educativo
-Um projeto prático para aprender programação através do desenvolvimento de um jogo clássico
+# Campo Minado Clássico — React + Phaser
 
-# 📋 Índice
-* [O que é este projeto?](#o-que-é-este-projeto)
-* [Por que Campo Minado?](#por-que-campo-minado)
-* [O que você vai aprender](#o-que-voce-vai-aprender)
-* [Como funciona o jogo](#como-funciona-o-jogo)
-* [Estrutura do projeto](#estrutura-do-projeto)
-* [Primeiros passos](#primeiros-passos)
-* [Desafios progressivos](#desafios-progressivos)
-* [Recursos adicionais](#recursos-adicionais)
+Versão didática do **Campo Minado Clássico** reescrita com **React + Phaser**, corrigindo os principais problemas encontrados na auditoria técnica do projeto original.
 
-# Por que Campo Minado?
-* O que você vai aprender
-* Como funciona o jogo
-* Estrutura do projeto
-* Primeiros passos
-* Desafios progressivos
-* Recursos adicionais
+## Objetivo
 
-# 🎯 O que é este projeto?
-Este é um projeto educativo onde você vai desenvolver do zero o famoso jogo Campo Minado. O objetivo é aprender programação de forma prática, construindo algo divertido e funcional.
+Este projeto serve como material de estudo para desenvolvimento de jogos 2D web. A arquitetura separa:
 
-# 🎮 Informações do Jogo
-* **Nome:** Campo Minado
-* **Criado por:** Robert Donner (1989)
-* **Popularizado:** Microsoft Windows 3.1 (1992)
-* **Tipo:** Jogo de lógica e estratégia
-* **Dificuldade de implementação:** ⭐⭐⭐ (Intermediário)
+- **React**: menus, HUD, configurações, estatísticas e telas.
+- **Phaser**: cena do jogo, renderização do tabuleiro e input 2D.
+- **Core JavaScript**: regras puras do Campo Minado, testáveis sem React e sem Phaser.
 
-# 🤔 Por que Campo Minado?
-Campo Minado é perfeito para iniciantes porque:
-## ✅ Conceitos Fundamentais
-* Estruturas de dados (arrays/matrizes)
-* Loops e condicionais
-* Funções e modularização
-* Manipulação de eventos
+## Principais correções aplicadas
 
-## ✅ Algoritmos Importantes
-* Geração de números aleatórios
-* Busca em profundidade (DFS)
-* Detecção de vizinhos
-* Validação de condições
+- Dificuldade escolhida não é mais perdida ao iniciar partida.
+- Inputs do modo personalizado não iniciam o jogo por acidente.
+- Minas são distribuídas por lista de candidatos válidos, evitando quantidade errada.
+- Primeiro clique seguro protege a célula inicial e adjacentes.
+- Timer para corretamente ao pausar, reiniciar, sair ou finalizar.
+- `localStorage` é lido com segurança contra JSON corrompido.
+- Temas visuais também afetam a renderização do Phaser.
+- A antiga opção “Auto-Bandeira” foi corrigida para “Auto-revelar vizinhos”.
+- Suporte mobile com toque longo e modo bandeira.
+- Regras do tabuleiro possuem testes automatizados.
 
-## ✅ Interface Gráfica
-* Criação de botões interativos
-* Manipulação de cliques
-* Atualização visual em tempo real
-* Feedback ao usuário
+## Como executar
 
-# 🎓 O que você vai aprender
-Ao completar este projeto, você terá experiência com:
-ÁreaConceitosLógica de ProgramaçãoCondicionais, loops, arrays bidimensionaisAlgoritmosBusca recursiva, geração proceduralInterfaceEventos de mouse, atualização de UIArquiteturaSeparação de responsabilidades, classes/objetosDebuggingIdentificação e correção de bugs
+```bash
+npm install
+npm run dev
+```
 
-# 🎮 Como funciona o jogo
-## Regras Básicas
-### Campo
-* Grade de células (ex: 9x9, 16x16)
-* Minas: Algumas células contêm minas ocultas
-* Objetivo: Revelar todas as células sem minas
-* Números: Indicam quantas minas existem nas células adjacentes
-* Bandeiras: Marque células suspeitas de conter minas
+Depois acesse o endereço exibido pelo Vite.
 
-### Exemplo Visual
-    ? ? ? ?    →    1 💣 1 0
-    ? ? ? ?    →    2 2 2 0  
-    ? ? ? ?    →    💣 1 1 0
-    ? ? ? ?    →    1 1 0 0
+## Scripts disponíveis
 
-### Condições de Vitória/Derrota
-* Vitória: Todas as células sem minas foram reveladas
-* Derrota: Clicou em uma célula com mina
+```bash
+npm run dev      # inicia ambiente de desenvolvimento
+npm run build    # gera build de produção
+npm run preview  # pré-visualiza build
+npm run test     # executa testes do core do jogo
+```
 
-# 🏗️ Estrutura do projeto
-## Componentes Principais
-📁 Campo-Minado/
-├── 📄 index.html       # Arquivo principal
-├── 📁 css              
-    └── 📄 styles.css   # Representação do tabuleiro
-├── 📁 js               
-    └── 📄 script.js    # Interface gráfica
+## Estrutura do projeto
 
-## Funcionalidades Essenciais
- * Criar tabuleiro
- * Posicionar minas aleatoriamente
- * Calcular números das células
- * Revelar células (incluindo área vazia)
- * Marcar/desmarcar bandeiras
- * Detectar vitória/derrota
- * Reiniciar jogo
+```txt
+src/
+  App.jsx                      # UI React e telas
+  styles.css                   # Estilos globais e responsivos
+  game/
+    PhaserGame.jsx             # Componente React que instancia o Phaser
+    EventBus.js                # Comunicação React <-> Phaser
+    themes.js                  # Paletas compartilhadas
+    core/
+      board.js                 # Regras puras do Campo Minado
+      difficulties.js          # Presets e validação do modo personalizado
+    scenes/
+      MinesweeperScene.js      # Cena Phaser do tabuleiro
+  services/
+    audio.js                   # Áudio com AudioContext reutilizável
+    storage.js                 # localStorage seguro
 
-# 🚀 Primeiros passos
-1. Configuração Inicial
-    * Crie um novo diretório para o projeto
-    * Dentro do diretório, crie os arquivos:
-        * `index.html`
-        * `styles.css`
-        * `script.js`
-1. Configurações básicas
-    * Abra `styles.css` e adicione estilos básicos
-    * Abra `script.js` e adicione configurações básicas
-    * Abra `index.html` e adicione a estrutura básica
-1. Estrutura da Célula
-    * Cada célula precisa armazenar:
-        * `temMina` (boolean)
-        * `foiRevelada` (boolean)
-        * `temBandeira` (boolean)
-        * `numeroMinasAdjacentes` (int)
-        * Número de minas adjacentes (0-8)
+tests/
+  board.test.js                # Testes da lógica do tabuleiro
 
-1. Primeira Implementação
-    * Comece criando:
-        * Função para criar o tabuleiro
-        * Função para posicionar minas
-        * Função para calcular números
+Docs/
+  AUDITORIA-CORRECOES.md
+  ARQUITETURA.md
+  GUIA-DIDATICO.md
+  CONTROLES.md
+  TESTES.md
+  ROADMAP.md
+  DECISOES-TECNICAS.md
+```
 
-# 🎯 Desafios progressivos
-## Nível 1: Básico
-    * Criar matriz do tabuleiro
-    * Posicionar minas aleatoriamente
-    * Calcular números das células
+## Controles
 
-## Nível 2: Intermediário
-    * Implementar revelação de células
-    * Revelar automaticamente células vazias
-    * Sistema de bandeiras
-    * Detecção de vitória/derrota
+| Ação | Desktop | Mobile |
+|---|---|---|
+| Revelar célula | Clique esquerdo | Toque curto |
+| Marcar bandeira | Clique direito | Toque longo |
+| Modo bandeira | Botão 🚩 | Botão 🚩 |
+| Revelar vizinhos de número satisfeito | Duplo clique | Toque duplo/click duplo quando suportado |
+| Dica | Botão 💡 | Botão 💡 |
+| Pausar | Botão ⏸️ | Botão ⏸️ |
 
-## Nível 3: Avançado
-    * Interface gráfica
-    * Diferentes níveis de dificuldade
-    * Contador de tempo
-    * Sistema de recordes
+## Documentação
 
-## Nível 4: Expert
-    * Garantir que o primeiro clique nunca seja uma mina
-    * Animações visuais
-    * Sons de feedback
-    * Modo multijogador local
+A pasta [`Docs/`](./Docs) contém documentos pensados para estudantes e manutenção do projeto:
 
-# 📚 Recursos adicionais
-## Documentação e Tutoriais
-Documentação JavaScript Canvas
-Tutorial JavaScript Canvas
-Algoritmos de Busca
+- [Auditoria e correções](./Docs/AUDITORIA-CORRECOES.md)
+- [Arquitetura](./Docs/ARQUITETURA.md)
+- [Guia didático](./Docs/GUIA-DIDATICO.md)
+- [Controles](./Docs/CONTROLES.md)
+- [Testes](./Docs/TESTES.md)
+- [Roadmap](./Docs/ROADMAP.md)
+- [Decisões técnicas](./Docs/DECISOES-TECNICAS.md)
 
-# 🏆 Objetivos de Aprendizagem
-Ao final deste projeto, você será capaz de:
-* Planejar a arquitetura de um software
-* Implementar algoritmos de busca e lógica
-* Criar interfaces de usuário interativas
-* Debugar e testar código sistematicamente
-* Documentar seu código adequadamente
+## Licença
 
-# 💡 Dicas importantes
-## Para Iniciantes
-* **Comece simples:** primeiro faça funcionar no console
-* Teste cada funcionalidade individualmente
-* Use muitos comentários no código
-* Não tenha medo de pesquisar e pedir ajuda
-
-## Para Avançados
-* Implemente padrões de design (MVC, Observer)
-* Adicione testes automatizados
-* Considere performance para tabuleiros grandes
-* Explore diferentes algoritmos de geração
-
-**Bom desenvolvimento! 🚀**
-*Lembre-se: o importante não é fazer perfeito na primeira vez, mas aprender no processo.*
+MIT — uso livre para estudo, aulas e evolução do projeto.

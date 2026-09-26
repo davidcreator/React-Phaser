@@ -1,0 +1,36 @@
+{
+  "frameWidth": 64,
+  "frameHeight": 64,
+  "frameCount": 4,
+  "layout": "horizontal",
+  "monsters": [
+    {
+      "id": "errante",
+      "kind": "walker",
+      "name": "Errante",
+      "png": "errante.png",
+      "svg": "errante.svg"
+    },
+    {
+      "id": "corredor",
+      "kind": "runner",
+      "name": "Corredor",
+      "png": "corredor.png",
+      "svg": "corredor.svg"
+    },
+    {
+      "id": "saltador",
+      "kind": "leaper",
+      "name": "Saltador",
+      "png": "saltador.png",
+      "svg": "saltador.svg"
+    },
+    {
+      "id": "blindado",
+      "kind": "armored",
+      "name": "Blindado",
+      "png": "blindado.png",
+      "svg": "blindado.svg"
+    }
+  ]
+}

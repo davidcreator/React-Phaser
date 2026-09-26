@@ -1,14 +1,14 @@
 # Apocalypse Race: Fleeing Hell
-## Game Design Document (GDD) — versão 0.5
+## Game Design Document (GDD) — versão 0.7
 
-> **Documento vivo de referência do projeto.** Esta revisão registra a versão jogável v0.5 com armas arcade, power-ups e danos ao veículo, além das quatro fases e quatro veículos; registra também os limites de conteúdo e decisões de design. O alvo de 2–4 minutos por fase e o balanceamento ainda precisam de playtests; decisões marcadas como provisórias podem ser revistas.
+> **Documento vivo de referência do projeto.** Esta revisão registra a versão jogável v0.7 com tilesets editáveis por fase, spritesheets animados para os monstros, armas arcade, power-ups, danos ao veículo, quatro fases e quatro veículos; registra também os limites de conteúdo e decisões de design. O alvo de 2–4 minutos por fase e o balanceamento ainda precisam de playtests; decisões marcadas como provisórias podem ser revistas.
 
 | Campo | Definição |
 |---|---|
 | Projeto | **Apocalypse Race: Fleeing Hell** |
 | Tipo de documento | GDD — visão de produto e especificação de design |
-| Versão / status | 0.5 — protótipo com quatro fases, quatro veículos, armas e power-ups; documento vivo, não especificação final de produção |
-| Data | 25/09/2026 |
+| Versão / status | 0.7 — protótipo com quatro fases, tilesets por rota, quatro monstros animados, quatro veículos, armas e power-ups; documento vivo, não especificação final de produção |
+| Data | 26/09/2026 |
 | Gênero | Corrida arcade 2D lateral / sobrevivência veicular |
 | Jogadores | 1 jogador; experiência offline-first |
 | Público pretendido | Aventura arcade para público familiar e jogadores casuais |
@@ -294,7 +294,7 @@ Sem placar online ou interação entre usuários na primeira versão.
 
 ### 8.2 Regiões e fases jogáveis
 
-As quatro rotas abaixo estão implementadas no protótipo v0.5. Cada uma tem alvo de duração de **2–4 minutos**; os comprimentos e recursos foram definidos para esse intervalo, ainda sujeito a playtest e balanceamento.
+As quatro rotas abaixo estão implementadas no protótipo v0.7. Cada uma tem alvo de duração de **2–4 minutos**; os comprimentos e recursos foram definidos para esse intervalo, ainda sujeito a playtest e balanceamento.
 
 | Código | Fase / região | Distância lógica | Rampas / obstáculos | Combustível / sucata | Munição / reparo / escudo | Zumbis | Identidade/modificador |
 |---|---|---:|---:|---:|---:|---|
@@ -470,9 +470,11 @@ src/
 
 ## 15. Escopo, produção e entregas
 
-### 15.1 Protótipo jogável (v0.5)
+### 15.1 Protótipo jogável (v0.7)
 
-- Menu, mapa, garagem, opções, pausa e resultados em React; corrida em Phaser.
+- Menu, mapa, garagem, opções, pausa e resultados em React; corrida em Phaser. Os quatro spritesheets dos carros permanecem os mesmos da versão anterior.
+- Quatro atlas ambientais específicos por fase, com 48 tiles de 32 × 32 px; fontes SVG, PNGs de runtime, TSX para Tiled e manifestos JSON editáveis. Marcos dos atlas compõem o parallax da corrida sem controlar a física.
+- Quatro spritesheets PNG/SVG para Errante, Corredor, Saltador e Blindado, com quatro quadros de 64 × 64 px; integradas à corrida com animação e fallback vetorial.
 - Quatro fases jogáveis (68.000–82.000 unidades lógicas), com alvo de 2–4 minutos e contagens de rampas, obstáculos e recursos definidas na seção 8.2.
 - Quatro veículos selecionáveis com atributos, silhuetas/paletas e desbloqueios após 0, 1, 2 e 3 missões concluídas.
 - Seis categorias de upgrade com até três níveis por veículo, incluindo armamento; sucata compartilhada e persistência local.
@@ -610,3 +612,4 @@ O placar local da corrida registra zumbis neutralizados para explicar os pontos;
 3. **MJSP — legislação de Classificação Indicativa, incluindo Portaria MJSP nº 1.048/2025.** [Página oficial](https://www.gov.br/mj/pt-br/assuntos/seus-direitos/classificacao-1/paginas-classificacao-indicativa/legislacao)
 
 > **Nota:** este GDD é uma diretriz de desenvolvimento, não um parecer jurídico nem uma classificação emitida pelo poder público ou por uma loja. Antes da publicação, revisar a versão final do jogo, o questionário do sistema de classificação aplicável, os descritores, os materiais de divulgação e as normas vigentes na data do lançamento.
+gentes na data do lançamento.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-26 — v0.7 (tilesets por fase e monstros)
+
+- Criados quatro atlas ambientais, um por fase, com 48 tiles de 32 × 32 px; cada um inclui PNG transparente, SVG editável, definição Tiled `.tsx` e manifesto JSON com IDs semânticos estáveis.
+- Integrados marcos dos atlas ao plano de fundo em parallax, sem acoplar a arte à geometria física da corrida; seleção centralizada em `src/game/tilesets/registry.ts`.
+- Criadas as spritesheets pixel art de Errante, Corredor, Saltador e Blindado (4 quadros de 64 × 64 px), com PNG/SVG e manifesto; integradas à cena mantendo movimento, colisões, barras de resistência e fallback vetorial.
+- Adicionados geradores Python, comandos npm e documentação para edição independente dos tilesets e monstros. Os spritesheets dos carros foram preservados sem alteração.
+- `npm run assets:tilesets`, `npm run assets:monsters`, `npm run typecheck` e `npm run build` passaram. Os PNGs de runtime, fontes SVG, arquivos TSX e manifestos foram gerados e validados; página e oito PNGs novos responderam HTTP 200. Playtest visual da corrida e validação manual no editor Tiled ainda pendentes.
+
+## 2026-09-26 — v0.6 (spritesheets veiculares)
+
+- Restilizados os quatro carros em pixel art inspirada nas referências fornecidas, mantendo silhuetas originais; criadas fontes SVG editáveis e PNGs transparentes de runtime, cada uma com 4 quadros de 96 × 80 px.
+- Integradas ao `RaceScene`: o PNG do carro selecionado é carregado como spritesheet e anima suas rodas em cadência proporcional à velocidade; desenho vetorial anterior permanece como fallback.
+- Adicionado o gerador `scripts/generate_car_spritesheets.py` e a documentação de dimensões/uso.
+- `npm run typecheck` e `npm run build` passaram. Página, bundle e quatro PNGs responderam HTTP 200; SVGs/PNGs e transparência foram validados e as folhas foram inspecionadas; playtest visual da corrida ainda pendente. O build mantém aviso não bloqueante de chunk Phaser acima de 500 kB.
+
 ## 2026-09-25 — v0.5 (armas, power-ups e dano ao veículo)
 
 - Adicionada arma veicular com disparo contínuo por `J` (remapeável), projéteis, munição finita e HUD; caixas de munição repõem a reserva.

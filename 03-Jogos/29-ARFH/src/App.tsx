@@ -619,7 +619,7 @@ function App() {
         </button>
         <div className="topbar-signal"><span className="signal-led" /> <span>SINAL DO REFÚGIO <b>ESTÁVEL</b></span></div>
         <div className="topbar-actions">
-          <span className="build-pill"><i /> BUILD 0.5</span>
+          <span className="build-pill"><i /> BUILD 0.6</span>
           <button className="icon-button" type="button" onClick={openOptions} aria-label="Abrir opções" title="Opções">⚙</button>
         </div>
       </header>
@@ -749,7 +749,7 @@ function App() {
               <p className="garage-description">{selectedCar.description}</p>
             </section>
             <section className="garage-upgrade-panel">
-              <div className="panel-kicker">CONFIGURAÇÃO · {selectedCar.name.toUpperCase()} <span>OFICINA V0.5</span></div>
+              <div className="panel-kicker">CONFIGURAÇÃO · {selectedCar.name.toUpperCase()} <span>OFICINA V0.6</span></div>
               <p className="garage-description">Instale melhorias para este veículo; os níveis são individuais e alteram os atributos efetivos durante a corrida.</p>
               <div className="upgrade-list">
                 {UPGRADE_DEFINITIONS.map((upgrade) => {
@@ -938,7 +938,7 @@ function App() {
         </main>
       )}
 
-      <footer className="site-footer"><span>APOCALYPSE RACE: FLEEING HELL <i>·</i> PROTÓTIPO EM DESENVOLVIMENTO</span><span>REACT <i>+</i> PHASER 3 <i>·</i> BUILD 0.5</span></footer>
+      <footer className="site-footer"><span>APOCALYPSE RACE: FLEEING HELL <i>·</i> PROTÓTIPO EM DESENVOLVIMENTO</span><span>REACT <i>+</i> PHASER 3 <i>·</i> BUILD 0.6</span></footer>
 
       {showResetModal && (
         <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowResetModal(false); }}>

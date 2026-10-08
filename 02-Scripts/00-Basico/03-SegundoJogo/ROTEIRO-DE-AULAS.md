@@ -17,7 +17,7 @@ destrancar, modificar e se apropriar** do jogo aos poucos. 🪖
 | 4 | Inimigos: spawn, patrulha e IA de tiro | 3 (INIMIGOS) | ~60 min |
 | 5 | Dano dos dois lados + invencibilidade | 4 (DANO) | ~50 min |
 | 6 | O chefão tanque + barra de vida | 5 (O CHEFÃO) | ~60 min |
-| 7 | Juice: partículas, tremor e flash | 6 (EFEITOS) | ~40 min |
+| 7 | Juice: partículas, tremor, flash e sons | 6 (EFEITOS) | ~50 min |
 | 8 | HUD completo + game over + vitória | 7 e 8 (HUD, FIM) | ~60 min |
 
 > 💡 **Dica de ouro:** em cada aula, o professor abre o jogo **pronto**
@@ -91,25 +91,34 @@ bandeira, um cachorro) com pelo menos 10 quadradinhos e coloque no jogo.
 
 ---
 
-## Aula 4 — Inimigos: spawn, patrulha e IA de tiro 🤖
+## Aula 4 — Inimigos variados: soldado, drone voador e robô saltador 🤖🚁🦘
 
-**Objetivo:** criar inimigos **durante** o jogo e dar um "cérebro" simples.
+**Objetivo:** criar **3 tipos diferentes de inimigos** durante o jogo e dar
+a cada um um comportamento (IA) exclusivo:
+
+1. **Soldado Robô:** anda na terra e atira reto;
+2. **Drone Voador:** aéreo (`allowGravity: false`), oscila com senóide,
+   hélice gira e atira plasma verde angulado mirando no herói;
+3. **Robô Saltador:** pernas de mola, salta alto no ar pulando por cima
+   de tiros rasteiros e plataformas!
 
 **O que o aluno faz:**
 
-1. Joga e vê os robôs nascerem fora da tela, à direita;
-2. Muda `INTERVALO_SPAWN` (2,2 s) e `MAX_INIMIGOS` (6);
-3. Lê a IA em `atualizarInimigos()`: anda para a esquerda, atira quando
-   o herói está perto (`DISTANCIA_TIRO_INIMIGO`), some se ficar para trás;
-4. Muda a velocidade do robô (`VEL_INIMIGO`) e a velocidade da bala
-   inimiga (`VEL_BALA_INIMIGA`).
+1. Joga e observa os 3 tipos nascerem em momentos diferentes;
+2. Lê `tentarSpawnarInimigo()` — o sorteio percentual (40% soldado,
+   35% drone, 25% saltador);
+3. Lê `criarVoador()` — por que `setAllowGravity(false)` é necessário
+   para um inimigo que voa;
+4. Lê `criarPulador()` — como o salto usa `setVelocityY(FORCA_PULO_PULADOR)`
+   com teste de `body.blocked.down`;
+5. Muda a velocidade de voo e a frequência de salto dos robôs.
 
-**Conceitos:** `this.time.addEvent({ delay, loop: true })` (timer),
-`physics.add.existing`, `body.setCollideWorldBounds(true)`, IA simples
-(distância + timer).
+**Conceitos:** tipos de inimigos, `allowGravity: false` para voadores,
+função seno (`Math.sin`) para ondulação orgânica, `Phaser.Math.Between`,
+IA variada.
 
-**Tarefa final:** faça um robô **pular** de vez em quando (use
-`body.setVelocityY(FORCA_PULO)` quando `body.blocked.down`).
+**Tarefa final:** ajuste a chance de spawn para criar uma "onda aérea"
+com mais drones voadores ou uma fase "cheia de saltadores"!
 
 ---
 
@@ -158,23 +167,35 @@ do tanque para um "chefão de gelo" no alto de uma montanha).
 
 ---
 
-## Aula 7 — Juice: partículas, tremor e flash 🍋
+## Aula 7 — Juice: partículas, tremor, flash E sons 🍋🔊
 
-**Objetivo:** **game feel** — os exageros que deixam o jogo gostoso.
+**Objetivo:** **game feel** — os exageros que deixam o jogo gostoso:
+efeitos visuais **e sonoros**!
 
 **O que o aluno faz:**
 
 1. Joga e presta atenção: explosão de partículas, tela tremendo, flash
-   amarelo, aviso piscando, números de pontos flutuando;
+   amarelo, aviso piscando, números de pontos flutuando — e os sons!
+   "pew" do tiro, "BOOM" do tanque, "ai!" do dano, "tá-dá-dááám" da vitória;
 2. Lê `explosao()` — partículas são só sprites com tween para fora;
-3. Testa `cameras.main.shake(600, 0.02)` com valores diferentes;
-4. Muda as cores das partículas.
+3. Lê `criarSons()` e `som()` — os sons são **sintetizados em código**
+   (Web Audio API): um oscilador é uma "voz" que toca uma frequência;
+   a explosão usa **ruído branco** filtrado + um "bum" grave;
+4. Toca cada som no console: `jogo.scene.getScene('Jogo').som('tiro')`;
+5. Testa `cameras.main.shake(600, 0.02)` com valores diferentes;
+6. Vê a música de fundo: `tocarMusica()` toca 8 notas em loop (chiptune)
+   — troca as notas do array `melodia` e ouve a música mudar;
+7. Muda as cores das partículas e a frequência do tiro.
 
 **Conceitos:** tween em grupo de objetos, `cameras.main.shake`,
-`cameras.main.flash`, partículas "manuais" (sem sistema de partículas!).
+`cameras.main.flash`, partículas "manuais" (sem sistema de partículas!),
+**síntese de som** (oscilador, envelope, ruído, Web Audio API) e
+**música de fundo em loop** (`tocarMusica()` — um chiptune de 8 notas!).
 
 **Tarefa final:** crie um efeito novo — por exemplo, a tela pisca
-**vermelho** quando o herói perde vida.
+**vermelho** quando o herói perde vida — e um **som novo** (mude a
+frequência do `som('tiro')` até virar um laser espacial!). Se sobrar
+tempo, **componha a sua música de fundo** mudando o array `melodia`. 🎶
 
 ---
 

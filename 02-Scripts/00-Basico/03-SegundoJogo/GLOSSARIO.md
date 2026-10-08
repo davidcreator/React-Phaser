@@ -15,15 +15,14 @@ tudo o que aparece no jogo começa com `this.add`.
 **alpha** — Transparência de um objeto. Vai de `0` (invisível) a `1` (opaco).
 
 **animação manual** — Trocar a textura de um sprite com um timer
-(`setInterval` do jogo), igual um flipbook desenhado à mão.
+(do jogo), igual um flipbook desenhado à mão.
 Nosso jogo usa isso em vez de spritesheet!
 
 **array / lista** — Uma coleção ordenada de valores: `this.inimigos.getChildren()`.
 Acesse os itens com `.forEach()` (percorre) e `.length` / `countActive()` (conta).
 
-**assets** — A pasta onde ficam as imagens e os sons do jogo.
-👉 _"os arquivos de arte e áudio"_. **Neste jogo não tem!** Desenhamos tudo
-com código. 🎨
+**assets** — A pasta onde ficam as imagens e os sons do jogo (`assets/`).
+O jogo vem com **27 sprites PNG reais** (cenário, herói, inimigos, chefão e efeitos)! 🖼️
 
 **axis/eixo X, Y** — No Phaser: **X cresce para a direita**, **Y cresce para
 baixo**. 🚨 O Y ao contrário é a maior pegadinha para quem está começando!
@@ -64,7 +63,7 @@ Também pode ser ajustada com `setDepth(número)`.
 **colisão (collision)** — O contato entre dois corpos físicos.
 
 **collider** — `physics.add.collider(A, B)`: **impede** que A e B se
-atravissem (o chão segura o herói, o herói não atravessa o tanque).
+atravessem (o chão segura o herói, o herói não atravessa o tanque).
 
 **constante** — Um valor com nome que não muda:
 `const VEL_BALA = 950;`. Deixa o código compreensível e fácil de ajustar.
@@ -87,12 +86,21 @@ Nossa cena se chama `'Jogo'`.
 **depth (profundidade)** — Camada do objeto. `setDepth(1000)` = bem na frente
 (usado no HUD); `setDepth(2000)` = telas de game over/vitória.
 
+**drone voador** — Inimigo aéreo (`voador-1`/`voador-2`): voa sem gravidade,
+oscila suavemente com senóide e atira plasma verde angulado. 🚁
+
+**duplo salto / pulo** — Ver robô saltador.
+
 * * *
 
 ## E
 
 **ease (suavização)** — Como um movimento acelera e desacelera nos tweens:
 `'Linear'`, `'Sine.inOut'`, `'Bounce.out'`...
+
+**envelope** — Como o **volume** de um som nasce e morre:
+`gain.setValueAtTime(ganho, agora)` + `exponentialRampToValueAtTime(0.001, ...)`.
+É o que transforma um "bipe" reto num "pew!" que morre rápido. 🎚️
 
 **escala (scale)** — Tamanho do desenho. `setScale(1.5)` = 1,5 vez maior.
 
@@ -122,7 +130,7 @@ O normal é por volta de 60.
 ## G
 
 **game feel / juice** — A **sensação** de jogar: tremor de tela, partículas,
-flash, recuo... Os exageros que deixam o jogo gostoso. 🍋
+flash, recuo, **sons**... Os exageros que dejan o jogo gostoso. 🍋
 
 **generateTexture** — Guarda um desenho feito com `graphics` na memória do
 jogo, com um apelido: `g.generateTexture('heroi-parado', 48, 64)`.
@@ -180,6 +188,18 @@ imóveis não se resolvem e o objeto atravessa o chão!
 **método (method)** — Uma "receita" com nome que pertence à cena:
 `this.criarInimigo(x)`. Também chamado de **função**.
 
+**música de fundo (background music)** — Uma melodia em loop durante o jogo.
+A nossa é um "chiptune" de 8 notas feita com osciladores, tocada por um
+timer — começa na 1ª tecla e para no game over. Veja `tocarMusica()`. 🎶
+
+* * *
+
+## N
+
+**nota musical** — Uma frequência tocando por um tempinho. A vitória toca
+**Dó-Mi-Sol** (523, 659 e 784 Hz) e o game over, 3 notas descendo! 🎵
+👉 _"som é só onda sonora"_ — igual uma flauta!
+
 * * *
 
 ## O
@@ -187,6 +207,10 @@ imóveis não se resolvem e o objeto atravessa o chão!
 **origin (origem)** — O ponto de encaixe do desenho:
 `(0, 0)` = canto superior esquerdo · `(0.5, 0.5)` = centro (padrão) ·
 **`(0.5, 1)` = base** (nosso truque para os pés ficarem no chão!).
+
+**oscilador (oscillator)** — A "voz" da Web Audio API que gera uma onda
+sonora numa certa frequência: `ctx.createOscillator()`. Tipos: `sine`
+(redonda), `square` (apito), `sawtooth` (áspera, tipo laser). 🎛️
 
 **overlap** — `physics.add.overlap(A, B, função)`: detecta o toque **sem**
 **impedir** a passagem, e chama a sua função (callback). Usado para dano
@@ -210,10 +234,19 @@ jogo começar. (Neste jogo, "carregar" é desenhar com código!)
 
 ## R
 
-**run and gun** — O gênero de jogo de tiro em 2D onde o personagem **corre,
-pula e atira**: Metal Slug, Contra... 🏃‍♂️💨 É o nosso jogo!
+**repeat** — Quantas vezes uma animação ou timer repete.
 
 **restart** — `this.scene.restart()`: reinicia a cena do zero.
+
+**robô saltador** — Inimigo com pernas de mola zigzag (`pulador-1`,
+`pulador-2`, `pulador-pulando`). Salta alto no ar pulando tiros e plataformas! 🦘
+
+**ruído (noise)** — Som aleatório, o "chiado" de uma TV fora do ar.
+É a base das nossas explosões: `Math.random() * 2 - 1` dentro de um
+buffer de áudio, passando por um filtro! 📻💥
+
+**run and gun** — O gênero de jogo de tiro em 2D onde o personagem **corre,
+pula e atira**: Metal Slug, Contra... 🏃‍♂️💨 É o nosso jogo!
 
 * * *
 
@@ -229,6 +262,11 @@ o mundo é gigante (4600 px!). É o truque dos jogos de tiro em 2D. 🔄
 **setOrigin / setSize / setOffset / setFlipX** — Ajustes do sprite:
 ponto de encaixe · tamanho da caixa de colisão · posição dessa caixa ·
 espelhar (virar) o desenho.
+
+**som (sound)** — Efeito sonoro. Neste jogo, todos são **sintetizados em
+código** (Web Audio API) — sem arquivo de áudio nenhum! 🔊
+Veja `criarSons()` e `som()` na ETAPA 6: tiro "pew", explosão de ruído,
+vitória com 3 notas...
 
 **spawn** — "Nascer": criar um inimigo **durante** o jogo, com um timer
 (`this.time.addEvent({ delay: 2200, loop: true })`). 🐣
@@ -275,6 +313,14 @@ direção (sinal): `body.setVelocityX(950)` = 950 px/s para a direita;
 
 * * *
 
+## W
+
+**Web Audio API** — A biblioteca do navegador para **criar som em código**
+(sem arquivo de áudio): osciladores, ruído, filtros, ganho... É assim que
+o jogo faz "pew!" e "boom!" do zero! 🔊🎛️ (Veja `criarSons()` e `som()`)
+
+* * *
+
 ## 🔗 Truques para memorizar
 
 | Pergunta | Resposta |
@@ -288,7 +334,9 @@ direção (sinal): `body.setVelocityX(950)` = 950 px/s para a direita;
 | Como faço a câmera seguir o herói? | `cameras.main.startFollow(heroi, true, 0.1, 0.05)` |
 | Como faço o HUD não andar com a câmera? | `setScrollFactor(0)` em tudo do HUD |
 | Como desenho uma imagem com código? | `make.graphics` + `fillRect` + `generateTexture('nome', w, h)` |
-| Como faço um objeto não cair? | `body.setAllowGravity(false)` |
+| Como faço som sem arquivo de áudio? | **Web Audio**: osciladores + ruído (veja `criarSons()` e `som()`) |
+| Como faço música de fundo? | Um array de notas + timer em loop (veja `tocarMusica()`) |
+| Por que o som não toca no começo? | O navegador só destrava o áudio depois da **1ª tecla/clique** |
 | Como deixo um corpo "imóvel"? | `body.setImmovable(true)` — **e tire a gravidade dele!** |
 | Qual a ordem dos argumentos no overlap grupo×sprite? | **(sprite, membro do grupo)** — ex.: `(chefao, bala)` |
 | Como limito a velocidade do tiro? | Cadência com `this.time.now` (relógio do jogo) |

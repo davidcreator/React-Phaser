@@ -28,6 +28,9 @@ import * as Phaser from 'phaser'
    TUDO com código (retângulos, círculos e triângulos), igual pixel art.
    Assim o jogo abre em qualquer lugar, sem baixar nada. Você também
    aprende que sprite é só "um desenho que o computador guarda".
+   🔊 E os SONS? Também são sintetizados em código (Web Audio API) —
+   sem arquivo de áudio nenhum — e tem MÚSICA DE FUNDO em loop! 🎶
+   Veja criarSons(), som() e tocarMusica() na ETAPA 6.
 
    O arquivo está dividido em ETAPAS numeradas (procure "ETAPA").
    Cada etapa é um conceito novo. Leia os comentários com calma! 😊
@@ -54,23 +57,33 @@ const DANO_BALA = 1;          // cada bala tira 1 de vida do inimigo
 const VEL_BALA_INIMIGA = 430; // velocidade da bala inimiga
 const VEL_BALA_CHEFE = 520;   // velocidade da bala do chefão
 
-const VIDA_INIMIGO = 3;       // 💥 tiros necessários para derrubar um robô
+const VIDA_INIMIGO = 3;       // 💥 tiros necessários para derrubar um robô soldado
+const VIDA_VOADOR = 2;        // 🚁 tiros necessários para derrubar o drone voador
+const VIDA_PULADOR = 4;       // 🦘 tiros necessários para derrubar o robô saltador
 const VIDA_CHEFE = 30;        // 💥 tiros necessários para derrubar o tanque
-const VEL_INIMIGO = 130;      // velocidade de caminhada do robô
+
+const VEL_INIMIGO = 130;      // velocidade de caminhada do robô soldado
+const VEL_VOADOR = 110;       // velocidade de voo do drone
+const VEL_PULADOR = 110;      // velocidade de caminhada do robô saltador
+const FORCA_PULO_PULADOR = -620; // força do salto do robô pulador
 const VEL_CHEFE = 55;         // o tanque anda devagar...
+
 const CADENCIA_TIRO_CHEFE = 950; // ...mas atira quase 1 vez por segundo
 const DISTANCIA_TIRO_INIMIGO = 560;  // o robô só atira se o herói estiver perto
+const DISTANCIA_TIRO_VOADOR = 520;   // distância para o drone atirar
 
-const INTERVALO_SPAWN = 2200; // ⏱️ nasce um robô a cada 2,2 segundos
-const MAX_INIMIGOS = 6;       // limite de robôs vivos ao mesmo tempo
+const INTERVALO_SPAWN = 2000; // ⏱️ nasce um inimigo a cada 2 segundos
+const MAX_INIMIGOS = 7;       // limite de robôs vivos ao mesmo tempo
 
 const X_CHEFE = TAMANHO_MUNDO - 260;   // posição do tanque no fim do mundo
 const X_GATILHO_CHEFE = X_CHEFE - 1100; // quando o herói chega perto, o chefão entra
 
 const VIDAS_INICIAIS = 3;     // corações do herói
 const TEMPO_INVENCIVEL = 1500; // ⏱️ tempo piscando depois de levar dano (ms)
-const PONTOS_INIMIGO = 100;
-const PONTOS_CHEFE = 2000;
+const PONTOS_INIMIGO = 100;   // pontos do soldado robô
+const PONTOS_VOADOR = 150;    // pontos do drone voador
+const PONTOS_PULADOR = 200;   // pontos do robô saltador
+const PONTOS_CHEFE = 2000;    // pontos do chefão tanque
 
 /* Cores do HUD, guardadas em constantes (visual consistente!). */
 const COR_TEXTO = '#ffffff';
@@ -94,11 +107,51 @@ export class Jogo extends Phaser.Scene {
     }
 
     /* =================================================================
-       ETAPA 0 — PRELOAD: "desenhar" as texturas com código
-       (no primeiro jogo carregávamos arquivos; aqui NÓS desenhamos!)
+       ETAPA 0 — PRELOAD: carregar os sprites PNG da pasta assets/
+       (com gerador procedural integrado como plano de contingência!)
        ================================================================= */
     preload() {
-        this.desenharTexturas();
+        // 📁 CARREGAR TODOS OS SPRITES PNG DA PASTA assets/
+        // O jogo usa arquivos PNG reais, organizados e nítidos:
+        this.load.image('ceu', 'assets/ceu.png');
+        this.load.image('nuvem', 'assets/nuvem.png');
+        this.load.image('montanha', 'assets/montanha.png');
+        this.load.image('chao', 'assets/chao.png');
+        this.load.image('plataforma', 'assets/plataforma.png');
+
+        // Herói (Sargento Pixel - 5 poses)
+        this.load.image('heroi-parado', 'assets/heroi-parado.png');
+        this.load.image('heroi-andando-1', 'assets/heroi-andando-1.png');
+        this.load.image('heroi-andando-2', 'assets/heroi-andando-2.png');
+        this.load.image('heroi-pulando', 'assets/heroi-pulando.png');
+        this.load.image('heroi-atirando', 'assets/heroi-atirando.png');
+
+        // Inimigo 1: Soldado Robô Vermelho (anda no chão e atira reto)
+        this.load.image('inimigo-1', 'assets/inimigo-1.png');
+        this.load.image('inimigo-2', 'assets/inimigo-2.png');
+        this.load.image('inimigo-atirando', 'assets/inimigo-atirando.png');
+
+        // Inimigo 2: Drone Voador (aéreo, hélice girando, atira plasma verde)
+        this.load.image('voador-1', 'assets/voador-1.png');
+        this.load.image('voador-2', 'assets/voador-2.png');
+
+        // Inimigo 3: Robô Saltador (pernas de mola, salta alto no ar)
+        this.load.image('pulador-1', 'assets/pulador-1.png');
+        this.load.image('pulador-2', 'assets/pulador-2.png');
+        this.load.image('pulador-pulando', 'assets/pulador-pulando.png');
+
+        // Chefão: Tanque Pesado
+        this.load.image('chefao-1', 'assets/chefao-1.png');
+        this.load.image('chefao-2', 'assets/chefao-2.png');
+
+        // Itens, Projéteis e Efeitos Visuais (VFX)
+        this.load.image('coracao', 'assets/coracao.png');
+        this.load.image('bala', 'assets/bala.png');
+        this.load.image('bala-inimiga', 'assets/bala-inimiga.png');
+        this.load.image('bala-voador', 'assets/bala-voador.png');
+        this.load.image('bala-chefe', 'assets/bala-chefe.png');
+        this.load.image('particula', 'assets/particula.png');
+        this.load.image('flash', 'assets/flash.png');
     }
 
     /* -----------------------------------------------------------------
@@ -132,12 +185,15 @@ export class Jogo extends Phaser.Scene {
         // ---- PERSONAGENS ----
         this.desenharHeroi();
         this.desenharInimigo();
+        this.desenharVoador();
+        this.desenharPulador();
         this.desenharChefao();
 
         // ---- OBJETOS ----
         this.desenharCoracao();
         this.desenharBala();
         this.desenharBalaInimiga();
+        this.desenharBalaVoador();
         this.desenharBalaChefe();
         this.desenharParticula();
         this.desenharFlash();
@@ -320,6 +376,72 @@ export class Jogo extends Phaser.Scene {
     }
 
     /* -----------------------------------------------------------------
+       🚁 O INIMIGO VOADOR (Drone) — 48x32.
+       Voa no ar com hélice girando e atira plasma verde.
+       ----------------------------------------------------------------- */
+    desenharVoador() {
+        const base = (g) => {
+            pintar(g, 0x37474f, 0, 13, 12, 6);
+            pintar(g, 0x37474f, 36, 13, 12, 6);
+            pintar(g, 0x546e7a, 10, 9, 28, 13);
+            pintar(g, 0x78909c, 12, 11, 24, 5);
+            pintar(g, 0xb2ebf2, 19, 11, 10, 5);
+            pintar(g, 0x00e676, 10, 15, 4, 4);
+            pintar(g, 0x455a64, 15, 22, 3, 6);
+            pintar(g, 0x455a64, 30, 22, 3, 6);
+            pintar(g, 0x455a64, 22, 5, 4, 4);
+            pintar(g, 0x212121, 23, 22, 3, 8);
+        };
+        let g = this.novoDesenho();
+        base(g); pintar(g, 0xeceff1, 16, 3, 16, 3);
+        g.generateTexture('voador-1', 48, 32); g.destroy();
+
+        g = this.novoDesenho();
+        base(g); pintar(g, 0xeceff1, 22, 0, 4, 9);
+        g.generateTexture('voador-2', 48, 32); g.destroy();
+    }
+
+    /* -----------------------------------------------------------------
+       🦘 O INIMIGO PULADOR (Robô Saltador) — 48x64.
+       Pernas de mola zigzag que pulam alto no ar!
+       ----------------------------------------------------------------- */
+    desenharPulador() {
+        const base = (g) => {
+            pintar(g, 0x616161, 23, 0, 3, 6);
+            pintar(g, 0xffeb3b, 21, 0, 7, 5);
+            pintar(g, 0xff8f00, 14, 6, 20, 14);
+            pintar(g, 0x263238, 17, 11, 5, 5);
+            pintar(g, 0xf57c00, 12, 20, 24, 24);
+            pintar(g, 0xe65100, 18, 26, 12, 10);
+            pintar(g, 0xffe082, 22, 29, 4, 4);
+            pintar(g, 0xe65100, 6, 24, 8, 7);
+            pintar(g, 0x8d6e63, 4, 29, 6, 5);
+            pintar(g, 0xe65100, 36, 24, 6, 12);
+        };
+        const mola = (g, x) => {
+            pintar(g, 0x8d6e63, x, 44, 8, 4);
+            pintar(g, 0x8d6e63, x + 1, 48, 6, 4);
+            pintar(g, 0x8d6e63, x, 52, 8, 4);
+        };
+
+        let g = this.novoDesenho();
+        base(g); mola(g, 14); mola(g, 26);
+        pintar(g, 0x4e342e, 12, 56, 12, 5); pintar(g, 0x4e342e, 24, 56, 12, 5);
+        g.generateTexture('pulador-1', 48, 64); g.destroy();
+
+        g = this.novoDesenho();
+        base(g); mola(g, 15); mola(g, 26);
+        pintar(g, 0x4e342e, 13, 52, 11, 5); pintar(g, 0x4e342e, 24, 56, 12, 5);
+        g.generateTexture('pulador-2', 48, 64); g.destroy();
+
+        g = this.novoDesenho();
+        base(g);
+        pintar(g, 0x8d6e63, 13, 44, 7, 4); pintar(g, 0x4e342e, 11, 48, 10, 4);
+        pintar(g, 0x8d6e63, 28, 44, 7, 4); pintar(g, 0x4e342e, 27, 48, 10, 4);
+        g.generateTexture('pulador-pulando', 48, 64); g.destroy();
+    }
+
+    /* -----------------------------------------------------------------
        🛢️ O CHEFÃO — um tanque (176x112), olhando para a ESQUERDA.
        Dois frames: as rodas da esteira mudam de lugar (ilusão de
        movimento, igual filme de flipbook!).
@@ -385,6 +507,15 @@ export class Jogo extends Phaser.Scene {
         g.destroy();
     }
 
+    /* ---- bala do drone voador (bolinha de plasma verde 12x12) ---- */
+    desenharBalaVoador() {
+        const g = this.novoDesenho();
+        g.fillStyle(0x00e676, 1); g.fillCircle(6, 6, 5);
+        g.fillStyle(0xb9f6ca, 1); g.fillCircle(4, 4, 2);
+        g.generateTexture('bala-voador', 12, 12);
+        g.destroy();
+    }
+
     /* ---- bala do chefão (bolão vermelho) ---- */
     desenharBalaChefe() {
         const g = this.novoDesenho();
@@ -432,6 +563,16 @@ export class Jogo extends Phaser.Scene {
         this.chefao = null;
         this.chefeCriado = false;
         this.tempoInicio = this.time.now;
+        this.musicaIniciada = false;   // a música de fundo começa na 1ª tecla
+        if (this.timerMusica) {         // se reiniciou (R), limpa o timer antigo
+            this.timerMusica.remove();
+            this.timerMusica = null;
+        }
+
+        // ---- GARANTIA DE TEXTURAS (fallback caso abra direto sem servidor) -
+        if (!this.textures.exists('heroi-parado')) {
+            this.desenharTexturas();
+        }
 
         // ---- CENÁRIO -----------------------------------------------
         // ☁️ O céu fica FIXO na tela (scrollFactor 0): ele não anda!
@@ -511,10 +652,16 @@ export class Jogo extends Phaser.Scene {
             if (this.acabou || this.vitorioso) this.scene.restart();
         });
 
-        // ---- INIMIGOS INICIAIS (já no mapa, lá na frente) ----------
-        this.criarInimigo(1500);
-        this.criarInimigo(2300);
-        this.criarInimigo(3100);
+        // ---- SONS (efeitos sonoros sintetizados em código! 🔊) ------
+        this.criarSons();
+
+        // ---- INIMIGOS INICIAIS (variados ao longo do percurso) -----
+        this.criarInimigo(1300);         // soldado no chão
+        this.criarVoador(1750, 310);      // drone voador no ar
+        this.criarPulador(2200);         // robô saltador
+        this.criarInimigo(2700);         // soldado
+        this.criarVoador(3050, 290);      // drone voador
+        this.criarPulador(3200);         // robô saltador perto da meta
 
         // ---- SPAWN: um timer que "fabrica" robôs para sempre ---------
         this.timerSpawn = this.time.addEvent({
@@ -574,6 +721,8 @@ export class Jogo extends Phaser.Scene {
             onComplete: () => flash.destroy(),
         });
 
+        this.som('tiro');   // 🔊 "pew!"
+
         // o herói faz a pose de atirando por um instante
         this.tempoAteAnimTiro = this.time.now + 160;
     }
@@ -590,26 +739,36 @@ export class Jogo extends Phaser.Scene {
     }
 
     /* =================================================================
-       ETAPA 3 — INIMIGOS: spawn (nascer), patrulha (andar) e IA de tiro
+       ETAPA 3 — INIMIGOS: soldado terrestre, drone voador e robô saltador!
        ================================================================= */
 
     /* ---------------------------------------------------------------
        tentarSpawnarInimigo() — roda toda vez que o timer dispara.
-       Só "fabrica" um robô se ainda couber mais um na tela.
-       💡 SPAWN: é o nome chique para "criar um inimigo" nos jogos!
+       Sorteia entre 3 tipos diferentes de robôs:
+         - 40% chance: Soldado Robô (anda e atira reto)
+         - 35% chance: Drone Voador (aéreo, desvia e atira plasma verde)
+         - 25% chance: Robô Saltador (pernas de mola, pula obstáculos!)
        --------------------------------------------------------------- */
     tentarSpawnarInimigo() {
         if (this.acabou || this.vitorioso || this.chefeCriado) return;
         if (this.inimigos.countActive() >= MAX_INIMIGOS) return;
         if (this.jogador.x > X_GATILHO_CHEFE) return; // perto do chefão, não spawna
+
         // nasce FORA da tela, à direita — o jogador nem vê ele aparecer!
-        const x = this.cameras.main.scrollX + LARGURA_TELA + Phaser.Math.Between(20, 120);
-        this.criarInimigo(x);
+        const x = this.cameras.main.scrollX + LARGURA_TELA + Phaser.Math.Between(40, 140);
+        const sorteio = Phaser.Math.Between(1, 100);
+
+        if (sorteio <= 40) {
+            this.criarInimigo(x);
+        } else if (sorteio <= 75) {
+            this.criarVoador(x, Phaser.Math.Between(260, 370));
+        } else {
+            this.criarPulador(x);
+        }
     }
 
     /* ---------------------------------------------------------------
-       criarInimigo(x) — o robô nasce no chão, na posição X.
-       Guardamos dados dentro do próprio sprite (vida, próximo tiro...)
+       criarInimigo(x) — Soldado Robô Vermelho (terrestre, patrulha).
        --------------------------------------------------------------- */
     criarInimigo(x) {
         const robo = this.add.sprite(x, TOPO_CHAO - 2, 'inimigo-1').setOrigin(0.5, 1);
@@ -617,60 +776,165 @@ export class Jogo extends Phaser.Scene {
         robo.body.setCollideWorldBounds(true);
         robo.body.setSize(26, 58);
         robo.body.setOffset(11, 6);
+        robo.tipo = 'soldado';
         robo.vida = VIDA_INIMIGO;
+        robo.pontos = PONTOS_INIMIGO;
+        robo.corExplosao = 0xff7043;
         robo.proximoTiro = this.time.now + Phaser.Math.Between(800, 2000);
         robo.tempoAnim = 0;
-        robo.texturaAtual = '';
+        robo.texturaAtual = 'inimigo-1';
         this.physics.add.collider(robo, this.chaoFisico);
-        this.inimigos.add(robo);   // coloca o robô dentro do grupo
+        this.inimigos.add(robo);
         return robo;
     }
 
     /* ---------------------------------------------------------------
-       atualizarInimigos() — o "cérebro" dos robôs (roda todo frame).
-       1) anda sempre para a esquerda (vem em direção ao herói);
-       2) troca o desenho para animar a caminhada;
-       3) atira quando o herói está perto (IA bem simples!);
-       4) se ficar para trás da tela, some (não gasta memória).
+       criarVoador(x, y) — Drone Voador 🚁
+       Voa no ar (sem gravidade!), oscila na vertical com senoide e
+       atira esferas de plasma verde em direção ao herói.
+       --------------------------------------------------------------- */
+    criarVoador(x, y = 320) {
+        const robo = this.add.sprite(x, y, 'voador-1').setOrigin(0.5, 0.5);
+        this.physics.add.existing(robo);
+        this.inimigos.add(robo);           // adiciona ao grupo primeiro
+        robo.body.setCollideWorldBounds(false);
+        robo.body.setAllowGravity(false); // ⚠️ desativa gravidade DEPOIS de entrar no grupo
+        robo.body.setSize(38, 22);
+        robo.body.setOffset(5, 5);
+        robo.tipo = 'voador';
+        robo.vida = VIDA_VOADOR;
+        robo.pontos = PONTOS_VOADOR;
+        robo.corExplosao = 0x00e676; // partículas verdes de plasma
+        robo.yBase = y;
+        robo.faseSeno = Math.random() * Math.PI * 2;
+        robo.proximoTiro = this.time.now + Phaser.Math.Between(900, 2200);
+        robo.tempoAnim = 0;
+        robo.texturaAtual = 'voador-1';
+        return robo;
+    }
+
+    /* ---------------------------------------------------------------
+       criarPulador(x) — Robô Saltador 🦘
+       Tem pernas de mola zigzag: anda e salta alto no ar periodicamente,
+       passando por cima dos tiros rasteiros e plataformas!
+       --------------------------------------------------------------- */
+    criarPulador(x) {
+        const robo = this.add.sprite(x, TOPO_CHAO - 2, 'pulador-1').setOrigin(0.5, 1);
+        this.physics.add.existing(robo);
+        robo.body.setCollideWorldBounds(true);
+        robo.body.setSize(26, 56);
+        robo.body.setOffset(11, 8);
+        robo.tipo = 'pulador';
+        robo.vida = VIDA_PULADOR;
+        robo.pontos = PONTOS_PULADOR;
+        robo.corExplosao = 0xffa726; // partículas âmbar/douradas
+        robo.proximoPulo = this.time.now + Phaser.Math.Between(1000, 2400);
+        robo.tempoAnim = 0;
+        robo.texturaAtual = 'pulador-1';
+        this.physics.add.collider(robo, this.chaoFisico);
+        this.inimigos.add(robo);
+        return robo;
+    }
+
+    /* ---------------------------------------------------------------
+       atualizarInimigos() — IA dos 3 tipos de inimigos a cada frame:
+       - Soldado: anda no chão e atira reto se herói estiver perto;
+       - Drone: voa com ondulação senoidal, hélices giram e atira plasma;
+       - Saltador: anda no chão e pula alto no ar (mola).
        --------------------------------------------------------------- */
     atualizarInimigos() {
         this.inimigos.getChildren().forEach((robo) => {
             if (!robo.active) return;
 
-            // robô que ficou para trás sai de cena
+            // robô que ficou para trás da tela sai de cena
             if (robo.x < this.cameras.main.scrollX - 80) {
                 robo.destroy();
                 return;
             }
 
-            // 1) patrulha: anda para a esquerda o tempo todo
-            robo.body.setVelocityX(-VEL_INIMIGO);
+            // ===== 1) SOLDADO ROBÔ (terrestre) =====
+            if (robo.tipo === 'soldado') {
+                robo.body.setVelocityX(-VEL_INIMIGO);
 
-            // 2) animação de andar (troca de textura a cada 180 ms)
-            if (this.time.now > robo.tempoAnim) {
-                robo.tempoAnim = this.time.now + 180;
-                if (robo.texturaAtual === 'inimigo-atirando') {
-                    robo.setTexture('inimigo-1');
-                    robo.texturaAtual = 'inimigo-1';
-                } else {
-                    const nova = robo.texturaAtual === 'inimigo-1' ? 'inimigo-2' : 'inimigo-1';
-                    robo.setTexture(nova);
-                    robo.texturaAtual = nova;
+                // animação de andar (troca de textura a cada 180 ms)
+                if (this.time.now > robo.tempoAnim) {
+                    robo.tempoAnim = this.time.now + 180;
+                    if (robo.texturaAtual === 'inimigo-atirando') {
+                        robo.setTexture('inimigo-1');
+                        robo.texturaAtual = 'inimigo-1';
+                    } else {
+                        const nova = robo.texturaAtual === 'inimigo-1' ? 'inimigo-2' : 'inimigo-1';
+                        robo.setTexture(nova);
+                        robo.texturaAtual = nova;
+                    }
+                }
+
+                // atira reto se herói estiver perto
+                const distancia = Phaser.Math.Distance.Between(
+                    robo.x, robo.y, this.jogador.x, this.jogador.y);
+                if (distancia < DISTANCIA_TIRO_INIMIGO && this.time.now > robo.proximoTiro) {
+                    robo.proximoTiro = this.time.now + Phaser.Math.Between(1300, 2400);
+                    this.inimigoAtirar(robo);
                 }
             }
 
-            // 3) atira se o herói estiver perto (e respeita a cadência)
-            const distancia = Phaser.Math.Distance.Between(
-                robo.x, robo.y, this.jogador.x, this.jogador.y);
-            if (distancia < DISTANCIA_TIRO_INIMIGO && this.time.now > robo.proximoTiro) {
-                robo.proximoTiro = this.time.now + Phaser.Math.Between(1300, 2400);
-                this.inimigoAtirar(robo);
+            // ===== 2) DRONE VOADOR (aéreo) =====
+            else if (robo.tipo === 'voador') {
+                robo.body.setVelocityX(-VEL_VOADOR);
+                // ondulação suave vertical (senóide):
+                const ondula = Math.sin((this.time.now / 350) + robo.faseSeno) * 45;
+                robo.body.setVelocityY(ondula);
+
+                // hélice girando (alterna rápido entre voador-1 e voador-2)
+                if (this.time.now > robo.tempoAnim) {
+                    robo.tempoAnim = this.time.now + 90;
+                    const nova = robo.texturaAtual === 'voador-1' ? 'voador-2' : 'voador-1';
+                    robo.setTexture(nova);
+                    robo.texturaAtual = nova;
+                }
+
+                // atira plasma verde se herói estiver no alcance
+                const distancia = Phaser.Math.Distance.Between(
+                    robo.x, robo.y, this.jogador.x, this.jogador.y);
+                if (distancia < DISTANCIA_TIRO_VOADOR && this.time.now > robo.proximoTiro) {
+                    robo.proximoTiro = this.time.now + Phaser.Math.Between(1600, 2800);
+                    this.voadorAtirar(robo);
+                }
+            }
+
+            // ===== 3) ROBÔ SALTADOR (mola) =====
+            else if (robo.tipo === 'pulador') {
+                robo.body.setVelocityX(-VEL_PULADOR);
+
+                const noChao = robo.body.blocked.down;
+
+                // pulo com mola!
+                if (noChao && this.time.now > robo.proximoPulo) {
+                    robo.proximoPulo = this.time.now + Phaser.Math.Between(1400, 2600);
+                    robo.body.setVelocityY(FORCA_PULO_PULADOR);
+                    this.som('pulo');
+                }
+
+                // animação: no ar usa pose de pulo; no chão anda
+                if (!noChao) {
+                    if (robo.texturaAtual !== 'pulador-pulando') {
+                        robo.setTexture('pulador-pulando');
+                        robo.texturaAtual = 'pulador-pulando';
+                    }
+                } else {
+                    if (this.time.now > robo.tempoAnim) {
+                        robo.tempoAnim = this.time.now + 160;
+                        const nova = robo.texturaAtual === 'pulador-1' ? 'pulador-2' : 'pulador-1';
+                        robo.setTexture(nova);
+                        robo.texturaAtual = nova;
+                    }
+                }
             }
         });
     }
 
     /* ---------------------------------------------------------------
-       inimigoAtirar() — o robô atira uma bala vermelha para a esquerda.
+       inimigoAtirar() — o soldado atira uma bala vermelha para a esquerda.
        --------------------------------------------------------------- */
     inimigoAtirar(robo) {
         const bala = this.balasInimigas.create(robo.x - 28, robo.y - 34, 'bala-inimiga');
@@ -689,6 +953,35 @@ export class Jogo extends Phaser.Scene {
             targets: flash, scale: 1.4, alpha: 0, duration: 90,
             onComplete: () => flash.destroy(),
         });
+
+        this.som('tiroInimigo');   // 🔊 tiro do robô
+    }
+
+    /* ---------------------------------------------------------------
+       voadorAtirar() — o drone atira esfera de plasma verde em direção
+       ao herói (tiro angulado!).
+       --------------------------------------------------------------- */
+    voadorAtirar(robo) {
+        const bala = this.balasInimigas.create(robo.x, robo.y + 12, 'bala-voador');
+        bala.body.setAllowGravity(false);
+
+        // mira no peito do herói
+        const angulo = Math.atan2((this.jogador.y - 30) - robo.y, this.jogador.x - robo.x);
+        bala.body.setVelocity(
+            Math.cos(angulo) * VEL_BALA_INIMIGA,
+            Math.sin(angulo) * VEL_BALA_INIMIGA
+        );
+
+        // flash verde na ponta do canhão do drone
+        const flash = this.add.image(robo.x, robo.y + 16, 'flash');
+        flash.setTint(0x00e676);
+        flash.setScale(0.7);
+        this.tweens.add({
+            targets: flash, scale: 1.5, alpha: 0, duration: 90,
+            onComplete: () => flash.destroy(),
+        });
+
+        this.som('tiroInimigo');
     }
 
     /* =================================================================
@@ -696,9 +989,7 @@ export class Jogo extends Phaser.Scene {
        ================================================================= */
 
     /* ---------------------------------------------------------------
-       balaAcertouInimigo() — bala do herói encontra robô.
-       Cada bala tira DANO_BALA de vida; quando a vida zera, o robô
-       "morre" (explosão + pontos!).
+       balaAcertouInimigo() — bala do herói encontra qualquer robô.
        --------------------------------------------------------------- */
     balaAcertouInimigo(bala, inimigo) {
         if (!inimigo.active) return;
@@ -715,15 +1006,19 @@ export class Jogo extends Phaser.Scene {
     }
 
     /* ---------------------------------------------------------------
-       derrotarInimigo() — explosão, pontos e adeus, robô!
+       derrotarInimigo() — explosão colorida, pontos dinâmicos e adeus!
        --------------------------------------------------------------- */
     derrotarInimigo(inimigo) {
-        this.explosao(inimigo.x, inimigo.y - 20, 0xff7043, 14);
-        this.pontos += PONTOS_INIMIGO;
+        const pontos = inimigo.pontos || PONTOS_INIMIGO;
+        const cor = inimigo.corExplosao || 0xff7043;
+        const offY = inimigo.tipo === 'voador' ? 0 : 20;
+
+        this.explosao(inimigo.x, inimigo.y - offY, cor, 16);
+        this.pontos += pontos;
         this.inimigosDerrotados++;
-        this.mostrarPontosFlutuantes(inimigo.x, inimigo.y - 40, '+' + PONTOS_INIMIGO);
+        this.mostrarPontosFlutuantes(inimigo.x, inimigo.y - 40, '+' + pontos);
         this.atualizarHUD();
-        inimigo.destroy();   // sair do grupo acontece sozinho
+        inimigo.destroy();
     }
 
     /* ---------------------------------------------------------------
@@ -755,9 +1050,10 @@ export class Jogo extends Phaser.Scene {
         this.vidas--;
         this.atualizarCoracoes();
 
-        // feedback: tela treme, herói fica vermelho
+        // feedback: tela treme, herói fica vermelho, som de impacto
         this.cameras.main.shake(220, 0.01);
         this.jogador.setTint(0xff6b6b);
+        this.som('dano');   // 🔊 "ai!"
         this.time.delayedCall(250, () => this.jogador.clearTint());
 
         // knockback: empurra o herói para longe de quem atacou
@@ -816,9 +1112,11 @@ export class Jogo extends Phaser.Scene {
         this.physics.add.overlap(this.balas, this.chefao, this.balaAcertouChefao, null, this);
         this.physics.add.overlap(this.jogador, this.chefao, this.contatoComChefao, null, this);
 
-        // os robôs que sobraram se "recolhem" para dentro do tanque
+        // os robôs que sobraram se recolhem com explosões coloridas
         this.inimigos.getChildren().forEach((robo) => {
-            this.explosao(robo.x, robo.y - 20, 0xef5350, 6);
+            const cor = robo.corExplosao || 0xef5350;
+            const offY = robo.tipo === 'voador' ? 0 : 20;
+            this.explosao(robo.x, robo.y - offY, cor, 8);
             robo.destroy();
         });
 
@@ -880,6 +1178,8 @@ export class Jogo extends Phaser.Scene {
                 targets: flash, scale: 2.2, alpha: 0, duration: 120,
                 onComplete: () => flash.destroy(),
             });
+
+            this.som('tiroChefe');   // 🔊 "BOOM" do canhão
         }
 
         // barra de vida do chefão encolhe conforme ele apanha
@@ -934,7 +1234,7 @@ export class Jogo extends Phaser.Scene {
     }
 
     /* =================================================================
-       ETAPA 6 — EFEITOS: explosão de partículas (juice! 🍋)
+       ETAPA 6 — EFEITOS: partículas + SONS (juice! 🍋🔊)
        ================================================================= */
 
     /* ---------------------------------------------------------------
@@ -944,6 +1244,7 @@ export class Jogo extends Phaser.Scene {
        Cada partícula é um image + um tween (animação automática).
        --------------------------------------------------------------- */
     explosao(x, y, cor, quantidade = 12) {
+        this.som('explosao');   // 💥 a explosão também faz barulho!
         for (let i = 0; i < quantidade; i++) {
             const p = this.add.image(x, y, 'particula');
             p.setTint(cor);
@@ -975,6 +1276,172 @@ export class Jogo extends Phaser.Scene {
         this.tweens.add({
             targets: aviso, y: aviso.y - 60, alpha: 0, duration: 700,
             onComplete: () => aviso.destroy(),
+        });
+    }
+
+    /* ---------------------------------------------------------------
+       criarSons() — os EFEITOS SONOROS, feitos em código! 🔊
+       Não usamos ARQUIVOS de áudio: cada som é sintetizado na hora com
+       a Web Audio API (um "oscilador" é como uma voz do computador que
+       toca uma certa frequência). Som nada mais é do que ONDA sonora —
+       igual uma flauta, um apito ou um trovão! Assim o jogo continua
+       abrindo em qualquer lugar, sem baixar NADA. 🎵
+
+       💡 O navegador só deixa tocar áudio depois da 1ª tecla ou clique
+       do jogador (regra de "autoplay"). Por isso destravamos no 1º
+       keydown/pointerdown — e de novo dentro do som(), por garantia.
+       --------------------------------------------------------------- */
+    criarSons() {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        // se a cena reiniciar (tecla R), reaproveitamos o mesmo "estúdio"
+        if (!this.audio) this.audio = new AudioCtx();
+
+        const destravar = () => {
+            if (this.audio && this.audio.state === 'suspended') this.audio.resume();
+            // a 1ª tecla também liga a MÚSICA DE FUNDO (agora que o áudio destravou!)
+            if (!this.musicaIniciada) {
+                this.musicaIniciada = true;
+                this.tocarMusica();
+            }
+        };
+        this.input.keyboard.on('keydown', destravar);
+        this.input.on('pointerdown', destravar);
+    }
+
+    /* ---------------------------------------------------------------
+       som(nome) — toca um efeito sonoro sintetizado na hora. 🎶
+       Cada som é uma "receita": um oscilador (a onda) ligada num ganho
+       (o volume) que nasce alto e morre rápido — o tal do envelope!
+       Os nomes: pulo, tiro, tiroInimigo, tiroChefe, explosao, dano,
+       vitoria e gameover.
+       --------------------------------------------------------------- */
+    som(nome) {
+        if (!this.audio) return;
+        if (this.audio.state === 'suspended') this.audio.resume();
+        const ctx = this.audio;
+        const agora = ctx.currentTime;
+
+        // 🎚️ envelope: o volume nasce no máximo e cai até quase zero
+        const envelope = (ganho, duracao) => {
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(ganho, agora);
+            g.gain.exponentialRampToValueAtTime(0.001, agora + duracao);
+            return g;
+        };
+
+        // 🎹 nota musical: uma frequência tocando por um tempinho
+        const nota = (freq, inicio, duracao, tipo, ganho) => {
+            const osc = ctx.createOscillator();
+            osc.type = tipo;
+            osc.frequency.setValueAtTime(freq, inicio);
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(ganho, inicio);
+            g.gain.exponentialRampToValueAtTime(0.001, inicio + duracao);
+            osc.connect(g).connect(ctx.destination);
+            osc.start(inicio);
+            osc.stop(inicio + duracao + 0.05);
+        };
+
+        if (nome === 'pulo') {
+            // som de mola: frequência subindo rapidinho
+            const osc = ctx.createOscillator();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(280, agora);
+            osc.frequency.exponentialRampToValueAtTime(520, agora + 0.09);
+            osc.connect(envelope(0.08, 0.1)).connect(ctx.destination);
+            osc.start(agora);
+            osc.stop(agora + 0.12);
+        } else if (nome === 'tiro') {
+            // "pew!" — frequência descendo rápido (efeito laser)
+            const osc = ctx.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(950, agora);
+            osc.frequency.exponentialRampToValueAtTime(140, agora + 0.12);
+            osc.connect(envelope(0.1, 0.14)).connect(ctx.destination);
+            osc.start(agora);
+            osc.stop(agora + 0.16);
+        } else if (nome === 'tiroInimigo') {
+            const osc = ctx.createOscillator();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(480, agora);
+            osc.frequency.exponentialRampToValueAtTime(90, agora + 0.16);
+            osc.connect(envelope(0.08, 0.18)).connect(ctx.destination);
+            osc.start(agora);
+            osc.stop(agora + 0.2);
+        } else if (nome === 'tiroChefe') {
+            // "BOOM" grave do canhão do tanque
+            const osc = ctx.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(260, agora);
+            osc.frequency.exponentialRampToValueAtTime(50, agora + 0.28);
+            osc.connect(envelope(0.18, 0.32)).connect(ctx.destination);
+            osc.start(agora);
+            osc.stop(agora + 0.35);
+        } else if (nome === 'explosao') {
+            // 💥 chiado de ruído (filtrado) + um "bum" grave de tanque
+            const buffer = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate);
+            const dados = buffer.getChannelData(0);
+            for (let i = 0; i < dados.length; i++) dados[i] = Math.random() * 2 - 1;
+            const fonte = ctx.createBufferSource();
+            fonte.buffer = buffer;
+            const filtro = ctx.createBiquadFilter();
+            filtro.type = 'lowpass';
+            filtro.frequency.setValueAtTime(1400, agora);
+            filtro.frequency.exponentialRampToValueAtTime(80, agora + 0.4);
+            fonte.connect(filtro).connect(envelope(0.22, 0.45)).connect(ctx.destination);
+            fonte.start(agora);
+            fonte.stop(agora + 0.5);
+            nota(130, agora, 0.4, 'sine', 0.25);   // o "bum" grave
+        } else if (nome === 'dano') {
+            const osc = ctx.createOscillator();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(420, agora);
+            osc.frequency.exponentialRampToValueAtTime(70, agora + 0.3);
+            osc.connect(envelope(0.15, 0.32)).connect(ctx.destination);
+            osc.start(agora);
+            osc.stop(agora + 0.35);
+        } else if (nome === 'vitoria') {
+            // 🎺 "tá-dá-dááám!" — 3 notas SUBINDO (Dó-Mi-Sol)
+            nota(523, agora, 0.16, 'square', 0.1);
+            nota(659, agora + 0.16, 0.16, 'square', 0.1);
+            nota(784, agora + 0.32, 0.4, 'square', 0.12);
+        } else if (nome === 'gameover') {
+            // 🎺 3 notas DESCENDO — "tchã-tchã-tchããám..."
+            nota(392, agora, 0.28, 'sawtooth', 0.1);
+            nota(311, agora + 0.28, 0.28, 'sawtooth', 0.1);
+            nota(247, agora + 0.56, 0.5, 'sawtooth', 0.1);
+        }
+    }
+
+    /* ---------------------------------------------------------------
+       tocarMusica() — a MÚSICA DE FUNDO: uma melodia simples de 8
+       notas em loop, tocada com um timer. É um "chiptune" — aquele
+       som de videogame antigo, feito só com osciladores! 🎶🎮
+       Começa na 1ª tecla (quando o navegador destrava o áudio) e
+       para sozinha no game over / na vitória.
+       --------------------------------------------------------------- */
+    tocarMusica() {
+        if (!this.audio) return;
+        if (this.timerMusica) this.timerMusica.remove();  // se reiniciou, limpa o timer antigo
+        const melodia = [262, 330, 392, 523, 392, 330, 262, 220];  // Dó-Mi-Sol-Dó-Mi-Dó-Lá-Sol
+        let i = 0;
+        this.timerMusica = this.time.addEvent({
+            delay: 260, loop: true,
+            callback: () => {
+                if (this.acabou || this.vitorioso) return;   // jogo acabou: a música para
+                const ctx = this.audio;
+                const agora = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(melodia[i % melodia.length], agora);
+                const g = ctx.createGain();
+                g.gain.setValueAtTime(0.045, agora);
+                g.gain.exponentialRampToValueAtTime(0.001, agora + 0.22);
+                osc.connect(g).connect(ctx.destination);
+                osc.start(agora);
+                osc.stop(agora + 0.25);
+                i++;
+            },
         });
     }
 
@@ -1093,6 +1560,7 @@ export class Jogo extends Phaser.Scene {
         this.physics.pause();              // ❄️ congela o mundo físico
         this.jogador.body.setVelocity(0, 0);
         this.jogador.setTint(0xff6b6b);
+        this.som('gameover');              // 🔊 3 notas descendo...
 
         const painel = this.add.rectangle(LARGURA_TELA / 2, ALTURA_TELA / 2,
             LARGURA_TELA, ALTURA_TELA, 0x0b1020, 0.72).setScrollFactor(0).setDepth(2000);
@@ -1134,6 +1602,7 @@ export class Jogo extends Phaser.Scene {
         this.jogador.body.setVelocity(0, 0);
         this.jogador.setTexture('heroi-parado');
         this.jogador.clearTint();
+        this.som('vitoria');   // 🔊🎺 "tá-dá-dááám!"
 
         const segundos = Math.floor((this.time.now - this.tempoInicio) / 1000);
 
@@ -1198,6 +1667,7 @@ export class Jogo extends Phaser.Scene {
         const estaNoChao = this.jogador.body.blocked.down;
         if (apertouPulo && estaNoChao) {
             this.jogador.body.setVelocityY(FORCA_PULO);
+            this.som('pulo');
         }
 
         // ---- TIRO (segurado = atira várias vezes, com cadência) ----
@@ -1292,7 +1762,7 @@ export class Jogo extends Phaser.Scene {
    3) PULO DUPLO: deixe o herói pular de novo no ar (1 vez só).
    4) ESPINGARDA: um tiro que vira 3 balas em leque (use ângulos).
    5) INIMIGO VOADOR: um drone que voa reto e atira para baixo.
-   6) SOM: coloque sons de tiro e explosão (veja a pasta 07-Sounds).
+   6) MÚSICA: crie uma melodia de fundo em loop (som() já mostra como!).
    7) RECORDE: salve a maior pontuação com localStorage.
    8) PAUSA: tecla P pausa e retoma o jogo (this.physics.pause()).
    9) TELA DE PAUSE com texto "PAUSADO" no meio da tela.

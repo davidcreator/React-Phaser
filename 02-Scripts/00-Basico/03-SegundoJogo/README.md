@@ -17,10 +17,14 @@ Esse truque se chama **scroll lateral**, e é o segredo dos jogos
 pula e atira em robôs — e no fim do mapa um **CHEFÃO (tanque)** espera
 por você. 🛢️💥
 
-> 🎨 **A grande sacada desta aula:** não usamos **nenhuma imagem pronta**!
-> Desenhamos **TUDO com código** (retângulos, círculos e triângulos),
-> igual pixel art raiz. O jogo abre em qualquer lugar, sem baixar nada —
-> e você aprende que sprite é só "um desenho que o computador guarda". 🖌️
+> 🎨 **Sprites PNG reais:** o jogo vem com uma pasta `assets/` completa
+> contendo **27 arquivos PNG** (cenário, herói, 3 tipos de inimigos, chefão,
+> projéteis, corações e efeitos visuais). O `preload()` carrega tudo com
+> `this.load.image(...)` — e o código ainda traz o gerador procedural
+> como garantia de segurança! 🖌️🖼️
+> 🔊 **E os sons?** São **sintetizados em código** (Web Audio API) —
+> zero arquivos de áudio pesados! "pew" de tiro, "boom" de explosão,
+> jingle de vitória, som de dano, pulo e **música de fundo chiptune** em loop! 🎵
 
 ---
 
@@ -32,7 +36,8 @@ por você. 🛢️💥
 * O herói **atira**, os inimigos **atiram de volta** (IA simples!);
 * Um **chefão** no fim do mapa, com barra de vida;
 * **Vidas, HUD, game over e vitória** — o loop completo de um jogo;
-* **Parallax** no cenário (céu, nuvens, montanhas em velocidades diferentes).
+* **Parallax** no cenário (céu, nuvens, montanhas em velocidades diferentes);
+* **Sons sintetizados em código** (Web Audio) — sem arquivo de áudio! 🔊
 
 > 🧠 **O que é "run and gun"?** É o gênero de jogos de tiro em 2D onde o
 > personagem **corre e atira** — Metal Slug, Contra, Gunstar Heroes...
@@ -79,39 +84,27 @@ O arquivo `src/scenes/Jogo.js` está dividido em **ETAPAS numeradas**
 | **7** | HUD: vidas, pontos, barra de progresso e barra do chefão |
 | **8** | GAME OVER e VITÓRIA |
 
-### 1) Desenhar com código — o nosso pincel de pixel art 🎨
+### 1) Sprites PNG carregados no preload + gerador procedural 🖼️🎨
 
-Em vez de carregar imagens, desenhamos com quadradinhos coloridos:
+O jogo carrega todos os sprites reais da pasta `assets/`:
 
 ```js
-function pintar(g, cor, x, y, largura, altura) {
-    g.fillStyle(cor, 1);
-    g.fillRect(x, y, largura, altura);
+preload() {
+    this.load.image('ceu', 'assets/ceu.png');
+    this.load.image('chao', 'assets/chao.png');
+    this.load.image('heroi-parado', 'assets/heroi-parado.png');
+    this.load.image('voador-1', 'assets/voador-1.png');
+    this.load.image('pulador-1', 'assets/pulador-1.png');
+    // ... total de 27 sprites na pasta assets/!
 }
 ```
 
-`g` é um `graphics` — uma "folha de papel em branco" (`add: false` =
-não vira objeto do jogo, só desenho). Depois guardamos na memória:
-
-```js
-this.desenharHeroi() {
-    const g = this.novoDesenho();
-    pintar(g, '#2f9e44', 16, 0, 16, 8);    // boina do sargento
-    pintar(g, '#f1c27d', 16, 8, 16, 14);   // rosto
-    // ...vários quadradinhos depois, temos um soldadinho!
-    g.generateTexture('heroi-parado', 48, 64);  // guarda com um apelido
-}
-```
-
-`generateTexture('nome', largura, altura)` guarda o desenho na memória
-do jogo com um **apelido** — depois é só usar `this.add.sprite(x, y,
-'heroi-parado')`! 💾 É assim que se faz pixel art raiz: cada quadradinho
-é um pixel grandão.
-
-> ⚠️ **Detalhe de reinício:** quando o jogo reinicia (tecla R), o
-> `create()` roda de novo. Se tentarmos desenhar as texturas de novo,
-> `generateTexture` com apelido repetido dá aviso no console. Por isso
-> a proteção no começo: `if (this.textures.exists('heroi-parado')) return;`
+A pasta `assets/` tem 27 imagens prontas para você ver, editar no seu
+editor de pixel art favorito ou substituir por suas próprias criações!
+E como bônus educativo, o arquivo `src/scenes/Jogo.js` ainda mantém a
+função `desenharTexturas()`: se você abrir o jogo em um ambiente que
+bloqueia carregamento local de arquivos (CORS no `file://`), o jogo
+**desenha tudo com código na hora** como plano de contingência! 🛡️✨
 
 ### 2) Scroll lateral — o mundo é uma fila gigante 🔄
 
@@ -166,23 +159,31 @@ atirar() {
   criar, reciclar e contar os membros. E fora da tela? `limparBalas()`
   destrói — o jogo não fica lento com bala perdida! 🧹
 
-### 5) Inimigos que nascem, andam e atiram 🤖
+### 5) 3 tipos de inimigos diferentes com IAs únicas 🤖🚁🦘
+
+O jogo conta com **3 tipos de inimigos variados**, cada um com seu próprio
+comportamento, animação e padrão de ataque:
+
+| Inimigo | Tipo | Vida | Pontos | Ataque e Comportamento |
+|---|---|---|---|---|
+| 🤖 **Soldado Robô** | Terrestre | 3 | +100 | Patrulha o chão e atira balas vermelhas retas em direção ao herói. |
+| 🚁 **Drone Voador** | Aéreo | 2 | +150 | Voa sem gravidade, oscila com movimento senoidal, hélice gira e atira plasma verde angulado mirando no herói! |
+| 🦘 **Robô Saltador** | Terrestre | 4 | +200 | Pernas de mola zigzag: resistente, anda e salta alto no ar pulando tiros rasteiros e plataformas! |
 
 ```js
-// nasce um robô a cada 2,2 segundos, FORA da tela, à direita:
-this.timerSpawn = this.time.addEvent({
-    delay: INTERVALO_SPAWN, loop: true, callback: () => this.tentarSpawnarInimigo()
-});
+// Sorteio dinâmico no spawn (40% soldado, 35% drone voador, 25% saltador):
+tentarSpawnarInimigo() {
+    const x = this.cameras.main.scrollX + LARGURA_TELA + Phaser.Math.Between(40, 140);
+    const sorteio = Phaser.Math.Between(1, 100);
+    if (sorteio <= 40) this.criarInimigo(x);
+    else if (sorteio <= 75) this.criarVoador(x, Phaser.Math.Between(260, 370));
+    else this.criarPulador(x);
+}
 ```
 
-A IA do robô é bem simples (e é o suficiente para divertir!):
-
-1. **Patrulha:** anda sempre para a esquerda (vem em direção ao herói);
-2. **Atira** quando o herói está perto (`DISTANCIA_TIRO_INIMIGO = 560`);
-3. Se ficar para trás da tela, **some** (não gasta memória).
-
-> 🧠 **IA** = Inteligência Artificial. Nem precisa ser esperta — precisa
-> ser **justa**! Um robô que atira quando você está perto já parece vivo.
+Cada inimigo derrotado produz partículas na sua própria cor temática
+(laranja no soldado, verde no drone, âmbar no saltador) e exibe os
+pontos flutuantes correspondentes! 💥✨
 
 ### 6) Dano — quem acertou, acertou! 💥
 
@@ -223,7 +224,36 @@ this.chefao.body.setAllowGravity(false); // ⚠️ sem gravidade!
 > fica "em pé" na altura do chão e anda só com a velocidade. O chefão
 > tem **30 de vida** e uma **barra vermelha no topo** quando aparece.
 
-### 8) Game over e vitória — o jogo tem começo, meio e fim 🏁
+### 8) Sons sintetizados — sem arquivo de áudio 🔊
+
+Os efeitos sonoros também são **feitos em código**, com a **Web Audio API**:
+um oscilador é como uma "voz" do computador que toca uma frequência —
+som nada mais é do que **onda sonora**, igual uma flauta ou um trovão! 🎵
+
+```js
+// dentro de som('tiro') — o "pew!" do herói:
+const osc = ctx.createOscillator();          // a "voz"
+osc.type = 'sawtooth';
+osc.frequency.setValueAtTime(950, agora);     // começa agudo...
+osc.frequency.exponentialRampToValueAtTime(140, agora + 0.12);  // ...e desce!
+osc.connect(envelope(0.1, 0.14)).connect(ctx.destination);
+osc.start(agora);
+osc.stop(agora + 0.16);
+```
+
+* `criarSons()` cria o `AudioContext` (o "estúdio de som") **uma vez só** —
+  se a cena reiniciar (R), reaproveitamos o mesmo;
+* `som('explosao')` usa **ruído branco** (um chiado aleatório) passando por
+  um filtro, mais um "bum" grave — é assim que se faz barulho de bomba!
+* A **vitória** toca 3 notas subindo (Dó-Mi-Sol) e o **game over**,
+  3 notas descendo. 🎺
+* 🎶 E tem **música de fundo**! `tocarMusica()` toca uma melodia de 8
+  notas em loop (um "chiptune"), começando na 1ª tecla e parando
+  sozinha no game over / vitória.
+* ⚠️ O navegador só deixa tocar áudio depois da **1ª tecla/clique** —
+  por isso destravamos no 1º `keydown`/`pointerdown`.
+
+### 9) Game over e vitória — o jogo tem começo, meio e fim 🏁
 
 ```js
 // vitória (chefão destruído):
@@ -256,6 +286,10 @@ this.input.keyboard.on('keydown-R', () => {
 | **chefão (boss)** | O inimigo grandão do fim da fase. |
 | **imóvel (immovable)** | Um corpo que outros corpos não conseguem empurrar. |
 | **invencibilidade** | Um tempo em que o herói não pode levar dano de novo. |
+| **som (sound)** | Efeito sonoro — aqui, sintetizado em código (Web Audio). |
+| **oscilador (oscillator)** | A "voz" que gera uma onda sonora numa certa frequência. |
+| **ruído (noise)** | Som aleatório ("chiado") — a base das explosões! |
+| **envelope** | Como o volume de um som nasce e morre (o ganho). |
 
 ---
 
@@ -271,6 +305,9 @@ this.input.keyboard.on('keydown-R', () => {
    esperar 1 segundo para "recarregar". (Dica: um contador + `delayedCall`.)
 6. **Personalize!** Troque as cores do tanque, desenhe um segundo chefão,
    mude o céu para noite. O jogo é seu. 🌙
+7. **Mude a trilha!** A música de fundo já existe (`tocarMusica()`) —
+   troque as notas do array `melodia` e componha a sua. E **mude o som
+   do tiro** até virar um laser espacial! 🔫👽🎶
 
 ---
 
@@ -286,6 +323,7 @@ this.input.keyboard.on('keydown-R', () => {
 | O HUD some quando a câmera anda | Faltou `setScrollFactor(0)` nos objetos do HUD. |
 | O jogo fica lento depois de jogar um tempo | Faltou limpar as balas que saem da tela (`limparBalas()`). |
 | O herói continua andando depois do game over | Falta o `if (this.acabou \|\| this.vitorioso) return;` no começo do `update()`. |
+| Não sai som no navegador | É a regra de "autoplay": o áudio só destrava depois da **1ª tecla ou clique**. Jogue normalmente — o som aparece! (Se ainda não sair, confira se `criarSons()` rodou no `create()`.) |
 
 ---
 
@@ -296,6 +334,7 @@ this.input.keyboard.on('keydown-R', () => {
 - [ ] Existe um chefão no fim do mapa, com barra de vida.
 - [ ] Tem HUD com vidas, pontos e progresso.
 - [ ] Perder todas as vidas dá game over; destruir o chefão dá vitória.
+- [ ] Meu jogo tem sons (tiro, explosão, vitória...). 🔊
 - [ ] Dá para jogar de novo apertando R.
 - [ ] Consigo explicar o que é `generateTexture` e `scrollFactor`. 🎨
 - [ ] Personalizei o jogo do meu jeito. 🪖

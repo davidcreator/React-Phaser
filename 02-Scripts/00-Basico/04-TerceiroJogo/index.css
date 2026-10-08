@@ -1,0 +1,38 @@
+* { box-sizing: border-box; }
+
+html, body { min-width: 320px; min-height: 100%; margin: 0; }
+
+body {
+  background: radial-gradient(circle at 50% 0%, #18314a 0, #0b1725 62%, #07101a 100%);
+  color: #eef6ff;
+  font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+}
+
+.pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+}
+
+.cabecalho { width: min(1280px, 100%); text-align: center; }
+.cabecalho .etiqueta { margin: 0 0 4px; color: #5eead4; font-size: .75rem; font-weight: 800; letter-spacing: .18em; }
+.cabecalho h1 { margin: 0; color: #fff; font-size: clamp(1.55rem, 3vw, 2.35rem); line-height: 1.1; }
+.cabecalho h1 span { color: #fde047; }
+.cabecalho p:last-child { margin: 6px 0 0; color: #cbd5e1; font-size: .95rem; }
+
+#game-container { width: min(1280px, 100%); aspect-ratio: 16 / 9; overflow: hidden; border: 2px solid rgba(148, 163, 184, .35); border-radius: 14px; background: #82d7f5; box-shadow: 0 20px 55px rgba(0, 0, 0, .42); }
+#game-container canvas { display: block; width: 100% !important; height: 100% !important; image-rendering: pixelated; }
+
+.rodape { margin: 0; color: #9fb1c4; font-size: .78rem; text-align: center; }
+kbd { padding: 2px 6px; border: 1px solid #506174; border-radius: 5px; background: #172638; color: #fff; }
+
+@media (max-width: 640px) {
+  .pagina { padding: 8px; gap: 6px; }
+  .cabecalho p:last-child { font-size: .8rem; }
+  .rodape { font-size: .68rem; }
+  #game-container { border-radius: 8px; }
+}
